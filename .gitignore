@@ -3,6 +3,10 @@
 .env.local
 *.env
 
+# credential / runtime databases (contain password hashes + sessions)
+data/app.db*
+
+
 # deps / build
 node_modules/
 dist/

@@ -17,6 +17,8 @@
     "ingest:local": "node scripts/expand-drive.mjs && node scripts/fetch-meta.mjs && node scripts/enrich-local.mjs && node scripts/build-data.mjs && node scripts/validate.mjs",
     "validate": "node scripts/validate.mjs",
     "test": "node scripts/smoke.mjs",
+    "migrate": "node scripts/migrate.mjs",
+    "server": "node server.mjs",
     "serve": "node scripts/serve.mjs",
     "deploy": "echo \"Push main branch; enable GitHub Pages on /(root) or use gh-pages branch\""
   },
