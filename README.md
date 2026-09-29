@@ -1,100 +1,97 @@
-# SEHS Study Directory — Link/Data Directory
+# SEHS Study Directory — secure study-resource platform
 
-Vanilla static searchable directory built from Google Drive folders. Dataset is generated locally and embedded as static JSON — the deployed site makes **zero** Gemini/API calls.
+Searchable directory of SEHS selective-entry study resources with password-gated
+access tiers, per-session Terms acceptance, and an admin console. Zero dependencies
+(plain Node 22+ with `node:sqlite`), no build step, no client-side secrets.
 
-Live data: `data/links.json` (1,641 records) + `data/categories.json`. Open `index.html` or `npm run serve`.
+Live dataset: 1,641 resources (seeded from `data/links.json`, served from SQLite —
+clients never receive raw storage URLs or folder IDs).
 
 ## Project structure
 
 ```
-source-data/drive-folders.txt   # 1. SOURCE: 11 supplied Drive URLs
-source-data/drive-files.json    # expanded file listing (generated)
-source-data/urls.txt            # deduped URLs (generated)
-scripts/expand-drive.mjs        # 2a. INGESTION: recurse Drive folders via Drive API
-scripts/fetch-meta.mjs          # 2b. HTTP reachability + title/meta/OG/JSON-LD
-scripts/enrich-gemini.mjs       # 2c. Gemini classification/summary (needs Generative Language API)
-scripts/enrich-local.mjs        # 2c-alt. No-key heuristic enrichment from Drive filenames
-scripts/build-data.mjs          # 3. GENERATED: data/links.json + data/categories.json
-scripts/validate.mjs            # checks duplicates, URLs, schema
-scripts/ingest.mjs              # orchestrator with --initial/--update/--refresh/--retry-failed
-state/fetch.json, state/enriched.json  # checkpoints for resume (not committed)
-index.html, styles.css, app.js, search.js  # 4. FRONTEND: relevance search engine + filters/sort/paginate/discovery
-data/                           # committed production dataset
+server.mjs                  # platform server: pages + JSON API + access gateway
+server/db.mjs               # SQLite schema + open helpers (node:sqlite)
+server/crypto.mjs           # scrypt passwords, sessions, rate limits, lockouts
+server/content.mjs          # tier-aware index + strict public serializers
+server/templates.mjs        # shared SSR layout + components (escaped)
+server/pages.mjs            # /, /search, /r/:id, /subjects, /providers, /about, /unlock, /saved
+server/admin.mjs            # admin API + dashboard/resources/audit/settings pages
+search.js                   # local relevance engine (shared browser + server)
+theme.js gate.js open.js    # client: theme, consent/terms gates, grant open flow
+ux.js suggest.js            # client: bookmarks/density/recents, autocomplete
+search-page.js record.js unlock.js admin.js  # page-specific clients
+scripts/migrate.mjs         # links.json → SQLite (new 128-bit public IDs)
+scripts/smoke.mjs           # npm test: dataset + engine + wiring checks
+source-data/                # original Drive inputs + expansion output
+scripts/expand-drive.mjs …  # ingestion pipeline (unchanged, see below)
+data/links.json             # seed dataset (server-side only, never shipped to clients)
+data/app.db*                # runtime DB (gitignored — holds password hashes + sessions)
+state/id-map.json           # old→new ID map (gitignored, server-only)
 ```
 
-## Install
+## Quick start
 
 ```powershell
 cd C:\sehs
-npm install   # no deps currently; Node >= 18 required
+npm install   # no deps; Node >= 22 required (node:sqlite)
+
+# First run only: build the database (generates viewer+admin passwords once,
+# or set SEHS_VIEWER_PASSWORD / SEHS_ADMIN_PASSWORD beforehand)
+$env:SEHS_VIEWER_PASSWORD="..."   # optional; omit to auto-generate
+$env:SEHS_ADMIN_PASSWORD="..."
+node scripts/migrate.mjs [--reset]
+
+npm run server   # http://localhost:8080
 ```
 
-## API keys (important)
+Open `http://localhost:8080`, accept cookies, search, open `/unlock` for the
+member/admin areas. Re-running `migrate.mjs` without `--reset` keeps passwords.
 
-- The key supplied during build (`AIza...`, project `1069633021613`) is a **Drive API key**, not Gemini-enabled. Drive expansion works; Gemini returns `403 generativelanguage.googleapis.com ... PERMISSION_DENIED / API_KEY_SERVICE_BLOCKED`.
-- To enable AI summaries: enable **Generative Language API** in that GCP project, or create a Gemini key in Google AI Studio, then rotate the old key (it was exposed in chat).
-- Never commit keys. Ingestion reads env only:
+## Routes
+
+- `/`, `/search?q=&cat=&provider=&type=&year=&sort=&page=&per=&view=`, `/r/:id`
+- `/subjects`, `/providers`, `/about`, `/unlock`, `/saved` (local bookmarks)
+- `/api/search`, `/api/suggest`, `/api/by-ids`, `/api/session`, `/api/stats`
+- `/api/unlock`, `/api/logout`, `/api/consent`, `/api/terms`, `/api/terms/accept`
+- `/api/access/:id` → `{openUrl: /open/:token}` → single-use grant → 302
+- `/admin`, `/admin/resources`, `/admin/audit`, `/admin/settings` + `/api/admin/*`
+
+## Security model (summary)
+
+- Two generated passwords (viewer/admin), `scrypt` hashes + salts, `timingSafeEqual`.
+- HTTPOnly/Secure/SameSite=Lax sessions (viewer 7d, admin 12h); server checks on
+  every privileged request; uniform 404s (no enumeration oracle).
+- Unlock rate-limited + escalating lockouts; CSRF header on API mutations; 100KB
+  payload caps; security headers incl. same-origin CSP.
+- Cookie hard block + per-session Terms gate, both enforced server-side on
+  unlock/access — not just hidden UI.
+- Members-only rows fully omitted from anonymous responses (search, pages,
+  suggestions, hydration). Rotation revokes role sessions.
+- Analytics: hashed IPs, 30-day raw auto-purge (configurable), aggregates kept.
+- Never commit: `.env`, `data/app.db*`, `state/`. No secrets in responses/bundles.
+
+## Validate & test
 
 ```powershell
-$env:GEMINI_API_KEY="YOUR_NEW_GEMINI_KEY"
-$env:DRIVE_API_KEY=$env:GEMINI_API_KEY   # or a separate Drive key
-$env:GEMINI_MODEL="gemini-2.0-flash"
+npm run validate   # dataset schema checks
+npm test           # 17 smoke checks (dataset + engine + wiring)
 ```
 
-`.env` is gitignored; see `.env.example`.
-
-## Run ingestion
+## Ingestion (unchanged legacy pipeline)
 
 ```powershell
-# Full local pipeline (no Gemini needed) — what built the current dataset:
-npm run ingest:local
-
-# Full Gemini pipeline (needs Generative Language API enabled):
-npm run expand
-npm run fetch
-npm run enrich -- --limit=50        # test batch
-npm run enrich                      # all remaining (checkpointed)
-npm run build:data
-npm run validate
-
-# Or orchestrated:
-npm run ingest -- --update          # default: only new URLs
-npm run ingest -- --initial         # reprocess all
-npm run ingest -- --refresh         # refresh stale (>30d) + new
-npm run ingest -- --retry-failed    # retry Gemini failures only
+npm run ingest:local   # expand → fetch → enrich → build data/links.json
 ```
 
-What each step logs (no secrets in logs): total, expanded, success, gemini failures, inaccessible, duplicates, redirects, invalid, remaining → `logs/*-summary.json`.
+After re-ingestion, re-run `node scripts/migrate.mjs --reset` (passwords preserved
+only without `--reset`; with `--reset`, set env passwords again). Drive API notes:
+the build-time key supplied earlier is Drive-only (project `1069633021613`);
+Gemini enrichment needs Generative Language API enabled. Never commit keys.
 
-## Update dataset
+## Deploy notes
 
-- Add URLs to `source-data/drive-folders.txt`, run `npm run ingest -- --update`.
-- Refresh AI summaries after enabling Gemini: `$env:GEMINI_API_KEY="..."; node scripts/enrich-gemini.mjs --refresh; npm run build:data`.
-
-## Validate
-
-```powershell
-npm run validate
-# checks: invalid URLs, duplicate id/url, bad confidence/status/date, placeholder text
-```
-
-## Build / deploy (GitHub Pages)
-
-Site is fully static — no build step.
-
-```powershell
-npm run serve   # http://localhost:8080
-```
-
-Deploy:
-1. `git init; git add .; git commit -m "link directory"; gh repo create --public --source=. --push`
-2. Repo Settings → Pages → Deploy from branch → `main` / `(root)`.
-3. Ensure `data/links.json` is committed; `.env`, `state/`, `node_modules/`, `logs/*.log` stay ignored.
-
-## Where data lives
-
-- Generated + committed: `data/links.json`, `data/categories.json`
-- Raw: `source-data/drive-files.json`
-- Checkpoints (gitignored): `state/fetch.json`, `state/enriched.json`
-
-Each record keeps `url` (original), `driveId/driveName`, `status` (`active/redirected/unavailable/timeout/blocked/unknown`), `metadataSource` (`extracted+heuristic` vs `gemini` vs `fallback`), `confidence`, `lastChecked`. Failed URLs are never deleted.
+Needs a Node host with persistent disk (VPS / Render / Fly / Railway) — GitHub
+Pages cannot host the backend. Set `PORT`, `APP_SECURE=1` (behind TLS),
+`APP_DB` (optional path), SMTP later for email (not yet wired). Reverse-proxy
+should forward real client IPs (`X-Forwarded-For` is honoured for rate limits).
