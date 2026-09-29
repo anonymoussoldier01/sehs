@@ -47,8 +47,7 @@ function sendHtml(res, code, html) {
   res.writeHead(code, { 'Content-Type': 'text/html; charset=utf-8' });
   res.end(html);
 }
-function clientIp(req) {
-  const fwd = req.headers['x-forwarded-for'];
+function clientIp(req) {  const fwd = req.headers['x-forwarded-for'];
   const ip = (typeof fwd === 'string' ? fwd.split(',')[0] : req.socket.remoteAddress) || 'unknown';
   return ip.trim().slice(0, 80);
 }
@@ -141,8 +140,77 @@ function readBody(req, maxBytes = 100 * 1024) {
   });
 }
 
+// ---- consent + terms ---------------------------------------------------------------
+function consentGiven(req) {
+  const c = parseCookies(req.headers.cookie).sehs_consent || '';
+  return c === 'v1' || c.startsWith('v1|');
+}
+function consentCookie(secure) {
+  const v = `v1|${new Date().toISOString().slice(0, 10)}`;
+  const parts = [`sehs_consent=${v}`, 'Path=/', 'SameSite=Lax', 'Max-Age=31536000'];
+  if (secure) parts.push('Secure');
+  return parts.join('; ');
+}
+function clearConsentCookie(secure) {
+  const parts = ['sehs_consent=', 'Path=/', 'SameSite=Lax', 'Max-Age=0'];
+  if (secure) parts.push('Secure');
+  return parts.join('; ');
+}
+function currentTermsVersion() {
+  return Number(getMeta(db, 'terms_version') || 1);
+}
+async function apiConsent(req, res) {
+  let body;
+  try { body = JSON.parse(await readBody(req, 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+  if (body.accept === true) {
+    logEvent('consent', { data: { accept: true } });
+    secureHeaders(res);
+    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Set-Cookie': consentCookie(SECURE) });
+    res.end(JSON.stringify({ ok: true }));
+    return;
+  }
+  // withdraw: clear consent + kill session
+  const cookies = parseCookies(req.headers.cookie);
+  if (cookies.sehs_session) {
+    try { db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(tokenHash(cookies.sehs_session)); } catch { /* noop */ }
+  }
+  logEvent('consent', { data: { accept: false } });
+  secureHeaders(res);
+  res.writeHead(200, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Set-Cookie': [clearConsentCookie(SECURE), clearSessionCookie(SECURE)],
+  });
+  res.end(JSON.stringify({ ok: true, withdrawn: true }));
+}
+function apiTerms(_req, res) {
+  const v = currentTermsVersion();
+  const row = db.prepare('SELECT version, body_md, summary_md FROM terms WHERE version = ?').get(v);
+  if (!row) return sendJson(res, 500, { ok: false, error: 'unavailable' });
+  return sendJson(res, 200, { version: row.version, summary: row.summary_md, body: row.body_md });
+}
+function apiTermsStatus(_req, res, session) {
+  const v = currentTermsVersion();
+  const row = session.fresh ? null : db.prepare('SELECT terms_version FROM sessions WHERE token_hash = ?').get(tokenHash(session.token));
+  const accepted = !!row && Number(row.terms_version) >= v;
+  return sendJson(res, 200, { ok: true, accepted, version: v });
+}
+function apiTermsAccept(_req, res, session) {
+  if (session.fresh) return sendJson(res, 401, { ok: false, error: 'Session required.' });
+  const v = currentTermsVersion();
+  db.prepare('UPDATE sessions SET terms_version = ?, last_seen_at = ? WHERE token_hash = ?')
+    .run(v, nowIso(), tokenHash(session.token));
+  logEvent('terms_accept', { data: { version: v } });
+  return sendJson(res, 200, { ok: true, version: v });
+}
+function termsAccepted(session) {
+  if (session.fresh) return false;
+  const row = db.prepare('SELECT terms_version FROM sessions WHERE token_hash = ?').get(tokenHash(session.token));
+  return !!row && Number(row.terms_version) >= currentTermsVersion();
+}
+
 // ---- API handlers ------------------------------------------------------------------
 async function apiUnlock(req, res, session, ip) {
+  if (!consentGiven(req)) return sendJson(res, 403, { ok: false, consentRequired: true, error: 'Please accept cookies first.' });
   if (!rlUnlock.allow('u:' + ip).ok) {
     logEvent('lockout', { data: { endpoint: 'unlock' } });
     return sendJson(res, 429, { ok: false, error: 'Too many attempts. Try again shortly.' });
@@ -201,6 +269,10 @@ function apiMissing(res) {
 }
 
 async function apiAccess(_req, res, session, ip, publicId) {
+  if (!consentGiven(_req)) return sendJson(res, 403, { ok: false, consentRequired: true, error: 'Please accept cookies first.' });
+  if (!termsAccepted(session)) {
+    return sendJson(res, 403, { ok: false, termsRequired: true, version: currentTermsVersion(), error: 'Please accept the Terms & Conditions first.' });
+  }
   const rl = rlAccess.allow('a:' + (session.token || ip));
   if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Too many requests. Slow down.' });
   const row = findResource(publicId);
@@ -214,10 +286,8 @@ async function apiAccess(_req, res, session, ip, publicId) {
     logEvent('open_denied', { resourceId: row.id, data: { reason: 'unavailable' } });
     return sendJson(res, 410, { ok: false, error: 'This resource is temporarily unavailable.' });
   }
-  // Terms gate lands in P2 — placeholder check (sessions created before terms exist get version 0):
-  // const termsV = Number(getMeta(db, 'terms_version') || 1);
-  const token = newToken(24);
-  const now = nowIso();
+  // Consent + Terms already enforced above — only authorised sessions reach here.
+  const token = newToken(24);  const now = nowIso();
   db.prepare(`INSERT INTO grants(token, resource_id, session_hash, created_at, expires_at, used_at)
     VALUES (?, ?, ?, ?, ?, NULL)`)
     .run(token, row.id, session.fresh ? null : tokenHash(session.token),
@@ -321,6 +391,10 @@ const server = http.createServer(async (req, res) => {
       }
       if (url.pathname === '/api/unlock' && req.method === 'POST') return apiUnlock(req, res, session, ip);
       if (url.pathname === '/api/logout') return apiLogout(req, res, session);
+      if (url.pathname === '/api/consent' && req.method === 'POST') return apiConsent(req, res);
+      if (url.pathname === '/api/terms' && req.method === 'GET') return apiTerms(req, res);
+      if (url.pathname === '/api/terms/status' && req.method === 'GET') return apiTermsStatus(req, res, session);
+      if (url.pathname === '/api/terms/accept' && req.method === 'POST') return apiTermsAccept(req, res, session);
       const m = url.pathname.match(/^\/api\/access\/([A-Za-z0-9_-]{1,64})$/);
       if (m && req.method === 'POST') return apiAccess(req, res, session, ip, m[1]);
       return sendJson(res, 404, { ok: false, error: 'Not found.' });

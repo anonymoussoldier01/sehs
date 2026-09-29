@@ -295,8 +295,8 @@ export function aboutPage(ctx) {
     <p style="color:var(--mut)">A searchable collection of ${Number(n).toLocaleString()} SEHS selective-entry study resources — practice papers, notes, homework and tests. Search runs on our own index; opening a resource takes you to its hosted file.</p>
     <h2 style="font-size:16px;margin-top:24px">Access</h2>
     <p style="color:var(--mut)">Most resources are open to everyone. Some are members-only: ask your administrator for the member password, then <a href="/unlock">unlock access</a>. You will be asked to accept the Terms &amp; Conditions when you open your first resource each visit.</p>
-    <h2 style="font-size:16px;margin-top:24px">Privacy</h2>
-    <p style="color:var(--mut)">There is no third-party tracking or advertising. We log the minimum needed to operate access control. See <a href="/unlock">access</a> for cookie details.</p></div>`;
+    <h2 style="font-size:16px;margin-top:24px">Privacy &amp; cookies</h2>
+    <p style="color:var(--mut)">There is no third-party tracking or advertising. Entry requires accepting essential cookies (consent record, session if you unlock, on-device preferences). We log the minimum needed to operate access control, and raw usage statistics auto-purge after 30 days. You can withdraw consent anytime via “Cookie settings” in the footer.</p></div>`;
   return layout({ title: 'About', body, active: '/about', session });
 }
 

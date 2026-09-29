@@ -49,10 +49,41 @@ ${extraHead}
     <h2>About this directory</h2>
     <p>A searchable collection of SEHS selective-entry study resources. Search runs on our index — opening a resource takes you to its hosted file.</p>
   </div>
-  <div class="foot-actions"><a class="link-btn" href="/about">About</a><a class="link-btn" href="/unlock">Access</a></div>
+  <div class="foot-actions"><a class="link-btn" href="/about">About</a><a class="link-btn" href="/unlock">Access</a><button class="link-btn" id="cookie-settings">Cookie settings</button></div>
 </footer>
+<div class="modal-backdrop" id="consent-gate" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="consent-title">
+    <h2 id="consent-title">Cookies required to enter</h2>
+    <p style="color:var(--mut)">This site needs to store a small amount of data in your browser to work at all. No tracking, no ads, no third parties — ever.</p>
+    <ul style="color:var(--mut);font-size:14px;padding-left:20px">
+      <li><strong>Consent record</strong> — remembers you accepted (12 months).</li>
+      <li><strong>Session</strong> — only if you unlock access or open resources.</li>
+      <li><strong>Preferences</strong> — theme and layout, on this device only.</li>
+    </ul>
+    <div id="consent-details" hidden>
+      <p style="color:var(--mut);font-size:13.5px">We do not use analytics, advertising, or cross-site tracking cookies. Sessions expire automatically (members 7 days, admins 12 hours). You can withdraw consent anytime via “Cookie settings” in the footer, which wipes local data and ends sessions. Raw usage statistics, if enabled, are auto-purged after 30 days.</p>
+    </div>
+    <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+      <button class="btn" id="consent-accept">Accept &amp; enter</button>
+      <button class="btn secondary" id="consent-details-toggle">Cookie details</button>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop" id="terms-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="terms-title">
+    <h2 id="terms-title">Terms &amp; Conditions <span id="terms-version" style="font-size:13px;color:var(--faint)"></span></h2>
+    <p id="terms-summary" style="color:var(--mut);font-weight:600"></p>
+    <div id="terms-body" style="max-height:40vh;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--mut)"></div>
+    <label class="check-row" style="margin-top:12px"><input type="checkbox" id="terms-agree"> <span>I have read and agree to these Terms &amp; Conditions</span></label>
+    <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+      <button class="btn" id="terms-accept">Accept &amp; continue</button>
+      <button class="btn secondary" id="terms-decline">Decline</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 <script src="/theme.js" defer></script>
+<script src="/gate.js" defer></script>
 </body>
 </html>`;
 }
