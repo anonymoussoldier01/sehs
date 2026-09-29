@@ -3,88 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SEHS Study Directory — Searchable Link Library</title>
-<meta name="description" content="Searchable directory of selective-entry study materials: maths, verbal reasoning, reading, writing, science.">
-<link rel="stylesheet" href="styles.css">
+<title>SEHS Study Directory — 1,641 Searchable Practice Files</title>
+<meta name="description" content="Searchable directory of selective-entry study materials: maths, numerical reasoning, verbal reasoning, reading, writing, science. ACER, JAC, Spectrum, VSSE, EduKingdom, Pearson.">
+<meta name="theme-color" content="#4f46e5">
 <link rel="icon" href="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="topbar">
+<a class="skip" href="#results">Skip to results</a>
+
+<header class="topbar" role="banner">
   <div class="wrap topbar-inner">
-    <div>
-      <h1>SEHS Study Directory</h1>
-      <p class="sub"><span id="stat-total">…</span> files &amp; folders · locally searchable · no login</p>
+    <a class="brand" href="#" id="brand-home" aria-label="SEHS Study Directory home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="30" height="30"><rect x="2" y="2" width="28" height="28" rx="8" fill="#4f46e5"/><path d="M10 12.5A6 6 0 0 1 22 12.5c0 4-4.5 4.5-4.5 8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="17.5" cy="23.5" r="1.6" fill="#fff"/></svg>
+      </span>
+      <span class="brand-text"><strong>SEHS Study Directory</strong><small id="stat-total">Loading…</small></span>
+    </a>
+    <div class="searchbox" role="search">
+      <svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Search 1,641 files — try “VSSE maths answers”…" autocomplete="off" aria-label="Search links" aria-describedby="search-hint">
+      <kbd id="search-hint" title="Press / to focus">/</kbd>
+      <button id="clear" class="icon-btn" title="Clear search" aria-label="Clear search" hidden>✕</button>
     </div>
-    <div class="searchbox">
-      <input id="q" type="search" placeholder="Search title, tags, provider, subject…  ( / )" autocomplete="off" aria-label="Search links">
-      <button id="clear" title="Clear search">✕</button>
+    <div class="top-actions">
+      <button id="filters-toggle" class="btn secondary only-mobile" aria-expanded="false" aria-controls="filters">Filters</button>
+      <button id="theme-toggle" class="icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" aria-pressed="false">◐</button>
     </div>
+  </div>
+  <div class="wrap quick-row" aria-label="Quick searches">
+    <span class="quick-label">Popular:</span>
+    <div class="quick-chips" id="quick-chips"></div>
   </div>
 </header>
 
+<section class="wrap hero" aria-label="Library overview">
+  <div class="hero-card">
+    <div class="hero-main">
+      <h1>Every practice file, finally findable.</h1>
+      <p>Search across <strong id="hero-count">1,641</strong> selective-entry files and folders — maths, numerical reasoning, reading, writing, science — from ACER, JAC, Spectrum, VSSE and more. Everything runs locally from <code>data/links.json</code>.</p>
+      <div class="hero-stats" id="hero-stats" aria-live="polite"></div>
+    </div>
+    <div class="hero-side">
+      <div class="stat-tile"><span class="stat-num" id="st-files">–</span><span class="stat-lbl">files</span></div>
+      <div class="stat-tile"><span class="stat-num" id="st-folders">–</span><span class="stat-lbl">folders</span></div>
+      <div class="stat-tile"><span class="stat-num" id="st-answers">–</span><span class="stat-lbl">with answers</span></div>
+      <div class="stat-tile"><span class="stat-num" id="st-pdf">–</span><span class="stat-lbl">PDFs</span></div>
+    </div>
+  </div>
+</section>
+
 <div class="wrap layout">
-  <aside class="filters" aria-label="Filters">
-    <div class="f-group">
-      <label for="f-cat">Category</label>
-      <select id="f-cat"><option value="">All categories</option></select>
+  <aside class="filters" id="filters" aria-label="Filters">
+    <div class="filters-head">
+      <h2>Filters</h2>
+      <button id="reset" class="link-btn">Reset all</button>
     </div>
-    <div class="f-group">
-      <label for="f-type">Content type</label>
-      <select id="f-type"><option value="">All types</option></select>
-    </div>
-    <div class="f-group">
-      <label for="f-domain">Domain</label>
-      <select id="f-domain"><option value="">All domains</option></select>
-    </div>
-    <div class="f-group">
-      <label for="f-status">Status</label>
-      <select id="f-status">
-        <option value="">Any status</option>
-        <option value="active">active</option>
-        <option value="redirected">redirected</option>
-        <option value="unavailable">unavailable</option>
-        <option value="timeout">timeout</option>
-        <option value="blocked">blocked</option>
-        <option value="unknown">unknown</option>
-      </select>
-    </div>
-    <div class="f-group">
-      <label for="f-tag">Tag</label>
-      <select id="f-tag"><option value="">All tags</option></select>
-    </div>
-    <div class="f-group">
-      <label for="f-sort">Sort</label>
-      <select id="f-sort">
-        <option value="relevance">Best match</option>
-        <option value="title">Title A–Z</option>
-        <option value="newest">Recently modified</option>
-        <option value="domain">Domain</option>
-      </select>
-    </div>
-    <button id="reset" class="btn ghost">Reset filters</button>
-    <p class="hint">Dataset: <code>data/links.json</code> · generated locally.<br>Tip: try <button class="chiplink" data-q="vsse">vsse</button> <button class="chiplink" data-q="answers">answers</button> <button class="chiplink" data-q="numerical">numerical</button></p>
+    <div id="active-chips" class="active-chips" aria-live="polite"></div>
+
+    <details class="f-section" open>
+      <summary>Subject / Category <span class="count-pill" id="cnt-cat"></span></summary>
+      <div class="check-list" id="facet-cat" role="group" aria-label="Category"></div>
+    </details>
+    <details class="f-section" open>
+      <summary>File type</summary>
+      <div class="check-list" id="facet-type" role="group" aria-label="Content type"></div>
+    </details>
+    <details class="f-section" open>
+      <summary>Provider</summary>
+      <div class="check-list" id="facet-provider" role="group" aria-label="Provider"></div>
+      <div class="tag-cloud" id="tag-cloud" aria-label="Top tags"></div>
+    </details>
+    <details class="f-section">
+      <summary>More options</summary>
+      <div class="f-group">
+        <label for="f-tag">Tag</label>
+        <select id="f-tag"><option value="">All tags</option></select>
+      </div>
+      <div class="f-group">
+        <label for="f-status">Status</label>
+        <select id="f-status">
+          <option value="">Any status</option>
+          <option value="active">active</option>
+          <option value="redirected">redirected</option>
+          <option value="unavailable">unavailable</option>
+          <option value="timeout">timeout</option>
+          <option value="blocked">blocked</option>
+          <option value="unknown">unknown</option>
+        </select>
+      </div>
+      <label class="check-row"><input type="checkbox" id="f-answers"> <span>Answers included only</span></label>
+      <label class="check-row"><input type="checkbox" id="f-hide-img"> <span>Hide screenshots / images</span></label>
+    </details>
+    <p class="hint">Static dataset · <code>data/links.json</code><br><span id="stat-meta"></span></p>
   </aside>
 
-  <main>
+  <main id="results" aria-label="Results">
     <div class="toolbar">
       <span id="stat-showing" aria-live="polite">Loading…</span>
-      <div class="pager" id="pager-top"></div>
+      <div class="toolbar-right">
+        <div class="seg" role="group" aria-label="View">
+          <button id="view-grid" class="seg-btn is-on" aria-pressed="true" title="Grid view">▦</button>
+          <button id="view-list" class="seg-btn" aria-pressed="false" title="List view">☰</button>
+        </div>
+        <label class="sort-wrap">Sort
+          <select id="f-sort" aria-label="Sort results">
+            <option value="relevance">Best match</option>
+            <option value="title">Title A–Z</option>
+            <option value="newest">Recently modified</option>
+            <option value="answers">Answers first</option>
+          </select>
+        </label>
+        <label class="sort-wrap">Show
+          <select id="f-per" aria-label="Results per page">
+            <option value="24">24</option>
+            <option value="48">48</option>
+            <option value="96">96</option>
+          </select>
+        </label>
+      </div>
     </div>
-    <div id="grid" class="grid"></div>
+    <div class="pager" id="pager-top" aria-label="Pagination top"></div>
+    <div id="grid" class="grid" aria-live="polite"></div>
+    <div id="skeleton" class="grid" hidden aria-hidden="true"></div>
     <div id="empty" class="empty" hidden>
-      <h2>No results</h2>
-      <p>Try a shorter query or clear a filter. The directory searches title, description, tags, category, keywords, site name and domain.</p>
-      <button class="btn" id="empty-reset">Clear search &amp; filters</button>
+      <div class="empty-ico" aria-hidden="true">🔍</div>
+      <h2>No matches found</h2>
+      <p id="empty-msg">Try fewer words, check spelling, or clear a filter. Search covers titles, descriptions, tags, providers and subjects.</p>
+      <div class="empty-actions">
+        <button class="btn" id="empty-reset">Clear search &amp; filters</button>
+        <button class="btn secondary" id="empty-browse">Browse everything</button>
+      </div>
+      <div class="empty-suggest">Try: <span id="empty-chips"></span></div>
     </div>
-    <div class="toolbar bottom">
-      <div class="pager" id="pager-bottom"></div>
-    </div>
+    <div class="pager bottom" id="pager-bottom" aria-label="Pagination bottom"></div>
   </main>
 </div>
 
 <footer class="wrap foot">
-  <span>Static directory · data in <code>data/links.json</code> · <span id="stat-meta"></span></span>
+  <span>Static directory · no tracking · data in <code>data/links.json</code></span>
+  <span class="foot-right"><button class="link-btn" id="copy-link">Copy share link</button> · <button class="link-btn" id="export-csv">Export CSV</button></span>
 </footer>
+
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <button class="icon-btn modal-x" id="modal-x" aria-label="Close details">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
 <script src="app.js" defer></script>
 </body>
