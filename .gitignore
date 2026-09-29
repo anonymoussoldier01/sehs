@@ -8,9 +8,9 @@ node_modules/
 dist/
 .tmp/
 
-# ingestion runtime (regenerable, may contain large caches)
-state/cache/
-state/progress.json
+# ingestion runtime (regenerable checkpoints/caches — keep local only)
+state/
+!state/.gitkeep
 logs/*.log
 !logs/.gitkeep
 
