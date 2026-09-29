@@ -10,9 +10,10 @@ import {
   rateLimiter, lockoutTracker, ipHash, uaFamily,
 } from './server/crypto.mjs';
 import { buildIndexes, forRole, loadRows, publicView } from './server/content.mjs';
+import { autoDecks, adminDecks, deckCards } from './server/decks.mjs';
 import { search, suggest } from './search.js';
 import { layout, esc } from './server/templates.mjs';
-import { landing, searchPage, resourcePage, taxonomyPage, aboutPage, unlockPage, savedPage, parseSearchParams } from './server/pages.mjs';
+import { landing, searchPage, resourcePage, taxonomyPage, aboutPage, unlockPage, savedPage, studyHubPage, studyDeckPage, parseSearchParams } from './server/pages.mjs';
 import {
   adminMissing, apiAdminStats, adminDashboard, adminResources, adminAudit, adminSettings,
   apiResourceUpdate, apiResourceCreate, apiResourceDelete, apiBulkImport, runPurge,
@@ -389,6 +390,22 @@ const server = http.createServer(async (req, res) => {
         return apiByIds(req, res, url.searchParams);
       }
       if (url.pathname === '/api/trending' && req.method === 'GET') return apiTrending(req, res);
+      if (url.pathname === '/api/decks' && req.method === 'GET') {
+        const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
+        return sendJson(res, 200, {
+          ok: true,
+          decks: [...autoDecks(forRole(indexes), rowMap), ...adminDecks(db)]
+            .map(d => ({ id: d.id, source: d.source, title: d.title, description: d.description, count: d.count })),
+        });
+      }
+      const dm = url.pathname.match(/^\/api\/decks\/([A-Za-z0-9-]{1,40})$/);
+      if (dm && req.method === 'GET') {
+        const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
+        const deck = deckCards(db, forRole(indexes), rowMap, dm[1]);
+        if (!deck) return sendJson(res, 404, { ok: false, error: 'Not found.' });
+        if (deck.cards.length > 200) deck.cards = deck.cards.slice(0, 200);
+        return sendJson(res, 200, { ok: true, deck });
+      }
       if (url.pathname === '/api/unlock' && req.method === 'POST') return apiUnlock(req, res, ip);
       if (url.pathname === '/api/logout' && req.method === 'POST') return apiLogout(req, res);
       if (url.pathname === '/api/terms' && req.method === 'GET') return apiTerms(req, res);
@@ -492,6 +509,71 @@ const server = http.createServer(async (req, res) => {
           logEvent('admin', { data: { action: 'purge', deleted: r.deleted } });
           return sendJson(res, 200, { ok: true, ...r });
         }
+        if (url.pathname === '/api/admin/decks' && req.method === 'POST') {
+          let body;
+          try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+          const title = String(body.title || '').trim().slice(0, 120);
+          if (title.length < 2) return sendJson(res, 400, { ok: false, error: 'Title needs 2+ characters.' });
+          const pid = crypto.randomBytes(16).toString('hex');
+          const now = nowIso();
+          const info = db.prepare('INSERT INTO decks(public_id, title, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?)')
+            .run(pid, title, String(body.description || '').slice(0, 500), now, now);
+          logEvent('admin', { data: { action: 'deck_create' } });
+          return sendJson(res, 201, { ok: true, id: Number(info.lastInsertRowid), publicId: pid });
+        }
+        const dkm = url.pathname.match(/^\/api\/admin\/decks\/(\d+)(\/cards)?$/);
+        if (dkm) {
+          const deck = db.prepare('SELECT * FROM decks WHERE id = ?').get(Number(dkm[1]));
+          if (!deck) return adminMissing(res, sendJson);
+          if (req.method === 'PATCH') {
+            let body;
+            try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+            const sets = [], vals = [];
+            if (body.title !== undefined) {
+              const t = String(body.title).trim().slice(0, 120);
+              if (t.length < 2) return sendJson(res, 400, { ok: false, error: 'Title needs 2+ characters.' });
+              sets.push('title = ?'); vals.push(t);
+            }
+            if (body.description !== undefined) { sets.push('description = ?'); vals.push(String(body.description).slice(0, 500)); }
+            if (!sets.length) return sendJson(res, 400, { ok: false, error: 'Nothing to update.' });
+            sets.push('updated_at = ?'); vals.push(nowIso()); vals.push(deck.id);
+            db.prepare(`UPDATE decks SET ${sets.join(', ')} WHERE id = ?`).run(...vals);
+            logEvent('admin', { data: { action: 'deck_update' } });
+            return sendJson(res, 200, { ok: true });
+          }
+          if (req.method === 'DELETE' && !dkm[2]) {
+            db.prepare('DELETE FROM decks WHERE id = ?').run(deck.id);
+            logEvent('admin', { data: { action: 'deck_delete' } });
+            return sendJson(res, 200, { ok: true });
+          }
+          if (req.method === 'PUT' && dkm[2] === '/cards') {
+            let body;
+            try { body = JSON.parse(await readBody(req, 500 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+            const cards = Array.isArray(body.cards) ? body.cards.slice(0, 500) : null;
+            if (!cards) return sendJson(res, 400, { ok: false, error: 'Provide cards: [...up to 500].' });
+            db.exec('BEGIN');
+            try {
+              db.prepare('DELETE FROM deck_cards WHERE deck_id = ?').run(deck.id);
+              const ins = db.prepare('INSERT INTO deck_cards(deck_id, front, back, position) VALUES (?, ?, ?, ?)');
+              let pos = 0, added = 0;
+              for (const c of cards) {
+                const f = String(c.front || '').trim().slice(0, 500);
+                const b = String(c.back || '').trim().slice(0, 2000);
+                if (!f || !b) continue;
+                ins.run(deck.id, f, b, pos++);
+                added++;
+              }
+              db.prepare('UPDATE decks SET updated_at = ? WHERE id = ?').run(nowIso(), deck.id);
+              db.exec('COMMIT');
+              logEvent('admin', { data: { action: 'deck_cards', added } });
+              return sendJson(res, 200, { ok: true, added });
+            } catch (e) {
+              db.exec('ROLLBACK');
+              return sendJson(res, 500, { ok: false, error: 'unavailable' });
+            }
+          }
+          return adminMissing(res, sendJson);
+        }
         return adminMissing(res, sendJson);
       }
       return sendJson(res, 404, { ok: false, error: 'Not found.' });
@@ -518,6 +600,9 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/providers') return html(200, taxonomyPage(ctx, 'providers'));
     if (url.pathname === '/about') return html(200, aboutPage(ctx));
     if (url.pathname === '/saved') return html(200, savedPage(ctx));
+    if (url.pathname === '/study') return html(200, studyHubPage(ctx));
+    const sm = url.pathname.match(/^\/study\/([A-Za-z0-9-]{1,40})$/);
+    if (sm) return html(200, studyDeckPage(ctx, sm[1]));
     if (url.pathname === '/unlock') return html(200, unlockPage(ctx));
     // Admin pages serve inert shells to everyone; ALL data loads through
     // bearer-authed /api/admin/* calls (navigation requests can't carry headers).

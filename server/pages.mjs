@@ -282,14 +282,73 @@ export function resourcePage(ctx, publicId) {
   };
 }
 
-export function savedPage(ctx) {
-  const { session } = ctx;
+export function savedPage(ctx) {  const { session } = ctx;
   const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:1000px" id="main">
     <h1 style="font-family:var(--disp)">Saved resources <span class="count-pill" id="saved-count" hidden></span></h1>
     <p style="color:var(--mut)">Bookmarks live only in this browser. Clearing site data removes them.</p>
     <div class="grid" id="saved-grid" style="margin-top:16px"><div class="sk"><i style="height:16px;width:60%"></i></div></div>
   </div>`;
   return layout({ title: 'Saved resources', body, session });
+}
+
+export function studyHubPage(ctx) {
+  const { session } = ctx;
+  const body = `<div class="wrap" style="padding:28px 20px 40px" id="main">
+    <h1 style="font-family:var(--disp)">Study hub</h1>
+    <p style="color:var(--mut)">Flashcards, quizzes and goals — everything stays in your browser.</p>
+    <section class="disc-section"><div class="disc-head"><h2>Your exam</h2></div>
+      <div class="disc-tile" id="goals-widget">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+          <div><div style="font-size:13px;color:var(--mut)">Countdown</div>
+          <div id="exam-countdown" style="font-family:var(--disp);font-size:28px;font-weight:800">—</div></div>
+          <div><div style="font-size:13px;color:var(--mut)">Day streak</div>
+          <div id="streak-count" style="font-family:var(--disp);font-size:28px;font-weight:800">0 🔥</div></div>
+          <div><div style="font-size:13px;color:var(--mut)">Cards mastered</div>
+          <div id="mastered-count" style="font-family:var(--disp);font-size:28px;font-weight:800">0</div></div>
+        </div>
+        <form id="exam-form" style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <input id="exam-date" type="date" aria-label="Exam date" style="padding:8px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit">
+          <button class="btn small" type="submit">Set exam date</button>
+          <button class="btn small secondary" type="button" id="exam-clear">Clear</button>
+        </form>
+      </div></section>
+    <section class="disc-section"><div class="disc-head"><h2>Flashcard decks</h2></div>
+      <div class="disc-grid" id="deck-grid"><div class="sk"><i style="height:16px;width:60%"></i></div></div></section>
+    <section class="disc-section"><div class="disc-head"><h2>Your decks</h2>
+      <span><button class="btn small secondary" id="deck-export">Export</button>
+      <label class="btn small secondary" style="cursor:pointer">Import<input id="deck-import" type="file" accept="application/json" hidden></label></span></div>
+      <div class="disc-grid" id="local-decks"></div>
+      <div class="disc-tile" style="margin-top:12px"><h3>New deck</h3>
+        <form id="deck-new" style="display:flex;gap:8px;flex-wrap:wrap">
+          <input id="deck-title" required maxlength="80" placeholder="Deck title" style="flex:1;min-width:200px;padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit">
+          <button class="btn small" type="submit">Create</button>
+        </form>
+        <form id="card-add" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px" hidden>
+          <select id="card-deck" aria-label="Deck"></select>
+          <input id="card-front" required maxlength="500" placeholder="Front" style="flex:1;min-width:140px;padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit">
+          <input id="card-back" required maxlength="2000" placeholder="Back" style="flex:1;min-width:140px;padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit">
+          <button class="btn small" type="submit">Add card</button>
+        </form></div></section>
+  </div>
+  <script src="/study.js" defer></script>`;
+  return layout({ title: 'Study hub', body, session });
+}
+
+export function studyDeckPage(ctx, deckId) {
+  const { session } = ctx;
+  const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:760px" id="main" data-deck="${esc(deckId)}">
+    <p class="crumb"><a href="/study">Study hub</a> › <span id="deck-crumb">Deck</span></p>
+    <h1 id="deck-title" style="font-family:var(--disp)">Loading deck…</h1>
+    <p id="deck-desc" style="color:var(--mut)"></p>
+    <div class="seg" role="group" aria-label="Study mode" style="margin:12px 0">
+      <button class="seg-btn is-on" data-mode="flip" aria-pressed="true">Flashcards</button>
+      <button class="seg-btn" data-mode="learn" aria-pressed="false">Learn</button>
+      <button class="seg-btn" data-mode="test" aria-pressed="false">Test</button>
+    </div>
+    <div id="study-area"></div>
+  </div>
+  <script src="/study.js" defer></script>`;
+  return layout({ title: 'Study deck', body, session });
 }
 
 export function taxonomyPage(ctx, kind) {  const { db, session } = ctx;

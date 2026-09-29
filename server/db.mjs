@@ -15,8 +15,7 @@ export const SCHEMA = `
 CREATE TABLE IF NOT EXISTS meta (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
-);
-CREATE TABLE IF NOT EXISTS passwords (
+);CREATE TABLE IF NOT EXISTS passwords (
   role TEXT PRIMARY KEY,           -- 'viewer' | 'admin'
   hash BLOB NOT NULL,
   salt BLOB NOT NULL,
@@ -95,6 +94,48 @@ CREATE TABLE IF NOT EXISTS daily_aggregates (
   key TEXT NOT NULL,
   count INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (day, kind, key)
+);
+-- Phase D: study decks (admin-authored; auto + local decks live client-side)
+CREATE TABLE IF NOT EXISTS decks (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  public_id TEXT NOT NULL UNIQUE,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS deck_cards (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  deck_id INTEGER NOT NULL REFERENCES decks(id) ON DELETE CASCADE,
+  front TEXT NOT NULL,
+  back TEXT NOT NULL,
+  position INTEGER NOT NULL DEFAULT 0
+);
+CREATE INDEX IF NOT EXISTS idx_cards_deck ON deck_cards(deck_id, position);
+-- Phase D: community triage queues (anonymous, rate-limited, IP-hashed)
+CREATE TABLE IF NOT EXISTS reports (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  resource_id INTEGER,
+  reason TEXT NOT NULL,
+  detail TEXT NOT NULL DEFAULT '',
+  ip_hash TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'open',   -- open|accepted|rejected
+  created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS requests (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  title TEXT NOT NULL,
+  detail TEXT NOT NULL DEFAULT '',
+  ip_hash TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'open',   -- open|accepted|rejected
+  created_at TEXT NOT NULL
+);
+-- Phase D: site announcements banner
+CREATE TABLE IF NOT EXISTS announcements (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  body TEXT NOT NULL,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL
 );
 `;
 

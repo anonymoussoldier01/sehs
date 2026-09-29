@@ -5,7 +5,7 @@ export function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-const NAV = [['/', 'Home'], ['/search', 'Browse'], ['/subjects', 'Subjects'], ['/providers', 'Providers'], ['/about', 'About']];
+const NAV = [['/', 'Home'], ['/search', 'Browse'], ['/study', 'Study'], ['/subjects', 'Subjects'], ['/providers', 'Providers'], ['/about', 'About']];
 
 export function layout({ title, desc = '', body, active = '', session = null, extraHead = '' }) {
   // No per-visitor state on the server (no cookies): the header always shows
