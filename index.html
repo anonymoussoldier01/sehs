@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SEHS Study Directory — 1,641 Searchable Practice Files</title>
-<meta name="description" content="Searchable directory of selective-entry study materials: maths, numerical reasoning, verbal reasoning, reading, writing, science. ACER, JAC, Spectrum, VSSE, EduKingdom, Pearson.">
+<title>SEHS Study Directory — Find exactly what you need to study</title>
+<meta name="description" content="Search the SEHS resource collection across practice papers, notes, tests and more. Maths, reasoning, reading, writing, science.">
 <meta name="theme-color" content="#4f46e5">
 <link rel="icon" href="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,99 +13,79 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<a class="skip" href="#results">Skip to results</a>
+<a class="skip" href="#main">Skip to results</a>
 
 <header class="topbar" role="banner">
   <div class="wrap topbar-inner">
     <a class="brand" href="#" id="brand-home" aria-label="SEHS Study Directory home">
       <span class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 32 32" width="30" height="30"><rect x="2" y="2" width="28" height="28" rx="8" fill="#4f46e5"/><path d="M10 12.5A6 6 0 0 1 22 12.5c0 4-4.5 4.5-4.5 8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="17.5" cy="23.5" r="1.6" fill="#fff"/></svg>
+        <svg viewBox="0 0 32 32" width="28" height="28"><rect x="2" y="2" width="28" height="28" rx="8" fill="#4f46e5"/><path d="M10 12.5A6 6 0 0 1 22 12.5c0 4-4.5 4.5-4.5 8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="17.5" cy="23.5" r="1.6" fill="#fff"/></svg>
       </span>
-      <span class="brand-text"><strong>SEHS Study Directory</strong><small id="stat-total">Loading…</small></span>
+      <span class="brand-text"><strong>SEHS Study Directory</strong><small>Practice papers · notes · study resources</small></span>
     </a>
-    <div class="searchbox" role="search">
-      <svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-      <input id="q" type="search" placeholder="Search 1,641 files — try “VSSE maths answers”…" autocomplete="off" aria-label="Search links" aria-describedby="search-hint">
-      <kbd id="search-hint" title="Press / to focus">/</kbd>
-      <button id="clear" class="icon-btn" title="Clear search" aria-label="Clear search" hidden>✕</button>
-    </div>
+    <nav class="topnav" aria-label="Sections">
+      <a href="#main" data-nav="browse">Browse</a>
+      <a href="#discovery" data-nav="discovery">Subjects</a>
+      <a href="#about" data-nav="about">About</a>
+    </nav>
     <div class="top-actions">
-      <button id="filters-toggle" class="btn secondary only-mobile" aria-expanded="false" aria-controls="filters">Filters</button>
+      <button id="filters-toggle" class="btn secondary only-mobile" aria-expanded="false" aria-controls="filters">Filters <span class="count-pill" id="filter-count" hidden></span></button>
       <button id="theme-toggle" class="icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" aria-pressed="false">◐</button>
     </div>
   </div>
-  <div class="wrap quick-row" aria-label="Quick searches">
-    <span class="quick-label">Popular:</span>
-    <div class="quick-chips" id="quick-chips"></div>
-  </div>
 </header>
 
-<section class="wrap hero" aria-label="Library overview">
-  <div class="hero-card">
-    <div class="hero-main">
-      <h1>Every practice file, finally findable.</h1>
-      <p>Search across <strong id="hero-count">1,641</strong> selective-entry files and folders — maths, numerical reasoning, reading, writing, science — from ACER, JAC, Spectrum, VSSE and more. Everything runs locally from <code>data/links.json</code>.</p>
-      <div class="hero-stats" id="hero-stats" aria-live="polite"></div>
+<section class="wrap hero" aria-label="Search">
+  <h1>Find exactly what you need to study.</h1>
+  <p class="hero-sub">Search the SEHS resource collection across practice papers, notes, tests and more.</p>
+  <div class="search-wrap">
+    <div class="searchbox" role="search">
+      <svg class="search-ico" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input id="q" type="search" placeholder="Search papers, subjects, providers, topics…" autocomplete="off" aria-label="Search study resources" aria-expanded="false" aria-controls="suggest" aria-describedby="search-hint" role="combobox" aria-autocomplete="list">
+      <kbd id="search-hint" title="Press / to focus">/</kbd>
+      <button id="clear" class="icon-btn" title="Clear search" aria-label="Clear search" hidden>✕</button>
     </div>
-    <div class="hero-side">
-      <div class="stat-tile"><span class="stat-num" id="st-files">–</span><span class="stat-lbl">files</span></div>
-      <div class="stat-tile"><span class="stat-num" id="st-folders">–</span><span class="stat-lbl">folders</span></div>
-      <div class="stat-tile"><span class="stat-num" id="st-answers">–</span><span class="stat-lbl">with answers</span></div>
-      <div class="stat-tile"><span class="stat-num" id="st-pdf">–</span><span class="stat-lbl">PDFs</span></div>
-    </div>
+    <div id="suggest" class="suggest" role="listbox" aria-label="Search suggestions" hidden></div>
   </div>
+  <dl class="stats" id="stats" aria-label="Collection statistics"></dl>
 </section>
 
-<div class="wrap layout">
+<div class="wrap layout" id="main">
   <aside class="filters" id="filters" aria-label="Filters">
     <div class="filters-head">
-      <h2>Filters</h2>
-      <button id="reset" class="link-btn">Reset all</button>
+      <h2>Filters <span class="count-pill" id="filter-count-2" hidden></span></h2>
+      <button id="reset" class="link-btn">Clear all</button>
     </div>
     <div id="active-chips" class="active-chips" aria-live="polite"></div>
-
     <details class="f-section" open>
-      <summary>Subject / Category <span class="count-pill" id="cnt-cat"></span></summary>
+      <summary>Category</summary>
       <div class="check-list" id="facet-cat" role="group" aria-label="Category"></div>
-    </details>
-    <details class="f-section" open>
-      <summary>File type</summary>
-      <div class="check-list" id="facet-type" role="group" aria-label="Content type"></div>
     </details>
     <details class="f-section" open>
       <summary>Provider</summary>
       <div class="check-list" id="facet-provider" role="group" aria-label="Provider"></div>
-      <div class="tag-cloud" id="tag-cloud" aria-label="Top tags"></div>
+    </details>
+    <details class="f-section" open>
+      <summary>File type</summary>
+      <div class="check-list" id="facet-type" role="group" aria-label="File type"></div>
+    </details>
+    <details class="f-section">
+      <summary>Audience</summary>
+      <div class="check-list" id="facet-aud" role="group" aria-label="Audience"></div>
     </details>
     <details class="f-section">
       <summary>More options</summary>
-      <div class="f-group">
-        <label for="f-tag">Tag</label>
-        <select id="f-tag"><option value="">All tags</option></select>
-      </div>
-      <div class="f-group">
-        <label for="f-status">Status</label>
-        <select id="f-status">
-          <option value="">Any status</option>
-          <option value="active">active</option>
-          <option value="redirected">redirected</option>
-          <option value="unavailable">unavailable</option>
-          <option value="timeout">timeout</option>
-          <option value="blocked">blocked</option>
-          <option value="unknown">unknown</option>
-        </select>
-      </div>
-      <label class="check-row"><input type="checkbox" id="f-answers"> <span>Answers included only</span></label>
-      <label class="check-row"><input type="checkbox" id="f-hide-img"> <span>Hide screenshots / images</span></label>
+      <label class="check-row"><input type="checkbox" id="f-answers"> <span>Answers included</span></label>
+      <label class="check-row"><input type="checkbox" id="f-hide-img"> <span>Hide images</span></label>
+      <label class="check-row"><input type="checkbox" id="f-hide-code"> <span>Hide support files</span></label>
     </details>
-    <p class="hint">Static dataset · <code>data/links.json</code><br><span id="stat-meta"></span></p>
   </aside>
 
   <main id="results" aria-label="Results">
     <div class="toolbar">
       <div class="showing-col">
         <span id="stat-showing" aria-live="polite">Loading…</span>
-        <span id="partial-note" class="partial-note" hidden></span>
+        <span id="mode-note" class="mode-note" hidden></span>
       </div>
       <div class="toolbar-right">
         <div class="seg" role="group" aria-label="View">
@@ -115,8 +95,10 @@
         <label class="sort-wrap">Sort
           <select id="f-sort" aria-label="Sort results">
             <option value="relevance">Best match</option>
-            <option value="title">Title A–Z</option>
-            <option value="newest">Recently modified</option>
+            <option value="title-az">A–Z</option>
+            <option value="title-za">Z–A</option>
+            <option value="newest">Newest</option>
+            <option value="type">File type</option>
             <option value="answers">Answers first</option>
           </select>
         </label>
@@ -129,26 +111,39 @@
         </label>
       </div>
     </div>
+
+    <div id="discovery" aria-label="Browse resources"></div>
+
     <div class="pager" id="pager-top" aria-label="Pagination top"></div>
     <div id="grid" class="grid" aria-live="polite"></div>
     <div id="skeleton" class="grid" hidden aria-hidden="true"></div>
+
     <div id="empty" class="empty" hidden>
       <div class="empty-ico" aria-hidden="true">🔍</div>
-      <h2>No matches found</h2>
-      <p id="empty-msg">Try fewer words, check spelling, or clear a filter. Search covers titles, descriptions, tags, providers and subjects.</p>
+      <h2 id="empty-title">No exact matches</h2>
+      <p id="empty-msg"></p>
+      <div id="did-you-mean" class="dym" hidden></div>
       <div class="empty-actions">
         <button class="btn" id="empty-reset">Clear search &amp; filters</button>
-        <button class="btn secondary" id="empty-browse">Browse everything</button>
       </div>
-      <div class="empty-suggest">Try: <span id="empty-chips"></span></div>
+      <div class="empty-suggest"><span class="quick-label">Try:</span> <span id="empty-chips"></span></div>
+      <div class="empty-cats" id="empty-cats"></div>
     </div>
+
     <div class="pager bottom" id="pager-bottom" aria-label="Pagination bottom"></div>
   </main>
 </div>
 
-<footer class="wrap foot">
-  <span>Static directory · no tracking · data in <code>data/links.json</code></span>
-  <span class="foot-right"><button class="link-btn" id="copy-link">Copy share link</button> · <button class="link-btn" id="export-csv">Export CSV</button></span>
+<footer class="wrap foot" id="about">
+  <div class="about">
+    <h2>About this directory</h2>
+    <p id="about-text">A static, searchable index of SEHS selective-entry study resources shared via Google Drive. Search runs entirely in your browser — no tracking, no account, no server. Opening a resource takes you directly to its Google Drive page.</p>
+    <p class="foot-meta"><span id="stat-meta"></span> · data in <code>data/links.json</code></p>
+  </div>
+  <div class="foot-actions">
+    <button class="link-btn" id="copy-link">Copy share link</button>
+    <button class="link-btn" id="export-csv">Export CSV</button>
+  </div>
 </footer>
 
 <div class="modal-backdrop" id="modal" hidden>
@@ -159,6 +154,6 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-<script src="app.js" defer></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>

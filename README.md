@@ -18,7 +18,7 @@ scripts/build-data.mjs          # 3. GENERATED: data/links.json + data/categorie
 scripts/validate.mjs            # checks duplicates, URLs, schema
 scripts/ingest.mjs              # orchestrator with --initial/--update/--refresh/--retry-failed
 state/fetch.json, state/enriched.json  # checkpoints for resume (not committed)
-index.html, styles.css, app.js  # 4. FRONTEND: search/filter/sort/paginate
+index.html, styles.css, app.js, search.js  # 4. FRONTEND: relevance search engine + filters/sort/paginate/discovery
 data/                           # committed production dataset
 ```
 
