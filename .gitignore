@@ -9,7 +9,7 @@ dist/
 .tmp/
 
 # ingestion runtime (regenerable checkpoints/caches — keep local only)
-state/
+state/*
 !state/.gitkeep
 logs/*.log
 !logs/.gitkeep
