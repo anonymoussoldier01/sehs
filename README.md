@@ -1,32 +1,55 @@
 # SEHS Study Directory — secure study-resource platform
 
-Searchable directory of SEHS selective-entry study resources with password-gated
-access tiers, per-session Terms acceptance, and an admin console. Zero dependencies
-(plain Node 22+ with `node:sqlite`), no build step, no client-side secrets.
+Searchable collection of SEHS selective-entry study resources with a smart local
+search engine, study tools, and an admin console. Zero dependencies (plain
+Node 22+ with `node:sqlite`), no build step, **zero cookies**, no accounts.
 
-Live dataset: 1,641 resources (seeded from `data/links.json`, served from SQLite —
-clients never receive raw storage URLs or folder IDs).
+Live dataset: 1,641 resources served from SQLite — clients never receive raw
+storage URLs or folder IDs.
+
+## What it does
+
+- **Smart search** (`search.js`, zero-dep): BM25-lite rarity scoring, typo-ranked
+  fuzzy matching, last-term prefix, `field:value` syntax, drop-one-token gating,
+  concept expansion (`algebra` → maths), TF-IDF related resources, synonyms,
+  on-device interest tuning with visible reset, command palette (`Cmd/Ctrl+K`).
+- **Study hub** (`/study`): auto-generated flashcard decks (provider / subject /
+  practice recognition), admin-authored decks, personal decks (import/export),
+  Flashcards + Learn (Leitner) + Test (timed mock) modes, exam countdown,
+  day streaks, mastered counts — all on-device.
+- **Library**: bookmarks, named studylists with shareable encoded links
+  (`/list/…`), saved hub, recently viewed, print packs, RSS (`/feed.xml`).
+- **Community queues**: anonymous broken-link reports + resource requests flow
+  into an admin triage queue (rate-limited, IP-hashed).
+- **Admin** (`/admin`, single password): dashboard with charts, resource CRUD +
+  bulk import, decks manager, triage, audit log + sessions, announcements,
+  Terms publishing, retention + purge, DB backup, health check.
+- **Privacy**: no cookies, no accounts, no third-party tracking. Preferences,
+  decks, lists and tuning live in the visitor's own browser. Raw analytics
+  auto-purge after 30 days (configurable). Admin auth is a per-tab bearer token.
 
 ## Project structure
 
 ```
 server.mjs                  # platform server: pages + JSON API + access gateway
-server/db.mjs               # SQLite schema + open helpers (node:sqlite)
-server/crypto.mjs           # scrypt passwords, sessions, rate limits, lockouts
-server/content.mjs          # tier-aware index + strict public serializers
+server/db.mjs               # SQLite schema (auto-migrates on boot)
+server/crypto.mjs           # scrypt passwords, tokens, rate limits, lockouts
+server/content.mjs          # search index + strict public serializers
 server/templates.mjs        # shared SSR layout + components (escaped)
-server/pages.mjs            # /, /search, /r/:id, /subjects, /providers, /about, /unlock, /saved
-server/admin.mjs            # admin API + dashboard/resources/audit/settings pages
-search.js                   # local relevance engine (shared browser + server)
-theme.js gate.js open.js    # client: theme, consent/terms gates, grant open flow
-ux.js suggest.js            # client: bookmarks/density/recents, autocomplete
-search-page.js record.js unlock.js admin.js  # page-specific clients
+server/pages.mjs            # /, /search, /r/:id, /study, /saved, /list, taxonomy…
+server/decks.mjs            # auto-deck generation from the collection
+server/admin.mjs            # admin API + dashboard/resources/triage/audit/settings
+search.js                   # relevance engine (browser + server + tests)
+theme.js gate.js open.js    # theme, per-tab Terms gate, grant open flow
+ux.js suggest.js profile.js palette.js  # QoL, autocomplete, tuning, palette
+study.js lists.js request.js admin.js unlock.js  # page clients
 scripts/migrate.mjs         # links.json → SQLite (new 128-bit public IDs)
-scripts/smoke.mjs           # npm test: dataset + engine + wiring checks
+scripts/relevance.mjs       # graded relevance fixture (42 checks)
+scripts/smoke.mjs           # dataset + engine + wiring checks (17 checks)
 source-data/                # original Drive inputs + expansion output
 scripts/expand-drive.mjs …  # ingestion pipeline (unchanged, see below)
-data/links.json             # seed dataset (server-side only, never shipped to clients)
-data/app.db*                # runtime DB (gitignored — holds password hashes + sessions)
+data/links.json             # seed dataset (server-side only, never shipped)
+data/app.db*                # runtime DB (gitignored — password hashes + sessions)
 state/id-map.json           # old→new ID map (gitignored, server-only)
 ```
 
@@ -36,46 +59,47 @@ state/id-map.json           # old→new ID map (gitignored, server-only)
 cd C:\sehs
 npm install   # no deps; Node >= 22 required (node:sqlite)
 
-# First run only: build the database (generates viewer+admin passwords once,
-# or set SEHS_VIEWER_PASSWORD / SEHS_ADMIN_PASSWORD beforehand)
-$env:SEHS_VIEWER_PASSWORD="..."   # optional; omit to auto-generate
+# First run only: build the database (generates the admin password once,
+# or set SEHS_ADMIN_PASSWORD beforehand)
 $env:SEHS_ADMIN_PASSWORD="..."
 node scripts/migrate.mjs [--reset]
 
 npm run server   # http://localhost:8080
 ```
 
-Open `http://localhost:8080`, accept cookies, search, open `/unlock` for the
-member/admin areas. Re-running `migrate.mjs` without `--reset` keeps passwords.
+Open `http://localhost:8080`, search, open `/unlock` for admin. Re-running
+`migrate.mjs` without `--reset` keeps the admin password.
 
 ## Routes
 
-- `/`, `/search?q=&cat=&provider=&type=&year=&sort=&page=&per=&view=`, `/r/:id`
-- `/subjects`, `/providers`, `/about`, `/unlock`, `/saved` (local bookmarks)
-- `/api/search`, `/api/suggest`, `/api/by-ids`, `/api/session`, `/api/stats`
-- `/api/unlock`, `/api/logout`, `/api/consent`, `/api/terms`, `/api/terms/accept`
-- `/api/access/:id` → `{openUrl: /open/:token}` → single-use grant → 302
-- `/admin`, `/admin/resources`, `/admin/audit`, `/admin/settings` + `/api/admin/*`
+- `/`, `/search?q=&cat=&provider=&type=&year=&sort=&page=&per=&view=&aff=`,
+  `/r/:id`, `/study`, `/study/:deck`, `/saved`, `/list/:code`
+- `/subjects`, `/providers`, `/about`, `/unlock`, `/request`, `/feed.xml`
+- `/api/search`, `/api/suggest`, `/api/by-ids`, `/api/decks`, `/api/trending`,
+  `/api/new`, `/api/announcement`, `/api/me`, `/api/stats`
+- `/api/unlock`, `/api/logout`, `/api/terms`, `/api/access/:id` → `/open/:token`
+- `/api/reports`, `/api/requests`
+- `/admin`, `/admin/resources`, `/admin/triage`, `/admin/audit`,
+  `/admin/settings` + `/api/admin/*` (bearer-gated, uniform 404 otherwise)
 
 ## Security model (summary)
 
-- Two generated passwords (viewer/admin), `scrypt` hashes + salts, `timingSafeEqual`.
-- HTTPOnly/Secure/SameSite=Lax sessions (viewer 7d, admin 12h); server checks on
-  every privileged request; uniform 404s (no enumeration oracle).
-- Unlock rate-limited + escalating lockouts; CSRF header on API mutations; 100KB
-  payload caps; security headers incl. same-origin CSP.
-- Cookie hard block + per-session Terms gate, both enforced server-side on
-  unlock/access — not just hidden UI.
-- Members-only rows fully omitted from anonymous responses (search, pages,
-  suggestions, hydration). Rotation revokes role sessions.
-- Analytics: hashed IPs, 30-day raw auto-purge (configurable), aggregates kept.
+- Single generated admin password, `scrypt` hash + salt, `timingSafeEqual`.
+- Per-tab bearer token (`Authorization` header, sessionStorage); no cookies
+  anywhere, so CSRF is impossible by construction (header check retained).
+- Server checks on every privileged request; uniform 404s (no oracle).
+- Unlock rate-limited + escalating lockouts; 100KB payload caps (500KB bulk);
+  security headers incl. same-origin CSP (no inline scripts anywhere).
+- Single-use 15-min grant tokens for opens; all opens logged.
+- Members tier removed: everything public, admin gate is the only lock.
 - Never commit: `.env`, `data/app.db*`, `state/`. No secrets in responses/bundles.
 
 ## Validate & test
 
 ```powershell
-npm run validate   # dataset schema checks
-npm test           # 17 smoke checks (dataset + engine + wiring)
+npm run validate    # dataset schema checks
+npm test            # 17 smoke checks
+npm run relevance   # 42 graded relevance checks (gates ranking changes)
 ```
 
 ## Ingestion (unchanged legacy pipeline)
@@ -84,14 +108,14 @@ npm test           # 17 smoke checks (dataset + engine + wiring)
 npm run ingest:local   # expand → fetch → enrich → build data/links.json
 ```
 
-After re-ingestion, re-run `node scripts/migrate.mjs --reset` (passwords preserved
-only without `--reset`; with `--reset`, set env passwords again). Drive API notes:
-the build-time key supplied earlier is Drive-only (project `1069633021613`);
+After re-ingestion, re-run `node scripts/migrate.mjs --reset` (set the admin
+password env again — `--reset` rebuilds credentials). Drive API notes: the
+build-time key supplied earlier is Drive-only (project `1069633021613`);
 Gemini enrichment needs Generative Language API enabled. Never commit keys.
 
 ## Deploy notes
 
 Needs a Node host with persistent disk (VPS / Render / Fly / Railway) — GitHub
 Pages cannot host the backend. Set `PORT`, `APP_SECURE=1` (behind TLS),
-`APP_DB` (optional path), SMTP later for email (not yet wired). Reverse-proxy
-should forward real client IPs (`X-Forwarded-For` is honoured for rate limits).
+`APP_DB` (optional path). Reverse-proxy should forward real client IPs
+(`X-Forwarded-For` is honoured for rate limits).
