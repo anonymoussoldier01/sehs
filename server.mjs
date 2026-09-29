@@ -12,7 +12,7 @@ import {
 import { buildIndexes, forRole, loadRows, publicView } from './server/content.mjs';
 import { search, suggest } from './search.js';
 import { layout, esc } from './server/templates.mjs';
-import { landing, searchPage, resourcePage, taxonomyPage, aboutPage, unlockPage, parseSearchParams } from './server/pages.mjs';
+import { landing, searchPage, resourcePage, taxonomyPage, aboutPage, unlockPage, savedPage, parseSearchParams } from './server/pages.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir);
@@ -366,6 +366,26 @@ function apiSuggest(_req, res, session, sp) {
   return sendJson(res, 200, { ok: true, suggestions: out });
 }
 
+// Saved/recents hydration: tier-aware, order-preserving, hard-capped.
+function apiByIds(_req, res, session, sp) {
+  const role = session.role;
+  const ids = (sp.get('ids') || '').split(',').map(s => s.trim()).filter(s => /^[0-9a-f]{32}$/.test(s)).slice(0, 100);
+  if (!ids.length) return sendJson(res, 200, { ok: true, results: [] });
+  const where = role === 'viewer' || role === 'admin' ? `visibility = 1` : `visibility = 1 AND access_level = 'public'`;
+  const placeholders = ids.map(() => '?').join(',');
+  const rows = db.prepare(`SELECT * FROM resources WHERE ${where} AND public_id IN (${placeholders})`).all(...ids);
+  const byId = new Map(rows.map(r => [r.public_id, r]));
+  const index = forRole(indexes, role);
+  const docById = new Map(index.docs.map(d => [d.rec.id, d]));
+  const results = ids.map(id => {
+    const row = byId.get(id);
+    if (!row) return null;
+    const d = docById.get(id);
+    return { ...publicView(row), displayTitle: d ? d.displayTitle : row.title };
+  }).filter(Boolean);
+  return sendJson(res, 200, { ok: true, results });
+}
+
 // ---- router ----------------------------------------------------------------------
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
@@ -388,6 +408,10 @@ const server = http.createServer(async (req, res) => {
       if (url.pathname === '/api/suggest' && req.method === 'GET') {
         if (!rlSuggest.allow('s:' + ip).ok) return sendJson(res, 429, { ok: false, error: 'Too many requests.' });
         return apiSuggest(req, res, session, url.searchParams);
+      }
+      if (url.pathname === '/api/by-ids' && req.method === 'GET') {
+        if (!rlSuggest.allow('b:' + ip).ok) return sendJson(res, 429, { ok: false, error: 'Too many requests.' });
+        return apiByIds(req, res, session, url.searchParams);
       }
       if (url.pathname === '/api/unlock' && req.method === 'POST') return apiUnlock(req, res, session, ip);
       if (url.pathname === '/api/logout') return apiLogout(req, res, session);
@@ -423,6 +447,7 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/subjects') return html(200, taxonomyPage(ctx, 'subjects'));
     if (url.pathname === '/providers') return html(200, taxonomyPage(ctx, 'providers'));
     if (url.pathname === '/about') return html(200, aboutPage(ctx));
+    if (url.pathname === '/saved') return html(200, savedPage(ctx));
     if (url.pathname === '/unlock') return html(200, unlockPage(ctx));
     if (url.pathname === '/admin') {
       if (session.role !== 'admin') { secureHeaders(res); res.writeHead(404); res.end('not found'); return; }

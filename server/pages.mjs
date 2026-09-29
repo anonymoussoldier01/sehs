@@ -51,6 +51,7 @@ export function landing(ctx) {
   </section>
   <div class="wrap layout single" id="discovery">
     <main aria-label="Browse resources">
+      <section class="disc-section" id="recent-strip" hidden><div class="disc-head"><h2>Recently viewed</h2></div><div class="disc-grid" id="recent-grid"></div></section>
       <section class="disc-section"><div class="disc-head"><h2>Practice tests <small>${practice.length ? '' : ''}</small></h2><a class="link-btn" href="/search?cat=practice-test">View all →</a></div>
         <div class="disc-grid">${practice.map(card).join('')}</div></section>
       <section class="disc-section"><div class="disc-head"><h2>Resources with answers</h2><a class="link-btn" href="/search?answers=1">View all →</a></div>
@@ -71,6 +72,7 @@ export function parseSearchParams(sp) {
     year: (sp.get('year') || '').slice(0, 4),
     aud: list('aud'), answers: sp.get('answers') === '1',
     sort: ['relevance', 'title-az', 'title-za', 'newest', 'type', 'answers'].includes(sp.get('sort')) ? sp.get('sort') : 'relevance',
+    view: sp.get('view') === 'list' ? 'list' : 'grid',
     page: Math.max(1, Number(sp.get('page')) || 1),
     per: [24, 48, 96].includes(per) ? per : 24,
   };
@@ -135,6 +137,12 @@ export function searchPage(ctx, sp) {
   const page = Math.min(p.page, pages);
   const slice = arr.slice((page - 1) * p.per, page * p.per);
   const base = baseQuery(p);
+  const viewHref = (v) => {
+    const sp = new URLSearchParams(base.replace(/&$/, '').replace('/search?', ''));
+    if (v === 'list') sp.set('view', 'list'); else sp.delete('view');
+    const s = sp.toString();
+    return s ? `/search?${s}` : '/search';
+  };
 
   const cards = slice.map(x => {
     const row = rowMap.get(x.rec.id);
@@ -161,9 +169,14 @@ export function searchPage(ctx, sp) {
     <aside class="filters" id="filters" aria-label="Filters">
       <div class="filters-head"><h2>Filters</h2><a class="link-btn" href="/search${p.q ? `?q=${encodeURIComponent(p.q)}` : ''}">Clear all</a></div>
       <div class="active-chips">${chips.join('')}</div>
-      <details class="f-section" open><summary>Category</summary><div class="check-list" id="facet-cat">${catFacet}</div></details>
-      <details class="f-section" open><summary>Provider</summary><div class="check-list" id="facet-provider">${provFacet}</div></details>
-      <details class="f-section" open><summary>File type</summary><div class="check-list" id="facet-type">${typeFacet}</div></details>
+      <details class="f-section" open><summary>Category</summary>
+        <input class="facet-search" placeholder="Filter categories…" aria-label="Filter categories">
+        <div class="check-list" id="facet-cat">${catFacet}</div></details>
+      <details class="f-section" open><summary>Provider</summary>
+        <input class="facet-search" placeholder="Filter providers…" aria-label="Filter providers">
+        <div class="check-list" id="facet-provider">${provFacet}</div></details>
+      <details class="f-section" open><summary>File type</summary>
+        <div class="check-list" id="facet-type">${typeFacet}</div></details>
       <details class="f-section"><summary>More options</summary>
         <label class="check-row"><input type="checkbox" data-f="answers"${p.answers ? ' checked' : ''}><span>Answers included</span></label>
       </details>
@@ -174,15 +187,20 @@ export function searchPage(ctx, sp) {
           <span id="stat-showing">${total === 0 ? 'No results' : `${total.toLocaleString()} resource${total === 1 ? '' : 's'} found${p.q ? ` for “${esc(p.q)}”` : ''}`}</span>
           ${modeNote}
         </div>
-        <div class="toolbar-right">
-          <label class="sort-wrap">Sort
+      <div class="toolbar-right">
+        <button id="density-toggle" class="btn secondary small" title="Toggle compact rows">Compact</button>
+        <div class="seg" role="group" aria-label="View">
+          <a class="seg-btn${p.view === 'grid' ? ' is-on' : ''}" href="${viewHref('grid')}" aria-label="Grid view">▦</a>
+          <a class="seg-btn${p.view === 'list' ? ' is-on' : ''}" href="${viewHref('list')}" aria-label="List view">☰</a>
+        </div>
+        <label class="sort-wrap">Sort
             <select id="f-sort" aria-label="Sort results">
               ${[['relevance', 'Best match'], ['title-az', 'A–Z'], ['title-za', 'Z–A'], ['newest', 'Newest'], ['type', 'File type'], ['answers', 'Answers first']].map(([v, l]) => `<option value="${v}"${p.sort === v ? ' selected' : ''}>${l}</option>`).join('')}
             </select>
           </label>
         </div>
       </div>
-      <div id="grid" class="grid">${cards}</div>
+      <div id="grid" class="grid${p.view === 'list' ? ' list' : ''}">${cards}</div>
       ${total === 0 ? emptyBlock({
         msg: p.q ? `Nothing matched “${p.q}” with the current filters.` : 'Nothing matched the current filters.',
         corrected: res.mode === 'none' ? res.corrected : null,
@@ -241,7 +259,7 @@ export function resourcePage(ctx, publicId) {
     ['Status', v.status === 'available' ? 'Available' : pretty(v.status)],
   ].map(([k, val]) => `<dt>${k}</dt><dd>${esc(val)}</dd>`).join('');
   const body = `
-  <div class="wrap" style="padding:20px;max-width:900px" id="main">
+  <div class="wrap" style="padding:20px;max-width:900px" id="main" data-record-id="${esc(v.id)}">
     <p class="crumb"><a href="/">Home</a> › <a href="/search?cat=${encodeURIComponent(v.category)}">${esc(pretty(v.category))}</a> › ${esc(displayTitle.slice(0, 60))}</p>
     <h1 style="font-family:var(--disp);letter-spacing:-.02em">${esc(displayTitle)}</h1>
     <div class="meta-row" style="margin:10px 0 16px">
@@ -255,6 +273,7 @@ export function resourcePage(ctx, publicId) {
     <div class="meta-row" style="margin:6px 0 18px">${(v.tags || []).slice(0, 10).map(t => `<a class="tag" href="/search?q=${encodeURIComponent(t)}">${esc(pretty(t))}</a>`).join('')}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px">
       <button class="btn" data-open="${esc(v.id)}">Open resource →</button>
+      <button class="btn secondary" data-save="${esc(v.id)}" aria-label="Save this resource">☆ Save</button>
       <button class="btn secondary" id="copy-link">Copy link</button>
     </div>
     ${related ? `<section class="disc-section"><div class="disc-head"><h2>Related resources</h2></div><div class="disc-grid">${related}</div></section>` : ''}
@@ -266,8 +285,17 @@ export function resourcePage(ctx, publicId) {
   };
 }
 
-export function taxonomyPage(ctx, kind) {
-  const { db, session } = ctx;
+export function savedPage(ctx) {
+  const { session } = ctx;
+  const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:1000px" id="main">
+    <h1 style="font-family:var(--disp)">Saved resources <span class="count-pill" id="saved-count" hidden></span></h1>
+    <p style="color:var(--mut)">Bookmarks live only in this browser. Clearing site data removes them.</p>
+    <div class="grid" id="saved-grid" style="margin-top:16px"><div class="sk"><i style="height:16px;width:60%"></i></div></div>
+  </div>`;
+  return layout({ title: 'Saved resources', body, session });
+}
+
+export function taxonomyPage(ctx, kind) {  const { db, session } = ctx;
   const role = session?.role || 'anon';
   const where = role === 'viewer' || role === 'admin' ? `visibility = 1` : `visibility = 1 AND access_level = 'public'`;
   const isSubj = kind === 'subjects';

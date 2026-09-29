@@ -49,7 +49,7 @@ ${extraHead}
     <h2>About this directory</h2>
     <p>A searchable collection of SEHS selective-entry study resources. Search runs on our index — opening a resource takes you to its hosted file.</p>
   </div>
-  <div class="foot-actions"><a class="link-btn" href="/about">About</a><a class="link-btn" href="/unlock">Access</a><button class="link-btn" id="cookie-settings">Cookie settings</button></div>
+  <div class="foot-actions"><a class="link-btn" href="/about">About</a><a class="link-btn" href="/saved">Saved</a><a class="link-btn" href="/unlock">Access</a><button class="link-btn" id="cookie-settings">Cookie settings</button></div>
 </footer>
 <div class="modal-backdrop" id="consent-gate" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="consent-title">
@@ -82,8 +82,24 @@ ${extraHead}
   </div>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+<button id="to-top" class="icon-btn" aria-label="Back to top" title="Back to top" hidden>↑</button>
+<div class="modal-backdrop" id="shortcuts-modal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sc-title" style="max-width:440px">
+    <button class="icon-btn modal-x" id="shortcuts-x" aria-label="Close">✕</button>
+    <h2 id="sc-title">Keyboard shortcuts</h2>
+    <dl class="kv">
+      <dt><kbd>/</kbd></dt><dd>Focus search</dd>
+      <dt><kbd>↑</kbd> <kbd>↓</kbd></dt><dd>Move through suggestions</dd>
+      <dt><kbd>Enter</kbd></dt><dd>Open highlighted suggestion / search</dd>
+      <dt><kbd>Esc</kbd></dt><dd>Close menus and dialogs</dd>
+      <dt><kbd>?</kbd></dt><dd>This panel</dd>
+    </dl>
+  </div>
+</div>
 <script src="/theme.js" defer></script>
 <script src="/gate.js" defer></script>
+<script src="/ux.js" defer></script>
+<script src="/suggest.js" defer></script>
 </body>
 </html>`;
 }
@@ -128,8 +144,10 @@ export function resultRow(v, displayTitle, tokens = [], showDesc = true) {
       </div>
       ${tags ? `<div class="meta-row">${tags}</div>` : ''}
       <div class="card-foot">
-        <span></span>
-        <span><a class="btn small secondary" href="/r/${esc(v.id)}">Details</a>
+        <span class="date">${v.year ? esc(v.year) : ''}${v.sizeBytes ? ` · ${fmtBytes(v.sizeBytes)}` : ''}</span>
+        <span><button class="btn small secondary" data-save="${esc(v.id)}" aria-label="Save ${esc(displayTitle)}" title="Save">☆</button>
+        <button class="btn small secondary" data-copylink="/r/${esc(v.id)}" aria-label="Copy link">⧉</button>
+        <a class="btn small secondary" href="/r/${esc(v.id)}">Details</a>
         <button class="btn small" data-open="${esc(v.id)}">Open resource →</button></span>
       </div>
     </div>
