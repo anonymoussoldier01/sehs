@@ -19,6 +19,9 @@ export function layout({ title, desc = '', body, active = '', session = null, ex
 ${desc ? `<meta name="description" content="${esc(desc)}">` : ''}
 <meta name="theme-color" content="#4f46e5">
 <link rel="icon" href="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
@@ -82,9 +85,11 @@ ${extraHead}
 <script src="/theme.js" defer></script>
 <script src="/gate.js" defer></script>
 <script src="/ux.js" defer></script>
+<script src="/pwa.js" defer></script>
 <script src="/suggest.js" defer></script>
 <script src="/profile.js" defer></script>
 <script src="/palette.js" defer></script>
+<script src="/lists.js" defer></script>
 </body>
 </html>`;
 }
@@ -131,6 +136,7 @@ export function resultRow(v, displayTitle, tokens = [], showDesc = true) {
       <div class="card-foot">
         <span class="date">${v.year ? esc(v.year) : ''}${v.sizeBytes ? ` · ${fmtBytes(v.sizeBytes)}` : ''}</span>
         <span><button class="btn small secondary" data-save="${esc(v.id)}" aria-label="Save ${esc(displayTitle)}" title="Save">☆</button>
+        <button class="btn small secondary" data-listadd="${esc(v.id)}" aria-label="Add to list" title="Add to list">List +</button>
         <button class="btn small secondary" data-copylink="/r/${esc(v.id)}" aria-label="Copy link">⧉</button>
         <a class="btn small secondary" href="/r/${esc(v.id)}">Details</a>
         <button class="btn small" data-open="${esc(v.id)}">Open resource →</button></span>

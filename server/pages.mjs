@@ -63,6 +63,7 @@ export function landing(ctx) {
     <main aria-label="Browse resources">
       <section class="disc-section" id="recent-strip" hidden><div class="disc-head"><h2>Recently viewed</h2></div><div class="disc-grid" id="recent-grid"></div></section>
       <section class="disc-section" id="tuned-shelf" hidden><div class="disc-head"><h2>Tuned for you <small>based on what you open · stored only in this browser</small></h2></div><div class="disc-grid" id="tuned-grid"></div></section>
+      <section class="disc-section"><div class="disc-head"><h2>New arrivals</h2><a class="link-btn" href="/feed.xml">RSS →</a></div><div class="disc-grid" id="new-grid"></div></section>
       ${trendingCards ? `<section class="disc-section"><div class="disc-head"><h2>Trending this week</h2></div><div class="disc-grid">${trendingCards}</div></section>` : ''}
       <section class="disc-section"><div class="disc-head"><h2>Practice tests <small>${practice.length ? '' : ''}</small></h2><a class="link-btn" href="/search?cat=practice-test">View all →</a></div>
         <div class="disc-grid">${practice.map(card).join('')}</div></section>
@@ -271,8 +272,22 @@ export function resourcePage(ctx, publicId) {
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px">
       <button class="btn" data-open="${esc(v.id)}">Open resource →</button>
       <button class="btn secondary" data-save="${esc(v.id)}" aria-label="Save this resource">☆ Save</button>
-      <button class="btn secondary" id="copy-link">Copy link</button>
+      <button class="btn secondary" data-copylink="/r/${esc(v.id)}">Copy link</button>
+      <button class="btn secondary" data-report="${esc(v.id)}">Report issue</button>
     </div>
+    <div class="modal-backdrop" id="report-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="rep-title" style="max-width:480px">
+      <button class="icon-btn modal-x" id="report-x" aria-label="Close">✕</button>
+      <h2 id="rep-title">Report an issue</h2>
+      <form id="report-form" style="display:grid;gap:8px">
+        <select id="report-reason" aria-label="Reason" style="padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit">
+          <option value="broken">Link is broken</option>
+          <option value="wrong-details">Wrong title/details</option>
+          <option value="other">Something else</option>
+        </select>
+        <textarea id="report-detail" rows="3" maxlength="500" placeholder="Optional details…" style="padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit"></textarea>
+        <div><button class="btn small" type="submit">Send report</button></div>
+      </form>
+    </div></div>
     ${related ? `<section class="disc-section"><div class="disc-head"><h2>Related resources</h2></div><div class="disc-grid">${related}</div></section>` : ''}
   </div>
   <script src="/record.js" defer></script>`;
@@ -287,8 +302,36 @@ export function savedPage(ctx) {  const { session } = ctx;
     <h1 style="font-family:var(--disp)">Saved resources <span class="count-pill" id="saved-count" hidden></span></h1>
     <p style="color:var(--mut)">Bookmarks live only in this browser. Clearing site data removes them.</p>
     <div class="grid" id="saved-grid" style="margin-top:16px"><div class="sk"><i style="height:16px;width:60%"></i></div></div>
+    <section class="disc-section" style="margin-top:24px"><div class="disc-head"><h2>Studylists</h2></div>
+      <div class="disc-grid" id="lists-hub"></div>
+      <form id="list-new" style="display:flex;gap:8px;margin-top:12px;max-width:480px">
+        <input id="list-name" required maxlength="60" placeholder="New list name…" aria-label="New list name" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit">
+        <button class="btn small" type="submit">Create list</button>
+      </form>
+      <p style="color:var(--faint);font-size:12.5px">Lists live in this browser. Share links encode public resource IDs only.</p>
+    </section>
   </div>`;
   return layout({ title: 'Saved resources', body, session });
+}
+
+export function sharedListPage(ctx, ids) {
+  const { db, indexes, session } = ctx;
+  const index = forRole(indexes);
+  const docById = new Map(index.docs.map(d => [d.rec.id, d]));
+  const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
+  const cards = ids.map(id => {
+    const row = rowMap.get(id);
+    if (!row) return '';
+    const d = docById.get(id);
+    return resultRow(publicView(row), d ? d.displayTitle : row.title, [], true);
+  }).join('');
+  const body = `<div class="wrap" style="padding:28px 20px 40px" id="main">
+    <p class="crumb"><a href="/">Home</a> › <a href="/saved">Saved</a> › Shared list</p>
+    <h1 style="font-family:var(--disp)">Shared studylist (${ids.length} resources)</h1>
+    <div style="display:flex;gap:8px;margin:12px 0 16px"><button class="btn small secondary" onclick="window.print()">Print pack</button></div>
+    ${cards ? `<div class="grid">${cards}</div>` : '<p style="color:var(--mut)">None of these resources are available.</p>'}
+  </div>`;
+  return layout({ title: `Shared list (${ids.length})`, body, session });
 }
 
 export function studyHubPage(ctx) {
@@ -349,6 +392,22 @@ export function studyDeckPage(ctx, deckId) {
   </div>
   <script src="/study.js" defer></script>`;
   return layout({ title: 'Study deck', body, session });
+}
+
+export function requestPage(ctx) {
+  const { session } = ctx;
+  const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:640px" id="main">
+    <p class="crumb"><a href="/">Home</a> › Request a resource</p>
+    <h1 style="font-family:var(--disp)">Request a resource</h1>
+    <p style="color:var(--mut)">Tell us what's missing — an administrator reviews every request. Please don't include personal details.</p>
+    <form id="request-form" style="display:grid;gap:10px;margin-top:12px">
+      <input id="req-title" required minlength="4" maxlength="200" placeholder="What are you looking for? (e.g. 2023 ACER verbal reasoning)" style="padding:11px;border-radius:10px;border:1px solid var(--line2);background:var(--panel);color:inherit;font-size:15px">
+      <textarea id="req-detail" rows="4" maxlength="1000" placeholder="Extra detail (optional)" style="padding:11px;border-radius:10px;border:1px solid var(--line2);background:var(--panel);color:inherit"></textarea>
+      <div><button class="btn" type="submit">Send request</button> <span id="req-msg" style="font-size:13px"></span></div>
+    </form>
+  </div>
+  <script src="/request.js" defer></script>`;
+  return layout({ title: 'Request a resource', body, session });
 }
 
 export function taxonomyPage(ctx, kind) {  const { db, session } = ctx;

@@ -116,68 +116,42 @@ export function adminStats(db) {
 
 // ---- pages -------------------------------------------------------------------------
 function adminNav(active) {
-  const items = [['/admin', 'Dashboard'], ['/admin/resources', 'Resources'], ['/admin/audit', 'Audit & sessions'], ['/admin/settings', 'Settings']];
+  const items = [['/admin', 'Dashboard'], ['/admin/resources', 'Resources'], ['/admin/triage', 'Triage'], ['/admin/audit', 'Audit & sessions'], ['/admin/settings', 'Settings']];
   return `<nav class="topnav" aria-label="Admin" style="margin-bottom:16px">${items.map(([h, l]) =>
     `<a href="${h}"${active === h ? ' class="on" aria-current="page"' : ''}>${l}</a>`).join('')}</nav>`;
 }
 
 export function adminDashboard(ctx) {
   maybePurge(ctx.db);
-  const s = adminStats(ctx.db);
-  const bars = (vals, color) => {
-    const max = s.maxDay;
-    return `<span class="spark" aria-hidden="true">${vals.map(v =>
-      `<i style="height:${Math.max(2, Math.round((v / max) * 22))}px${color ? `;background:${color}` : ''}" title="${v}"></i>`).join('')}</span>`;
-  };
   const body = `<div class="wrap" style="padding:28px 20px 40px" id="main">
     <h1 style="font-family:var(--disp)">Admin dashboard</h1>
     ${adminNav('/admin')}
-    <div class="stat-cards">
-      <div class="stat-card"><b>${s.total.toLocaleString()}</b><span>Resources</span></div>
-      <div class="stat-card"><b>${s.members.toLocaleString()}</b><span>Members-only</span></div>
-      <div class="stat-card"><b>${s.sessions}</b><span>Active sessions</span></div>
-      <div class="stat-card"><b>${s.opensToday.toLocaleString()}</b><span>Opens today</span></div>
-    </div>
+    <div class="stat-cards" id="dash-stats"><div class="sk"><i style="height:20px;width:50%"></i></div></div>
     <section class="disc-section"><div class="disc-head"><h2>Last 14 days</h2></div>
-      <div class="disc-tile"><p>Opens ${bars(s.days.map(d => d.opens))}</p>
-      <p>Searches ${bars(s.days.map(d => d.queries), 'var(--acc-line)')}</p></div></section>
+      <div class="disc-tile" id="dash-chart"><p style="color:var(--mut)">Loading…</p></div></section>
     <div class="disc-sub">
-      <div class="disc-tile"><h3>Top queries</h3>${s.topQueries.length ? `<table class="grid-table"><tbody>${s.topQueries.map(q => `<tr><td>${esc(q.key)}</td><td style="text-align:right">${q.c}</td></tr>`).join('')}</tbody></table>` : '<p>No queries yet.</p>'}</div>
-      <div class="disc-tile"><h3>Top resources</h3>${s.topRes.length ? `<table class="grid-table"><tbody>${s.topRes.map(r => `<tr><td><a href="/r/${esc(r.id)}">${esc((r.title || r.id).slice(0, 50))}</a></td><td style="text-align:right">${r.c}</td></tr>`).join('')}</tbody></table>` : '<p>No opens yet.</p>'}</div>
+      <div class="disc-tile"><h3>Top queries</h3><div id="dash-queries"><p style="color:var(--mut)">Loading…</p></div></div>
+      <div class="disc-tile"><h3>Top resources</h3><div id="dash-top"></div></div>
     </div>
     <section class="disc-section" style="margin-top:16px"><div class="disc-head"><h2>Zero-result queries (content gaps)</h2></div>
-      <div class="disc-tile">${s.zeroQueries.length ? s.zeroQueries.map(q => `<a class="quick-chip" href="/search?q=${encodeURIComponent(q.key)}">${esc(q.key)} · ${q.count}</a>`).join(' ') : '<p>None recorded.</p>'}</div></section>
-  </div>`;
+      <div class="disc-tile" id="dash-zero"><p style="color:var(--mut)">Loading…</p></div></section>
+    <section class="disc-section"><div class="disc-head"><h2>Server health</h2></div>
+      <div class="disc-tile" id="dash-health"><p style="color:var(--mut)">Loading…</p></div></section>
+  </div>
+  <script src="/admin.js" defer></script>`;
   return layout({ title: 'Admin dashboard', body, session: ctx.session });
 }
 
 export function adminResources(ctx, sp) {
   const q = (sp.get('q') || '').slice(0, 120);
-  const page = Math.max(1, Number(sp.get('page')) || 1);
-  const per = 25;
-  const like = `%${q.toLowerCase()}%`;
-  const where = q ? `WHERE (lower(title) LIKE ? OR lower(provider) LIKE ? OR lower(category) LIKE ?)` : '';
-  const args = q ? [like, like, like] : [];
-  const total = ctx.db.prepare(`SELECT COUNT(*) n FROM resources ${where}`).get(...args).n;
-  const pages = Math.max(1, Math.ceil(total / per));
-  const rows = ctx.db.prepare(`SELECT * FROM resources ${where} ORDER BY id DESC LIMIT ? OFFSET ?`).all(...args, per, (Math.min(page, pages) - 1) * per);
-  const trs = rows.map(r => `<tr>
-      <td><a href="/r/${esc(r.public_id)}">${esc(r.title.slice(0, 60))}</a><br><span style="color:var(--faint);font-size:12px">${esc(r.provider || '')} · ${esc(r.file_type)}</span></td>
-      <td>${esc(r.category)}</td>
-      <td><span class="badge ${r.access_level === 'members' ? 'cat' : ''}">${esc(r.access_level)}</span></td>
-      <td><span class="badge ${r.status === 'available' ? 'st-active' : 'st-unknown'}">${esc(r.status.replace('_', ' '))}</span></td>
-      <td>${r.visibility ? 'yes' : 'no'}</td>
-      <td style="white-space:nowrap"><button class="btn small secondary" data-edit="${r.id}">Edit</button>
-      <button class="btn small secondary" data-tier="${r.id}" data-level="${r.access_level === 'members' ? 'public' : 'members'}">${r.access_level === 'members' ? 'Make public' : 'Make members'}</button></td>
-    </tr>`).join('');
   const body = `<div class="wrap" style="padding:28px 20px 40px" id="main">
     <h1 style="font-family:var(--disp)">Resources</h1>
     ${adminNav('/admin/resources')}
-    <form method="get" action="/admin/resources" class="search-wrap" style="max-width:520px;margin-bottom:16px">
+    <form id="res-search" class="search-wrap" style="max-width:520px;margin-bottom:16px">
       <div class="searchbox"><input name="q" type="search" value="${esc(q)}" placeholder="Search titles, providers…" aria-label="Search resources"></div>
     </form>
-    <div class="table-wrap"><table class="grid-table"><thead><tr><th>Title</th><th>Category</th><th>Access</th><th>Status</th><th>Visible</th><th>Actions</th></tr></thead><tbody>${trs || '<tr><td colspan="6">No resources.</td></tr>'}</tbody></table></div>
-    <p style="color:var(--mut);font-size:13px">Page ${Math.min(page, pages)} of ${pages} · ${total.toLocaleString()} total · edits apply immediately.</p>
+    <div class="table-wrap"><table class="grid-table"><thead><tr><th>Title</th><th>Category</th><th>Access</th><th>Status</th><th>Visible</th><th>Actions</th></tr></thead><tbody id="res-rows"><tr><td colspan="6">Loading…</td></tr></tbody></table></div>
+    <p style="color:var(--mut);font-size:13px" id="res-page"></p>
     <div class="disc-tile" style="margin-top:16px"><h3>Add resource</h3>
       <form id="res-add" style="display:grid;gap:8px;max-width:560px">
         <input name="title" required minlength="2" maxlength="200" placeholder="Title" style="padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit">
@@ -218,53 +192,47 @@ export function adminResources(ctx, sp) {
 
 export function adminAudit(ctx, sp) {
   const type = (sp.get('type') || '').slice(0, 30);
-  const page = Math.max(1, Number(sp.get('page')) || 1);
-  const per = 50;
-  const where = type ? `WHERE type = ?` : '';
-  const args = type ? [type] : [];
-  const total = ctx.db.prepare(`SELECT COUNT(*) n FROM events ${where}`).get(...args).n;
-  const pages = Math.max(1, Math.ceil(total / per));
-  const rows = ctx.db.prepare(`SELECT id, day, type, created_at, resource_id, data FROM events ${where} ORDER BY id DESC LIMIT ? OFFSET ?`).all(...args, per, (Math.min(page, pages) - 1) * per);
-  const titleOf = (rid) => {
-    if (!rid) return '—';
-    const r = ctx.db.prepare('SELECT title FROM resources WHERE id = ?').get(rid);
-    return r ? esc(r.title.slice(0, 50)) : `#${rid}`;
-  };
-  const trs = rows.map(e => {
-    let detail = '';
-    try {
-      const d = JSON.parse(e.data || '{}');
-      if (d.q) detail = `q=“${esc(String(d.q).slice(0, 60))}”`;
-      else if (d.which) detail = esc(d.which);
-      else if (d.version) detail = `v${d.version}`;
-      else if (d.reason) detail = esc(d.reason);
-    } catch { /* noop */ }
-    return `<tr><td style="white-space:nowrap">${esc(e.created_at.slice(0, 19).replace('T', ' '))}</td><td>${esc(e.type)}</td><td>${titleOf(e.resource_id)}</td><td>${detail}</td></tr>`;
-  }).join('');
-  const sessions = ctx.db.prepare(`SELECT rowid, role, created_at, expires_at, last_seen_at, ip_hash, ua_family FROM sessions WHERE expires_at > ? ORDER BY last_seen_at DESC LIMIT 100`).all(new Date().toISOString());
-  const sess = sessions.map(s => `<tr><td>${esc(s.role)}</td><td style="white-space:nowrap">${esc(s.last_seen_at.slice(0, 19).replace('T', ' '))}</td><td><code>${esc(s.ip_hash.slice(0, 12))}…</code></td><td>${esc(s.ua_family)}</td><td><button class="btn small secondary" data-revoke-session="${s.rowid}">Revoke</button></td></tr>`).join('');
   const body = `<div class="wrap" style="padding:28px 20px 40px" id="main">
     <h1 style="font-family:var(--disp)">Audit &amp; sessions</h1>
     ${adminNav('/admin/audit')}
-    <h2 style="font-size:16px">Active sessions (${sessions.length})</h2>
-    <div class="table-wrap"><table class="grid-table"><thead><tr><th>Role</th><th>Last seen</th><th>IP hash</th><th>Client</th><th></th></tr></thead><tbody>${sess || '<tr><td colspan="5">None.</td></tr>'}</tbody></table></div>
-    <div style="margin:12px 0"><button class="btn small secondary" id="revoke-all">Revoke all admin sessions</button></div>
+    <h2 style="font-size:16px">Active sessions <span id="sess-n"></span></h2>
+    <div class="table-wrap"><table class="grid-table"><thead><tr><th>Role</th><th>Last seen</th><th>IP hash</th><th>Client</th><th></th></tr></thead><tbody id="sess-rows"><tr><td colspan="5">Loading…</td></tr></tbody></table></div>
+    <div style="margin:12px 0"><button class="btn small secondary" id="revoke-all">Revoke all admin sessions</button>
+    <button class="btn small secondary" id="audit-csv">Export audit CSV</button></div>
     <h2 style="font-size:16px;margin-top:24px">Event log</h2>
-    <form method="get" action="/admin/audit" style="margin-bottom:12px;display:flex;gap:8px">
-      <select name="type" aria-label="Event type" onchange="this.form.submit()">
+    <form id="audit-filter" style="margin-bottom:12px;display:flex;gap:8px">
+      <select id="audit-type" aria-label="Event type">
         <option value="">All types</option>
-        ${['open', 'unlock', 'unlock_fail', 'lockout', 'terms_accept', 'consent', 'search_zero', 'admin'].map(t => `<option value="${t}"${type === t ? ' selected' : ''}>${t}</option>`).join('')}
+        ${['open', 'unlock', 'unlock_fail', 'lockout', 'terms_accept', 'report', 'request', 'search_zero', 'admin'].map(t => `<option value="${t}"${type === t ? ' selected' : ''}>${t}</option>`).join('')}
       </select>
     </form>
-    <div class="table-wrap"><table class="grid-table"><thead><tr><th>Time</th><th>Type</th><th>Resource</th><th>Detail</th></tr></thead><tbody>${trs || '<tr><td colspan="4">No events.</td></tr>'}</tbody></table></div>
-    <p style="color:var(--mut);font-size:13px">Page ${Math.min(page, pages)} of ${pages} · IPs stored hashed only.</p>
+    <div class="table-wrap"><table class="grid-table"><thead><tr><th>Time</th><th>Type</th><th>Resource</th><th>Detail</th></tr></thead><tbody id="audit-rows"><tr><td colspan="4">Loading…</td></tr></tbody></table></div>
+    <p style="color:var(--mut);font-size:13px" id="audit-page"></p>
   </div>
   <script src="/admin.js" defer></script>`;
   return layout({ title: 'Admin audit', body, session: ctx.session });
 }
 
-export function adminSettings(ctx) {
-  const days = Number(getMeta(ctx.db, 'retention_days') || 30);
+export function adminTriage(ctx) {
+  const reports = ctx.db.prepare(`SELECT r.*, res.title AS rtitle, res.public_id AS rpid FROM reports r
+    LEFT JOIN resources res ON res.id = r.resource_id WHERE r.status = 'open' ORDER BY r.id DESC LIMIT 100`).all();
+  const requests = ctx.db.prepare(`SELECT * FROM requests WHERE status = 'open' ORDER BY id DESC LIMIT 100`).all();
+  const repRows = reports.map(r => `<tr><td>#${r.id}</td><td>${r.rtitle && r.rpid ? `<a href="/r/${esc(r.rpid)}">${esc(r.rtitle.slice(0, 50))}</a>` : '—'}</td><td>${esc(r.reason)}</td><td>${esc((r.detail || '').slice(0, 80))}</td><td>${esc(r.created_at.slice(0, 16).replace('T', ' '))}</td><td style="white-space:nowrap"><button class="btn small secondary" data-triage="report:${r.id}:accepted">Accept</button> <button class="btn small secondary" data-triage="report:${r.id}:rejected">Reject</button></td></tr>`).join('');
+  const reqRows = requests.map(r => `<tr><td>#${r.id}</td><td>${esc(r.title.slice(0, 60))}</td><td>${esc((r.detail || '').slice(0, 80))}</td><td>${esc(r.created_at.slice(0, 16).replace('T', ' '))}</td><td style="white-space:nowrap"><button class="btn small secondary" data-triage="request:${r.id}:accepted">Accept</button> <button class="btn small secondary" data-triage="request:${r.id}:rejected">Reject</button></td></tr>`).join('');
+  const body = `<div class="wrap" style="padding:28px 20px 40px" id="main">
+    <h1 style="font-family:var(--disp)">Triage queue</h1>
+    ${adminNav('/admin/triage')}
+    <h2 style="font-size:16px">Broken-link reports (${reports.length})</h2>
+    <div class="table-wrap"><table class="grid-table"><thead><tr><th>ID</th><th>Resource</th><th>Reason</th><th>Detail</th><th>When</th><th></th></tr></thead><tbody>${repRows || '<tr><td colspan="6">Queue clear. 🎉</td></tr>'}</tbody></table></div>
+    <h2 style="font-size:16px;margin-top:24px">Resource requests (${requests.length})</h2>
+    <div class="table-wrap"><table class="grid-table"><thead><tr><th>ID</th><th>Title</th><th>Detail</th><th>When</th><th></th></tr></thead><tbody>${reqRows || '<tr><td colspan="5">Queue clear. 🎉</td></tr>'}</tbody></table></div>
+    <p style="color:var(--mut);font-size:13px">Accepting a broken-link report marks the resource <em>needs verification</em>.</p>
+  </div>
+  <script src="/admin.js" defer></script>`;
+  return layout({ title: 'Admin triage', body, session: ctx.session });
+}
+
+export function adminSettings(ctx) {  const days = Number(getMeta(ctx.db, 'retention_days') || 30);
   const lastPurge = getMeta(ctx.db, 'last_purge') || 'never';
   const termsV = Number(getMeta(ctx.db, 'terms_version') || 1);
   const terms = ctx.db.prepare('SELECT version, summary_md, body_md FROM terms WHERE version = ?').get(termsV) || { version: termsV, summary_md: '', body_md: '' };
@@ -293,6 +261,18 @@ export function adminSettings(ctx) {
         <button class="btn small secondary" type="button" id="purge-btn">Purge now</button>
         <span style="font-size:13px;color:var(--mut)">Last purge: ${esc(lastPurge)}</span>
       </form></div>
+    <div class="disc-tile" style="margin-top:16px"><h3>Announcements</h3>
+      <div id="ann-list"><p style="color:var(--mut)">Loading…</p></div>
+      <form id="ann-form" style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+        <input id="ann-body" required maxlength="300" placeholder="Banner text…" style="flex:1;min-width:200px;padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit">
+        <button class="btn small" type="submit">Publish</button>
+      </form></div>
+    <div class="disc-tile" style="margin-top:16px"><h3>Backup &amp; health</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a class="btn small secondary" href="/api/admin/backup">Download database backup</a>
+        <button class="btn small secondary" id="health-btn">Check health</button>
+      </div>
+      <div id="health-out" style="margin-top:8px;font-size:13px;color:var(--mut)"></div></div>
   </div>
   <script src="/admin.js" defer></script>`;
   return layout({ title: 'Admin settings', body, session: ctx.session });

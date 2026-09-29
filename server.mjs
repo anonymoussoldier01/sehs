@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { openDb, getMeta, setMeta } from './server/db.mjs';
+import { openDb, getMeta, setMeta, dbPath } from './server/db.mjs';
 import {
   hashPassword, verifyPassword, newToken, tokenHash,
   rateLimiter, lockoutTracker, ipHash, uaFamily,
@@ -13,9 +13,9 @@ import { buildIndexes, forRole, loadRows, publicView } from './server/content.mj
 import { autoDecks, adminDecks, deckCards } from './server/decks.mjs';
 import { search, suggest } from './search.js';
 import { layout, esc } from './server/templates.mjs';
-import { landing, searchPage, resourcePage, taxonomyPage, aboutPage, unlockPage, savedPage, studyHubPage, studyDeckPage, parseSearchParams } from './server/pages.mjs';
+import { landing, searchPage, resourcePage, taxonomyPage, aboutPage, unlockPage, savedPage, sharedListPage, studyHubPage, studyDeckPage, requestPage, parseSearchParams } from './server/pages.mjs';
 import {
-  adminMissing, apiAdminStats, adminDashboard, adminResources, adminAudit, adminSettings,
+  adminMissing, apiAdminStats, adminDashboard, adminResources, adminAudit, adminTriage, adminSettings,
   apiResourceUpdate, apiResourceCreate, apiResourceDelete, apiBulkImport, runPurge,
 } from './server/admin.mjs';
 
@@ -105,6 +105,7 @@ const rlApi = rateLimiter({ capacity: 120, refillPerSec: 2 });      // 120 burst
 const rlUnlock = rateLimiter({ capacity: 10, refillPerSec: 10 / 60 });
 const rlAccess = rateLimiter({ capacity: 30, refillPerSec: 0.5 });
 const rlSuggest = rateLimiter({ capacity: 60, refillPerSec: 1 });
+const rlReport = rateLimiter({ capacity: 5, refillPerSec: 5 / 3600 }); // 5 per hour per IP
 const unlockLockouts = lockoutTracker({});
 
 // ---- static ----------------------------------------------------------------------
@@ -390,6 +391,52 @@ const server = http.createServer(async (req, res) => {
         return apiByIds(req, res, url.searchParams);
       }
       if (url.pathname === '/api/trending' && req.method === 'GET') return apiTrending(req, res);
+      if (url.pathname === '/api/announcement' && req.method === 'GET') {
+        const row = db.prepare('SELECT body FROM announcements WHERE active = 1 ORDER BY id DESC LIMIT 1').get();
+        return sendJson(res, 200, { ok: true, body: row?.body || null });
+      }
+      if (url.pathname === '/api/new' && req.method === 'GET') {
+        const rows = db.prepare('SELECT * FROM resources WHERE visibility = 1 ORDER BY id DESC LIMIT 6').all();
+        const index = forRole(indexes);
+        const docById = new Map(index.docs.map(d => [d.rec.id, d]));
+        return sendJson(res, 200, {
+          ok: true,
+          results: rows.map(row => {
+            const d = docById.get(row.public_id);
+            return { ...publicView(row), displayTitle: d ? d.displayTitle : row.title };
+          }),
+        });
+      }
+      if (url.pathname === '/api/reports' && req.method === 'POST') {
+        if (!rlReport.allow('rep:' + ip).ok) return sendJson(res, 429, { ok: false, error: 'Too many reports. Try again later.' });
+        let body;
+        try { body = JSON.parse(await readBody(req, 10 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+        const reasons = ['broken', 'wrong-details', 'other'];
+        const reason = reasons.includes(body.reason) ? body.reason : 'other';
+        const detail = String(body.detail || '').slice(0, 500);
+        const rid = String(body.resourceId || '');
+        let resourceId = null;
+        if (/^[0-9a-f]{32}$/.test(rid)) {
+          const row = db.prepare('SELECT id FROM resources WHERE public_id = ?').get(rid);
+          if (!row) return sendJson(res, 400, { ok: false, error: 'Unknown resource.' });
+          resourceId = row.id;
+        }
+        db.prepare('INSERT INTO reports(resource_id, reason, detail, ip_hash, status, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+          .run(resourceId, reason, detail, ipHash(ip, saltForIp()), 'open', nowIso());
+        logEvent('report', { resourceId, data: { reason } });
+        return sendJson(res, 201, { ok: true });
+      }
+      if (url.pathname === '/api/requests' && req.method === 'POST') {
+        if (!rlReport.allow('req:' + ip).ok) return sendJson(res, 429, { ok: false, error: 'Too many requests. Try again later.' });
+        let body;
+        try { body = JSON.parse(await readBody(req, 10 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+        const title = String(body.title || '').trim().slice(0, 200);
+        if (title.length < 4) return sendJson(res, 400, { ok: false, error: 'Describe what you need (4+ characters).' });
+        db.prepare('INSERT INTO requests(title, detail, ip_hash, status, created_at) VALUES (?, ?, ?, ?, ?)')
+          .run(title, String(body.detail || '').slice(0, 1000), ipHash(ip, saltForIp()), 'open', nowIso());
+        logEvent('request', { data: {} });
+        return sendJson(res, 201, { ok: true });
+      }
       if (url.pathname === '/api/decks' && req.method === 'GET') {
         const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
         return sendJson(res, 200, {
@@ -509,6 +556,133 @@ const server = http.createServer(async (req, res) => {
           logEvent('admin', { data: { action: 'purge', deleted: r.deleted } });
           return sendJson(res, 200, { ok: true, ...r });
         }
+        if (url.pathname === '/api/admin/resources' && req.method === 'GET') {
+          const u = new URL(req.url, 'http://x').searchParams;
+          const q = (u.get('q') || '').slice(0, 120).toLowerCase();
+          const page = Math.max(1, Number(u.get('page')) || 1);
+          const per = 25;
+          const like = `%${q}%`;
+          const where = q ? `WHERE (lower(title) LIKE ? OR lower(provider) LIKE ? OR lower(category) LIKE ?)` : '';
+          const args = q ? [like, like, like] : [];
+          const total = db.prepare(`SELECT COUNT(*) n FROM resources ${where}`).get(...args).n;
+          const pages = Math.max(1, Math.ceil(total / per));
+          const rows = db.prepare(`SELECT * FROM resources ${where} ORDER BY id DESC LIMIT ? OFFSET ?`).all(...args, per, (Math.min(page, pages) - 1) * per);
+          return sendJson(res, 200, {
+            ok: true, total, page: Math.min(page, pages), pages,
+            items: rows.map(r => ({ ...publicView(r), _id: r.id, accessLevel: r.access_level, visibility: !!r.visibility })),
+          });
+        }
+        if (url.pathname === '/api/admin/events' && req.method === 'GET') {
+          const u = new URL(req.url, 'http://x').searchParams;
+          const type = (u.get('type') || '').slice(0, 30);
+          const page = Math.max(1, Number(u.get('page')) || 1);
+          const per = 50;
+          const where = type ? `WHERE type = ?` : '';
+          const args = type ? [type] : [];
+          const total = db.prepare(`SELECT COUNT(*) n FROM events ${where}`).get(...args).n;
+          const pages = Math.max(1, Math.ceil(total / per));
+          const rows = db.prepare(`SELECT e.id, e.created_at, e.type, e.resource_id, e.data, r.title AS rtitle
+            FROM events e LEFT JOIN resources r ON r.id = e.resource_id
+            ${where} ORDER BY e.id DESC LIMIT ? OFFSET ?`).all(...args, per, (Math.min(page, pages) - 1) * per);
+          return sendJson(res, 200, {
+            ok: true, total, page: Math.min(page, pages), pages,
+            items: rows.map(e => ({ id: e.id, at: e.created_at, type: e.type, resource: e.rtitle ? String(e.rtitle).slice(0, 60) : null, data: (() => { try { return JSON.parse(e.data || '{}'); } catch { return {}; } })() })),
+          });
+        }
+        if (url.pathname === '/api/admin/sessions' && req.method === 'GET') {
+          const rows = db.prepare(`SELECT rowid, role, created_at, expires_at, last_seen_at, ip_hash, ua_family FROM sessions WHERE expires_at > ? ORDER BY last_seen_at DESC LIMIT 100`).all(nowIso());
+          return sendJson(res, 200, { ok: true, sessions: rows.map(s => ({ rowid: s.rowid, role: s.role, created: s.created_at, expires: s.expires_at, seen: s.last_seen_at, ip: String(s.ip_hash).slice(0, 12) + '…', ua: s.ua_family })) });
+        }
+        if (url.pathname === '/api/admin/terms' && req.method === 'GET') {
+          const v = Number(getMeta(db, 'terms_version') || 1);
+          const row = db.prepare('SELECT version, summary_md, body_md FROM terms WHERE version = ?').get(v);
+          return sendJson(res, 200, { ok: true, version: v, summary: row?.summary_md || '', body: row?.body_md || '' });
+        }
+        if (url.pathname === '/api/admin/announcements' && req.method === 'GET') {
+          const rows = db.prepare('SELECT id, body, active, created_at FROM announcements ORDER BY id DESC LIMIT 50').all();
+          return sendJson(res, 200, { ok: true, items: rows });
+        }
+        if (url.pathname === '/api/admin/announcements' && req.method === 'POST') {
+          let body;
+          try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+          const text = String(body.body || '').trim().slice(0, 300);
+          if (text.length < 2) return sendJson(res, 400, { ok: false, error: 'Text needs 2+ characters.' });
+          db.prepare('INSERT INTO announcements(body, active, created_at) VALUES (?, 1, ?)').run(text, nowIso());
+          logEvent('admin', { data: { action: 'announce' } });
+          return sendJson(res, 201, { ok: true });
+        }
+        const anm = url.pathname.match(/^\/api\/admin\/announcements\/(\d+)$/);
+        if (anm) {
+          if (req.method === 'PATCH') {
+            let body;
+            try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+            db.prepare('UPDATE announcements SET active = ? WHERE id = ?').run(body.active ? 1 : 0, Number(anm[1]));
+            return sendJson(res, 200, { ok: true });
+          }
+          if (req.method === 'DELETE') {
+            db.prepare('DELETE FROM announcements WHERE id = ?').run(Number(anm[1]));
+            return sendJson(res, 200, { ok: true });
+          }
+          return adminMissing(res, sendJson);
+        }
+        if (url.pathname === '/api/admin/backup' && req.method === 'GET') {
+          try {
+            db.exec('PRAGMA wal_checkpoint(TRUNCATE)'); // consistent snapshot before streaming
+            const st = fs.statSync(dbPath());
+            secureHeaders(res);
+            res.writeHead(200, {
+              'Content-Type': 'application/octet-stream',
+              'Content-Length': st.size,
+              'Content-Disposition': `attachment; filename="sehs-backup-${new Date().toISOString().slice(0, 10)}.db"`,
+            });
+            fs.createReadStream(dbPath()).pipe(res);
+            logEvent('admin', { data: { action: 'backup' } });
+          } catch { sendJson(res, 500, { ok: false, error: 'unavailable' }); }
+          return;
+        }
+        if (url.pathname === '/api/admin/health' && req.method === 'GET') {          let dbBytes = 0;
+          try { dbBytes = fs.statSync(dbPath()).size; } catch { /* noop */ }
+          const t0 = Date.now();
+          buildIndexes(db);
+          return sendJson(res, 200, {
+            ok: true,
+            dbBytes,
+            uptimeSec: Math.round(process.uptime()),
+            node: process.version,
+            indexRebuildMs: Date.now() - t0,
+            retentionDays: Number(getMeta(db, 'retention_days') || 30),
+            lastPurge: getMeta(db, 'last_purge') || 'never',
+            termsVersion: Number(getMeta(db, 'terms_version') || 1),
+          });
+        }
+        if (url.pathname === '/api/admin/audit.csv' && req.method === 'GET') {
+          const rows = db.prepare('SELECT id, created_at, type, resource_id, data FROM events ORDER BY id DESC LIMIT 5000').all();
+          const q = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+          const csv = 'id,created_at,type,resource_id,data\n' + rows.map(e => [e.id, e.created_at, e.type, e.resource_id || '', e.data || ''].map(q).join(',')).join('\n');
+          secureHeaders(res);
+          res.writeHead(200, {
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': `attachment; filename="sehs-audit-${new Date().toISOString().slice(0, 10)}.csv"`,
+          });
+          res.end(csv);
+          return;
+        }
+        const tm = url.pathname.match(/^\/api\/admin\/triage\/(report|request)\/(\d+)$/);
+        if (tm && req.method === 'POST') {
+          let body;
+          try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+          const status = body.status === 'accepted' ? 'accepted' : 'rejected';
+          const table = tm[1] === 'report' ? 'reports' : 'requests';
+          const row = db.prepare(`SELECT * FROM ${table} WHERE id = ?`).get(Number(tm[2]));
+          if (!row) return adminMissing(res, sendJson);
+          db.prepare(`UPDATE ${table} SET status = ? WHERE id = ?`).run(status, row.id);
+          if (table === 'reports' && status === 'accepted' && row.resource_id) {
+            db.prepare(`UPDATE resources SET status = 'needs_verification', updated_at = ? WHERE id = ?`).run(nowIso(), row.resource_id);
+            rebuildIndexes();
+          }
+          logEvent('admin', { data: { action: 'triage', kind: table, status } });
+          return sendJson(res, 200, { ok: true });
+        }
         if (url.pathname === '/api/admin/decks' && req.method === 'POST') {
           let body;
           try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
@@ -600,6 +774,28 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/providers') return html(200, taxonomyPage(ctx, 'providers'));
     if (url.pathname === '/about') return html(200, aboutPage(ctx));
     if (url.pathname === '/saved') return html(200, savedPage(ctx));
+    if (url.pathname === '/feed.xml' && req.method === 'GET') {
+      const rows = db.prepare('SELECT * FROM resources WHERE visibility = 1 ORDER BY id DESC LIMIT 30').all();
+      const items = rows.map(r => {
+        const t = String(r.title).replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+        return `<item><title>${t}</title><link>https://sehs.directory/r/${r.public_id}</link><guid>https://sehs.directory/r/${r.public_id}</guid><pubDate>${new Date(r.created_at).toUTCString()}</pubDate></item>`;
+      }).join('');
+      secureHeaders(res);
+      res.writeHead(200, { 'Content-Type': 'application/rss+xml; charset=utf-8' });
+      res.end(`<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>SEHS Study Directory — new arrivals</title><link>https://sehs.directory/</link><description>Recently added study resources.</description>${items}</channel></rss>`);
+      return;
+    }
+    if (url.pathname === '/request') return html(200, requestPage(ctx));
+    const lm = url.pathname.match(/^\/list\/([A-Za-z0-9-_]{1,1400})$/);
+    if (lm) {
+      let ids = [];
+      try {
+        const raw = Buffer.from(lm[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr)) ids = arr.filter(s => /^[0-9a-f]{32}$/.test(s)).slice(0, 100);
+      } catch { /* invalid share code → empty list */ }
+      return html(200, sharedListPage(ctx, ids));
+    }
     if (url.pathname === '/study') return html(200, studyHubPage(ctx));
     const sm = url.pathname.match(/^\/study\/([A-Za-z0-9-]{1,40})$/);
     if (sm) return html(200, studyDeckPage(ctx, sm[1]));
@@ -609,6 +805,7 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/admin') return html(200, adminDashboard({ db, indexes, session: null }));
     if (url.pathname === '/admin/resources') return html(200, adminResources({ db, indexes, session: null }, url.searchParams));
     if (url.pathname === '/admin/audit') return html(200, adminAudit({ db, indexes, session: null }, url.searchParams));
+    if (url.pathname === '/admin/triage') return html(200, adminTriage({ db, indexes, session: null }));
     if (url.pathname === '/admin/settings') return html(200, adminSettings({ db, indexes, session: null }));
     return serveStatic(url.pathname, res);
   } catch (e) {

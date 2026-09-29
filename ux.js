@@ -161,4 +161,42 @@
   paintSaved();
   var dt = document.getElementById('density-toggle');
   syncDens(dt);
+  // new arrivals shelf (landing)
+  (function newArrivals() {
+    var grid = document.getElementById('new-grid');
+    if (!grid) return;
+    fetch('/api/new').then(function (r) { return r.json(); }).then(function (j) {
+      if (!j.results || !j.results.length) { grid.innerHTML = '<p style="color:var(--mut)">Nothing new yet.</p>'; return; }
+      grid.innerHTML = j.results.map(function (v) {
+        return '<article class="card"><div class="card-body"><h3><a href="/r/' + v.id + '">' +
+          String(v.displayTitle || v.title).replace(/[<>&]/g, function (c) { return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]; }) +
+          '</a></h3><div class="meta-row"><span class="badge">' + v.fileType + '</span>' +
+          (v.answersIncluded ? '<span class="badge ans">Answers included</span>' : '') +
+          '</div><div class="card-foot"><span></span><a class="btn small" href="/r/' + v.id + '">Open →</a></div></div></article>';
+      }).join('');
+    }).catch(function () { grid.innerHTML = ''; });
+  })();
+  // site announcement banner (public feed, dismissible per version)
+  (function announcement() {
+    fetch('/api/announcement').then(function (r) { return r.json(); }).then(function (j) {
+      if (!j.body) return;
+      var seen = null;
+      try { seen = localStorage.getItem('sehs-ann-seen'); } catch (e) {}
+      var key = String(j.body).slice(0, 120);
+      if (seen === key) return;
+      var main = document.getElementById('main');
+      if (!main) return;
+      var bar = document.createElement('div');
+      bar.className = 'notice';
+      bar.setAttribute('role', 'status');
+      bar.style.margin = '12px 20px 0';
+      bar.innerHTML = '<span></span> <button class="link-btn" id="ann-hide">Dismiss</button>';
+      bar.querySelector('span').textContent = j.body;
+      main.before(bar);
+      document.getElementById('ann-hide').addEventListener('click', function () {
+        try { localStorage.setItem('sehs-ann-seen', key); } catch (e) {}
+        bar.remove();
+      });
+    }).catch(function () { /* offline: skip */ });
+  })();
 })();
