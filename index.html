@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEHS Study Directory — Searchable Link Library</title>
+<meta name="description" content="Searchable directory of selective-entry study materials: maths, verbal reasoning, reading, writing, science.">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png">
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div>
+      <h1>SEHS Study Directory</h1>
+      <p class="sub"><span id="stat-total">…</span> files &amp; folders · locally searchable · no login</p>
+    </div>
+    <div class="searchbox">
+      <input id="q" type="search" placeholder="Search title, tags, provider, subject…  ( / )" autocomplete="off" aria-label="Search links">
+      <button id="clear" title="Clear search">✕</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap layout">
+  <aside class="filters" aria-label="Filters">
+    <div class="f-group">
+      <label for="f-cat">Category</label>
+      <select id="f-cat"><option value="">All categories</option></select>
+    </div>
+    <div class="f-group">
+      <label for="f-type">Content type</label>
+      <select id="f-type"><option value="">All types</option></select>
+    </div>
+    <div class="f-group">
+      <label for="f-domain">Domain</label>
+      <select id="f-domain"><option value="">All domains</option></select>
+    </div>
+    <div class="f-group">
+      <label for="f-status">Status</label>
+      <select id="f-status">
+        <option value="">Any status</option>
+        <option value="active">active</option>
+        <option value="redirected">redirected</option>
+        <option value="unavailable">unavailable</option>
+        <option value="timeout">timeout</option>
+        <option value="blocked">blocked</option>
+        <option value="unknown">unknown</option>
+      </select>
+    </div>
+    <div class="f-group">
+      <label for="f-tag">Tag</label>
+      <select id="f-tag"><option value="">All tags</option></select>
+    </div>
+    <div class="f-group">
+      <label for="f-sort">Sort</label>
+      <select id="f-sort">
+        <option value="relevance">Best match</option>
+        <option value="title">Title A–Z</option>
+        <option value="newest">Recently modified</option>
+        <option value="domain">Domain</option>
+      </select>
+    </div>
+    <button id="reset" class="btn ghost">Reset filters</button>
+    <p class="hint">Dataset: <code>data/links.json</code> · generated locally.<br>Tip: try <button class="chiplink" data-q="vsse">vsse</button> <button class="chiplink" data-q="answers">answers</button> <button class="chiplink" data-q="numerical">numerical</button></p>
+  </aside>
+
+  <main>
+    <div class="toolbar">
+      <span id="stat-showing" aria-live="polite">Loading…</span>
+      <div class="pager" id="pager-top"></div>
+    </div>
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" hidden>
+      <h2>No results</h2>
+      <p>Try a shorter query or clear a filter. The directory searches title, description, tags, category, keywords, site name and domain.</p>
+      <button class="btn" id="empty-reset">Clear search &amp; filters</button>
+    </div>
+    <div class="toolbar bottom">
+      <div class="pager" id="pager-bottom"></div>
+    </div>
+  </main>
+</div>
+
+<footer class="wrap foot">
+  <span>Static directory · data in <code>data/links.json</code> · <span id="stat-meta"></span></span>
+</footer>
+
+<script src="app.js" defer></script>
+</body>
+</html>

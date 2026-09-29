@@ -1,0 +1,9 @@
+{
+  "updatedAt": "2026-09-29T07:59:20.689Z",
+  "model": "gemini-2.0-flash",
+  "queued": 5,
+  "ok": 0,
+  "fail": 5,
+  "geminiFail": 5,
+  "total": 5
+}

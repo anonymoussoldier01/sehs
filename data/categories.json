@@ -1,0 +1,362 @@
+{
+  "generatedAt": "2026-09-29T08:00:27.051Z",
+  "total": 1641,
+  "categories": [
+    {
+      "value": "other",
+      "count": 921
+    },
+    {
+      "value": "practice-test",
+      "count": 233
+    },
+    {
+      "value": "reference",
+      "count": 147
+    },
+    {
+      "value": "maths",
+      "count": 113
+    },
+    {
+      "value": "folder",
+      "count": 99
+    },
+    {
+      "value": "quantitative",
+      "count": 53
+    },
+    {
+      "value": "writing",
+      "count": 42
+    },
+    {
+      "value": "reading",
+      "count": 24
+    },
+    {
+      "value": "verbal-reasoning",
+      "count": 9
+    }
+  ],
+  "tags": [
+    {
+      "value": "google-drive",
+      "count": 1542
+    },
+    {
+      "value": "science",
+      "count": 163
+    },
+    {
+      "value": "answers",
+      "count": 151
+    },
+    {
+      "value": "mathematics",
+      "count": 127
+    },
+    {
+      "value": "homework",
+      "count": 103
+    },
+    {
+      "value": "acer",
+      "count": 101
+    },
+    {
+      "value": "jmss",
+      "count": 99
+    },
+    {
+      "value": "drive-folder",
+      "count": 99
+    },
+    {
+      "value": "numerical-reasoning",
+      "count": 55
+    },
+    {
+      "value": "written-expression",
+      "count": 48
+    },
+    {
+      "value": "set-18",
+      "count": 28
+    },
+    {
+      "value": "reading-comprehension",
+      "count": 25
+    },
+    {
+      "value": "set-16",
+      "count": 25
+    },
+    {
+      "value": "set-20",
+      "count": 25
+    },
+    {
+      "value": "set-24",
+      "count": 20
+    },
+    {
+      "value": "set-13",
+      "count": 20
+    },
+    {
+      "value": "set-19",
+      "count": 19
+    },
+    {
+      "value": "set-26",
+      "count": 19
+    },
+    {
+      "value": "set-5",
+      "count": 18
+    },
+    {
+      "value": "set-15",
+      "count": 18
+    },
+    {
+      "value": "set-6",
+      "count": 17
+    },
+    {
+      "value": "set-14",
+      "count": 16
+    },
+    {
+      "value": "set-22",
+      "count": 16
+    },
+    {
+      "value": "set-21",
+      "count": 16
+    },
+    {
+      "value": "vsse",
+      "count": 15
+    },
+    {
+      "value": "set-17",
+      "count": 15
+    },
+    {
+      "value": "set-10",
+      "count": 15
+    },
+    {
+      "value": "set-8",
+      "count": 15
+    },
+    {
+      "value": "set-11",
+      "count": 15
+    },
+    {
+      "value": "set-23",
+      "count": 15
+    },
+    {
+      "value": "set-",
+      "count": 13
+    },
+    {
+      "value": "set-4",
+      "count": 13
+    },
+    {
+      "value": "set-12",
+      "count": 12
+    },
+    {
+      "value": "set-9",
+      "count": 12
+    },
+    {
+      "value": "set-7",
+      "count": 12
+    },
+    {
+      "value": "set-28",
+      "count": 11
+    },
+    {
+      "value": "set-2",
+      "count": 10
+    },
+    {
+      "value": "set-25",
+      "count": 10
+    },
+    {
+      "value": "verbal-reasoning",
+      "count": 10
+    },
+    {
+      "value": "sehs",
+      "count": 9
+    },
+    {
+      "value": "selective-entry",
+      "count": 9
+    },
+    {
+      "value": "set-3",
+      "count": 9
+    },
+    {
+      "value": "jac",
+      "count": 7
+    },
+    {
+      "value": "set-30",
+      "count": 7
+    },
+    {
+      "value": "set-27",
+      "count": 7
+    },
+    {
+      "value": "set-1",
+      "count": 7
+    },
+    {
+      "value": "set-01",
+      "count": 6
+    },
+    {
+      "value": "set-02",
+      "count": 6
+    },
+    {
+      "value": "set-03",
+      "count": 6
+    },
+    {
+      "value": "set-04",
+      "count": 6
+    },
+    {
+      "value": "pearson",
+      "count": 6
+    },
+    {
+      "value": "set-05",
+      "count": 4
+    },
+    {
+      "value": "set-06",
+      "count": 4
+    },
+    {
+      "value": "set-07",
+      "count": 4
+    },
+    {
+      "value": "set-08",
+      "count": 4
+    },
+    {
+      "value": "set-09",
+      "count": 4
+    },
+    {
+      "value": "practice-exam-pack",
+      "count": 4
+    },
+    {
+      "value": "quantitative",
+      "count": 4
+    },
+    {
+      "value": "capricorn",
+      "count": 3
+    },
+    {
+      "value": "spectrum",
+      "count": 3
+    },
+    {
+      "value": "mornington",
+      "count": 2
+    },
+    {
+      "value": "whitman",
+      "count": 2
+    },
+    {
+      "value": "set-32",
+      "count": 2
+    },
+    {
+      "value": "hendersons",
+      "count": 2
+    },
+    {
+      "value": "set-29",
+      "count": 2
+    },
+    {
+      "value": "year-8",
+      "count": 1
+    },
+    {
+      "value": "deepti",
+      "count": 1
+    },
+    {
+      "value": "edukingdom",
+      "count": 1
+    },
+    {
+      "value": "edutest",
+      "count": 1
+    },
+    {
+      "value": "vssa",
+      "count": 1
+    }
+  ],
+  "domains": [
+    {
+      "value": "drive.google.com",
+      "count": 1641
+    }
+  ],
+  "contentTypes": [
+    {
+      "value": "pdf",
+      "count": 938
+    },
+    {
+      "value": "image",
+      "count": 405
+    },
+    {
+      "value": "docx",
+      "count": 133
+    },
+    {
+      "value": "folder",
+      "count": 99
+    },
+    {
+      "value": "archive",
+      "count": 6
+    },
+    {
+      "value": "webpage",
+      "count": 4
+    }
+  ],
+  "statuses": [
+    {
+      "value": "active",
+      "count": 1641
+    }
+  ]
+}

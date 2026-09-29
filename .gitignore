@@ -1,0 +1,21 @@
+# secrets — never commit
+.env
+.env.local
+*.env
+
+# deps / build
+node_modules/
+dist/
+.tmp/
+
+# ingestion runtime (regenerable, may contain large caches)
+state/cache/
+state/progress.json
+logs/*.log
+!logs/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
