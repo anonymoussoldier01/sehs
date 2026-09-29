@@ -64,7 +64,8 @@ export function rateLimiter({ capacity, refillPerSec }) {
 }
 
 // Failed-attempt tracker with escalating lockout (for /api/unlock).
-export function lockoutTracker({ baseDelaySec = 60, maxDelaySec = 3600 } = {}) {
+// Lockout only bites after THRESHOLD consecutive fails; single typos just 401.
+export function lockoutTracker({ threshold = 5, baseDelaySec = 60, maxDelaySec = 3600 } = {}) {
   const m = new Map();
   return {
     recordFail(key) {
@@ -77,9 +78,9 @@ export function lockoutTracker({ baseDelaySec = 60, maxDelaySec = 3600 } = {}) {
     recordSuccess(key) { m.delete(key); },
     locked(key) {
       const e = m.get(key);
-      if (!e) return 0;
+      if (!e || e.fails < threshold) return 0;
       const ms = e.lockedUntil - Date.now();
-      if (ms <= 0) { if (e.fails >= 5) m.delete(key); return 0; }
+      if (ms <= 0) { m.delete(key); return 0; }
       return Math.ceil(ms / 1000);
     },
   };

@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS resources (
   year TEXT NOT NULL DEFAULT '',
   tags TEXT NOT NULL DEFAULT '[]', -- JSON array
   answers_included INTEGER NOT NULL DEFAULT 0,
+  audience TEXT NOT NULL DEFAULT '',
   access_level TEXT NOT NULL DEFAULT 'public',  -- public | members
   status TEXT NOT NULL DEFAULT 'available',     -- available | unavailable | needs_verification
   visibility INTEGER NOT NULL DEFAULT 1,

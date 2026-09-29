@@ -63,8 +63,8 @@ const PROVIDERS = ['acer', 'edutest', 'jac', 'spectrum', 'hendersons', 'edukingd
 const now = new Date().toISOString();
 const idMap = [];
 const insRes = db.prepare(`INSERT INTO resources
-  (public_id, title, description, subject, category, provider, file_type, year, tags, answers_included, access_level, status, visibility, featured, size_bytes, created_at, updated_at)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'public', 'available', 1, 0, ?, ?, ?)`);
+  (public_id, title, description, subject, category, provider, file_type, year, tags, answers_included, audience, access_level, status, visibility, featured, size_bytes, created_at, updated_at)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'public', 'available', 1, 0, ?, ?, ?)`);
 const insSrc = db.prepare('INSERT INTO resource_sources(resource_id, storage_provider, provider_file_id) VALUES (?, ?, ?)');
 const usedIds = new Set();
 
@@ -81,7 +81,7 @@ try {
     const info = insRes.run(
       pid, String(r.title || r.url), String(r.description || ''), subjects[0] || '',
       String(r.category || 'other'), provider, String(r.contentType || 'other'), year,
-      JSON.stringify(tags), tags.includes('answers') ? 1 : 0,
+      JSON.stringify(tags), tags.includes('answers') ? 1 : 0, String(r.audience || ''),
       r.driveId && sizes.has(r.driveId) ? sizes.get(r.driveId) : null, now, now);
     const fileId = String(r.driveId || '');
     if (fileId) insSrc.run(Number(info.lastInsertRowid), 'drive', fileId);
