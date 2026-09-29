@@ -103,7 +103,10 @@
 
   <main id="results" aria-label="Results">
     <div class="toolbar">
-      <span id="stat-showing" aria-live="polite">Loading…</span>
+      <div class="showing-col">
+        <span id="stat-showing" aria-live="polite">Loading…</span>
+        <span id="partial-note" class="partial-note" hidden></span>
+      </div>
       <div class="toolbar-right">
         <div class="seg" role="group" aria-label="View">
           <button id="view-grid" class="seg-btn is-on" aria-pressed="true" title="Grid view">▦</button>

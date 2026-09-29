@@ -5,7 +5,7 @@ const QUICK = [['vsse', 'VSSE'], ['maths answers', 'Maths + answers'], ['numeric
 const state = { links: [], cats: null, q: '', catsSel: new Set(), typesSel: new Set(), provSel: new Set(), tag: '', status: '', answersOnly: false, hideImg: false, sort: 'relevance', perPage: 24, page: 1, view: 'grid' };
 const $ = (id) => document.getElementById(id);
 const els = {};
-['q', 'clear', 'stat-total', 'stat-showing', 'stat-meta', 'grid', 'skeleton', 'empty', 'empty-msg', 'empty-chips', 'empty-reset', 'empty-browse', 'pager-top', 'pager-bottom', 'facet-cat', 'facet-type', 'facet-provider', 'tag-cloud', 'quick-chips', 'f-tag', 'f-status', 'f-answers', 'f-hide-img', 'f-sort', 'f-per', 'reset', 'active-chips', 'hero-stats', 'hero-count', 'st-files', 'st-folders', 'st-answers', 'st-pdf', 'cnt-cat', 'view-grid', 'view-list', 'filters', 'filters-toggle', 'theme-toggle', 'modal', 'modal-body', 'modal-x', 'toast', 'copy-link', 'export-csv', 'brand-home'].forEach(id => els[id] = $(id));
+['q', 'clear', 'stat-total', 'stat-showing', 'partial-note', 'stat-meta', 'grid', 'skeleton', 'empty', 'empty-msg', 'empty-chips', 'empty-reset', 'empty-browse', 'pager-top', 'pager-bottom', 'facet-cat', 'facet-type', 'facet-provider', 'tag-cloud', 'quick-chips', 'f-tag', 'f-status', 'f-answers', 'f-hide-img', 'f-sort', 'f-per', 'reset', 'active-chips', 'hero-stats', 'hero-count', 'st-files', 'st-folders', 'st-answers', 'st-pdf', 'cnt-cat', 'view-grid', 'view-list', 'filters', 'filters-toggle', 'theme-toggle', 'modal', 'modal-body', 'modal-x', 'toast', 'copy-link', 'export-csv', 'brand-home'].forEach(id => els[id] = $(id));
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
@@ -136,20 +136,54 @@ function score(l, terms) {
   return s;
 }
 
+// Partial-match scoring for fallback: +1 per matched term (weighted), -1 if none match.
+function scorePartial(l, terms) {
+  const title = (l.title || '').toLowerCase();
+  const tags = (l.tags || []).map(x => x.toLowerCase());
+  const hay = [l.title, l.description, l.summary, l.category, l.subcategory, (l.tags || []).join(' '), (l.keywords || []).join(' '), (l.subjects || []).join(' '), l.siteName, l.creator, l.domain].filter(Boolean).join(' ').toLowerCase();
+  let s = 0, hits = 0;
+  for (const t of terms) {
+    if (title.includes(t)) { s += 6; hits++; }
+    else if (tags.some(x => x.includes(t))) { s += 4; hits++; }
+    else if (hay.includes(t)) { s += 2; hits++; }
+  }
+  if (!hits) return -1;
+  // reward matching most terms: small bonus per extra hit so closer matches rank first
+  s += hits * 0.5 + (hits / terms.length);
+  if ((l.tags || []).includes('answers')) s += 0.1;
+  return s;
+}
+
+function passesFacets(l) {
+  if (state.catsSel.size && !state.catsSel.has(l.category)) return false;
+  if (state.typesSel.size && !state.typesSel.has(l.contentType)) return false;
+  if (state.provSel.size && !(l.tags || []).some(t => state.provSel.has(t))) return false;
+  if (state.tag && !(l.tags || []).includes(state.tag)) return false;
+  if (state.status && l.status !== state.status) return false;
+  if (state.answersOnly && !(l.tags || []).includes('answers')) return false;
+  if (state.hideImg && l.contentType === 'image') return false;
+  return true;
+}
+
 function filtered() {
   const terms = state.q.toLowerCase().split(/\s+/).filter(Boolean);
-  const out = [];
+  state.partial = false;
+  let out = [];
   for (const l of state.links) {
-    if (state.catsSel.size && !state.catsSel.has(l.category)) continue;
-    if (state.typesSel.size && !state.typesSel.has(l.contentType)) continue;
-    if (state.provSel.size && !(l.tags || []).some(t => state.provSel.has(t))) continue;
-    if (state.tag && !(l.tags || []).includes(state.tag)) continue;
-    if (state.status && l.status !== state.status) continue;
-    if (state.answersOnly && !(l.tags || []).includes('answers')) continue;
-    if (state.hideImg && l.contentType === 'image') continue;
+    if (!passesFacets(l)) continue;
     const s = score(l, terms);
     if (s < 0) continue;
     out.push({ l, s });
+  }
+  // Fallback: no exact AND-match for a multi-term query → show closest partial matches.
+  if (!out.length && terms.length > 1) {
+    for (const l of state.links) {
+      if (!passesFacets(l)) continue;
+      const s = scorePartial(l, terms);
+      if (s < 0) continue;
+      out.push({ l, s });
+    }
+    if (out.length) state.partial = true;
   }
   if (state.sort === 'title') out.sort((a, b) => String(a.l.title).localeCompare(String(b.l.title)));
   else if (state.sort === 'newest') out.sort((a, b) => String(b.l.dateModified || '').localeCompare(String(a.l.dateModified || '')));
@@ -254,6 +288,14 @@ function render() {
   els['grid'].style.display = total === 0 ? 'none' : '';
   els['stat-showing'].textContent = total === 0 ? '0 results' :
     `${fmt(total)} result${total === 1 ? '' : 's'} · page ${fmt(state.page)} of ${fmt(pages)}`;
+  const pn = els['partial-note'];
+  if (state.partial && total > 0) {
+    pn.hidden = false;
+    pn.textContent = `No exact match for “${state.q}” — showing closest matches.`;
+  } else {
+    pn.hidden = true;
+    pn.textContent = '';
+  }
   if (total === 0) els['empty-msg'].textContent = state.q ? `Nothing matched “${state.q}” with the current filters.` : 'Nothing matched the current filters.';
   chips();
 }
