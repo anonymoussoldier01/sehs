@@ -105,7 +105,7 @@ fs.mkdirSync(path.join(ROOT, 'state'), { recursive: true });
 fs.writeFileSync(path.join(ROOT, 'state', 'id-map.json'), JSON.stringify({ createdAt: now, map: idMap }, null, 1));
 console.log(`id map: state/id-map.json (server-only, never commit)`);
 
-// passwords: env or generated-once
+// passwords: admin only (viewer role retired — everything is public)
 function ensurePassword(role, envName) {
   const row = db.prepare('SELECT role FROM passwords WHERE role = ?').get(role);
   if (row) { console.log(`password [${role}]: already set (unchanged)`); return null; }
@@ -116,12 +116,15 @@ function ensurePassword(role, envName) {
     .run(role, hash, salt, now);
   return { pw, fromEnv };
 }
-const v = ensurePassword('viewer', 'SEHS_VIEWER_PASSWORD');
+db.prepare(`DELETE FROM passwords WHERE role = 'viewer'`).run();
+db.prepare(`DELETE FROM sessions WHERE role != 'admin'`).run();
+const flipped = db.prepare(`UPDATE resources SET access_level = 'public' WHERE access_level = 'members'`).run();
+if (flipped.changes) console.log(`access tiers collapsed: ${flipped.changes} members-only → public`);
 const a = ensurePassword('admin', 'SEHS_ADMIN_PASSWORD');
-for (const [role, r] of [['viewer', v], ['admin', a]]) {
+for (const [role, r] of [['admin', a]]) {
   if (!r) continue;
   if (r.fromEnv) {
-    console.log(`password [${role}]: set from ${role === 'viewer' ? 'SEHS_VIEWER_PASSWORD' : 'SEHS_ADMIN_PASSWORD'}`);
+    console.log(`password [${role}]: set from SEHS_ADMIN_PASSWORD`);
   } else {
     console.log('');
     console.log('================================================================');

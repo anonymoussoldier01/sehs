@@ -248,7 +248,7 @@ export function adminAudit(ctx, sp) {
     ${adminNav('/admin/audit')}
     <h2 style="font-size:16px">Active sessions (${sessions.length})</h2>
     <div class="table-wrap"><table class="grid-table"><thead><tr><th>Role</th><th>Last seen</th><th>IP hash</th><th>Client</th><th></th></tr></thead><tbody>${sess || '<tr><td colspan="5">None.</td></tr>'}</tbody></table></div>
-    <div style="margin:12px 0"><button class="btn small secondary" id="revoke-all">Revoke all viewer+admin sessions</button></div>
+    <div style="margin:12px 0"><button class="btn small secondary" id="revoke-all">Revoke all admin sessions</button></div>
     <h2 style="font-size:16px;margin-top:24px">Event log</h2>
     <form method="get" action="/admin/audit" style="margin-bottom:12px;display:flex;gap:8px">
       <select name="type" aria-label="Event type" onchange="this.form.submit()">
@@ -274,7 +274,7 @@ export function adminSettings(ctx) {
     <div class="disc-tile"><h3>Passwords</h3>
       <p style="color:var(--mut);font-size:13px">Changing a password instantly revokes all sessions of that role (including other devices). New password: 16+ characters.</p>
       <form id="pw-form" style="display:grid;gap:8px;max-width:420px">
-        <select name="role" aria-label="Role"><option value="viewer">Viewer password</option><option value="admin">Admin password</option></select>
+        <input type="hidden" name="role" value="admin">
         <input name="current" type="password" required placeholder="Current admin password" autocomplete="current-password" style="padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit">
         <input name="next" type="password" required minlength="16" placeholder="New password (16+ chars)" autocomplete="new-password" style="padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit">
         <div><button class="btn small" type="submit">Rotate password</button> <span id="pw-msg" style="font-size:13px"></span></div>

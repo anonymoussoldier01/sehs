@@ -51,24 +51,23 @@ export function publicView(row) {
   };
 }
 
-export function visibleWhere(role) {
-  // members + admins see public+members; anonymous sees public only. Always visibility=1.
-  if (role === 'viewer' || role === 'admin') return `visibility = 1`;
-  return `visibility = 1 AND access_level = 'public'`;
+export function visibleWhere() {
+  // Everything is public; only the admin visibility flag hides rows.
+  return `visibility = 1`;
 }
 
-export function loadRows(db, role) {
-  return db.prepare(`SELECT * FROM resources WHERE ${visibleWhere(role)}`).all();
+export function loadRows(db) {
+  return db.prepare(`SELECT * FROM resources WHERE ${visibleWhere()}`).all();
 }
 
 export function buildIndexes(db) {
-  const pub = db.prepare(`SELECT * FROM resources WHERE ${visibleWhere('anon')}`).all().map(toRec);
-  const all = db.prepare(`SELECT * FROM resources WHERE ${visibleWhere('viewer')}`).all().map(toRec);
-  return { anon: buildIndex(pub), authed: buildIndex(all) };
+  const recs = db.prepare(`SELECT * FROM resources WHERE ${visibleWhere()}`).all().map(toRec);
+  const index = buildIndex(recs);
+  return { anon: index, authed: index };
 }
 
-export function forRole(indexes, role) {
-  return (role === 'viewer' || role === 'admin') ? indexes.authed : indexes.anon;
+export function forRole(indexes) {
+  return indexes.anon;
 }
 
 export function fmtBytes(n) {

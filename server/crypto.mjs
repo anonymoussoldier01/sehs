@@ -87,6 +87,7 @@ export function lockoutTracker({ threshold = 5, baseDelaySec = 60, maxDelaySec =
 }
 
 export function parseCookies(header) {
+  // Legacy helper retained for tests; the server sets zero cookies.
   const out = {};
   if (!header) return out;
   for (const part of String(header).split(';')) {
@@ -95,15 +96,4 @@ export function parseCookies(header) {
     out[part.slice(0, i).trim()] = decodeURIComponent(part.slice(i + 1).trim());
   }
   return out;
-}
-
-export function sessionCookie(token, { maxAgeSec, secure }) {
-  const parts = [`sehs_session=${encodeURIComponent(token)}`, 'Path=/', 'HttpOnly', 'SameSite=Lax', `Max-Age=${maxAgeSec}`];
-  if (secure) parts.push('Secure');
-  return parts.join('; ');
-}
-export function clearSessionCookie(secure) {
-  const parts = ['sehs_session=', 'Path=/', 'HttpOnly', 'SameSite=Lax', 'Max-Age=0'];
-  if (secure) parts.push('Secure');
-  return parts.join('; ');
 }

@@ -1,9 +1,8 @@
-// Theme toggle (no secrets, no storage before consent — defaults to system).
+// Theme toggle. Preferences live in localStorage (your browser only).
+// This site sets zero cookies — nothing here leaves your device.
 (function () {
-  // Consent-aware: no localStorage writes until the cookie gate is accepted.
-  function consented() { return /(?:^|;\s*)sehs_consent=v1/.test(document.cookie || ''); }
   var saved = null;
-  try { if (consented()) saved = localStorage.getItem('sehs-theme'); } catch (e) { /* storage unavailable */ }
+  try { saved = localStorage.getItem('sehs-theme'); } catch (e) { /* storage unavailable */ }
   var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
   document.documentElement.dataset.theme = dark ? 'dark' : '';
   function sync() {
@@ -15,7 +14,7 @@
     if (e.target.closest && e.target.closest('#theme-toggle')) {
       dark = document.documentElement.dataset.theme !== 'dark';
       document.documentElement.dataset.theme = dark ? 'dark' : '';
-      try { if (consented()) localStorage.setItem('sehs-theme', dark ? 'dark' : 'light'); } catch (err) { /* consent-gated */ }
+      try { localStorage.setItem('sehs-theme', dark ? 'dark' : 'light'); } catch (err) { /* ignore */ }
       sync();
     }
   });

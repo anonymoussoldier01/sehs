@@ -3,32 +3,32 @@ import { search, normalizeQuery, computeStats, PROVIDERS } from '../search.js';
 import { toRec, publicView, loadRows, forRole, fmtBytes } from './content.mjs';
 import { layout, esc, pretty, resultRow, pagerHtml, emptyBlock, highlight, QUICK } from './templates.mjs';
 
-function liteRows(db, role) {
-  const where = role === 'viewer' || role === 'admin' ? `visibility = 1` : `visibility = 1 AND access_level = 'public'`;
+function liteRows(db) {
+  const where = `visibility = 1`;
   return db.prepare(`SELECT category, file_type, tags, subject FROM resources WHERE ${where}`).all()
     .map(r => ({ category: r.category, contentType: r.file_type, tags: JSON.parse(r.tags || '[]'), subjects: r.subject ? [r.subject] : [] }));
 }
 
 export function landing(ctx) {
   const { db, indexes, session } = ctx;
-  const role = session?.role || 'anon';
-  const stats = computeStats(liteRows(db, role));
-  const docById = new Map(forRole(indexes, role).docs.map(d => [d.rec.id, d]));
+  const stats = computeStats(liteRows(db));
+  const index = forRole(indexes);
+  const docById = new Map(index.docs.map(d => [d.rec.id, d]));
   const pick = (fn, n) => {
     const out = [];
-    for (const d of forRole(indexes, role).docs) {
+    for (const d of index.docs) {
       if (out.length >= n * 4) break;
       if (fn(d.rec)) out.push(d);
     }
     out.sort((a, b) => String(a.displayTitle).localeCompare(String(b.displayTitle)));
     return out.slice(0, n);
   };
-  const rowMap = new Map(loadRows(db, role).map(r => [r.public_id, r]));
+  const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
   const card = (d) => resultRow(publicView(rowMap.get(d.rec.id)), d.displayTitle, [], true);
   const practice = pick(r => r.category === 'practice-test', 6);
   const answers = pick(r => (r.tags || []).includes('answers'), 6);
   const subjCount = new Map();
-  for (const d of forRole(indexes, role).docs) for (const s of (d.rec.subjects || [])) subjCount.set(s, (subjCount.get(s) || 0) + 1);
+  for (const d of index.docs) for (const s of (d.rec.subjects || [])) subjCount.set(s, (subjCount.get(s) || 0) + 1);
   const topSubj = [...subjCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
   const body = `
   <section class="wrap hero" aria-label="Search">
@@ -95,10 +95,9 @@ function baseQuery(p, exclude) {
 
 export function searchPage(ctx, sp) {
   const { db, indexes, session } = ctx;
-  const role = session?.role || 'anon';
   const p = parseSearchParams(sp);
-  const index = forRole(indexes, role);
-  const rowMap = new Map(loadRows(db, role).map(r => [r.public_id, r]));
+  const index = forRole(indexes);
+  const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
 
   const facetPass = (rec) => {
     if (p.cat.length && !p.cat.includes(rec.category)) return false;
@@ -216,23 +215,21 @@ export function searchPage(ctx, sp) {
 
 export function resourcePage(ctx, publicId) {
   const { db, indexes, session } = ctx;
-  const role = session?.role || 'anon';
   const notFound = () => ({ code: 404, html: layout({ title: 'Not found', body: `<div class="wrap" style="padding:40px 20px">${emptyBlock({ title: 'Resource not found', msg: 'It may have been moved, hidden, or the link is incorrect.', chips: QUICK })}</div>`, session }) });
   if (!/^[0-9a-f]{32}$/.test(publicId || '')) return notFound();
   const row = db.prepare('SELECT * FROM resources WHERE public_id = ?').get(publicId);
   if (!row || !row.visibility) return notFound();
-  if (row.access_level !== 'public' && role !== 'viewer' && role !== 'admin') return notFound();
-  if (row.status === 'unavailable' && role !== 'admin') {
+  if (row.status === 'unavailable') {
     return { code: 200, html: layout({ title: row.title, body: `<div class="wrap" style="padding:40px 20px">${emptyBlock({ title: 'Temporarily unavailable', msg: 'This resource is being verified. Please check back soon.', chips: QUICK })}</div>`, session }) };
   }
   const v = publicView(row);
-  const index = forRole(indexes, role);
+  const index = forRole(indexes);
   const doc = index.docs.find(d => d.rec.id === publicId);
   const displayTitle = doc ? doc.displayTitle : row.title;
   // related: same subject +3, provider +2, year +1, tag overlap +1
   const tags = new Set(JSON.parse(row.tags || '[]'));
   const rel = [];
-  const rows = loadRows(db, role);
+  const rows = loadRows(db);
   for (const r of rows) {
     if (r.public_id === publicId) continue;
     let s = 0;
@@ -296,8 +293,7 @@ export function savedPage(ctx) {
 }
 
 export function taxonomyPage(ctx, kind) {  const { db, session } = ctx;
-  const role = session?.role || 'anon';
-  const where = role === 'viewer' || role === 'admin' ? `visibility = 1` : `visibility = 1 AND access_level = 'public'`;
+  const where = `visibility = 1`;
   const isSubj = kind === 'subjects';
   const rows = isSubj
     ? db.prepare(`SELECT subject AS v, COUNT(*) AS c FROM resources WHERE ${where} AND subject <> '' GROUP BY subject ORDER BY c DESC`).all()
@@ -315,43 +311,32 @@ export function taxonomyPage(ctx, kind) {  const { db, session } = ctx;
 
 export function aboutPage(ctx) {
   const { db, session } = ctx;
-  const role = session?.role || 'anon';
-  const where = role === 'viewer' || role === 'admin' ? `visibility = 1` : `visibility = 1 AND access_level = 'public'`;
-  const n = db.prepare(`SELECT COUNT(*) AS n FROM resources WHERE ${where}`).get().n;
+  const n = db.prepare(`SELECT COUNT(*) AS n FROM resources WHERE visibility = 1`).get().n;
   const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:760px" id="main">
     <h1 style="font-family:var(--disp)">About this directory</h1>
     <p style="color:var(--mut)">A searchable collection of ${Number(n).toLocaleString()} SEHS selective-entry study resources — practice papers, notes, homework and tests. Search runs on our own index; opening a resource takes you to its hosted file.</p>
     <h2 style="font-size:16px;margin-top:24px">Access</h2>
-    <p style="color:var(--mut)">Most resources are open to everyone. Some are members-only: ask your administrator for the member password, then <a href="/unlock">unlock access</a>. You will be asked to accept the Terms &amp; Conditions when you open your first resource each visit.</p>
-    <h2 style="font-size:16px;margin-top:24px">Privacy &amp; cookies</h2>
-    <p style="color:var(--mut)">There is no third-party tracking or advertising. Entry requires accepting essential cookies (consent record, session if you unlock, on-device preferences). We log the minimum needed to operate access control, and raw usage statistics auto-purge after 30 days. You can withdraw consent anytime via “Cookie settings” in the footer.</p></div>`;
+    <p style="color:var(--mut)">Every resource is open to everyone — no account, no login. You will be asked to accept the Terms &amp; Conditions when you open your first resource in each browser tab.</p>
+    <h2 style="font-size:16px;margin-top:24px">Privacy</h2>
+    <p style="color:var(--mut)">No cookies. No accounts. No third-party tracking or advertising. Preferences and saved items stay in your own browser. We log the minimum needed to operate the service, and raw usage statistics auto-purge after 30 days.</p></div>`;
   return layout({ title: 'About', body, active: '/about', session });
 }
 
-export function unlockPage(ctx, params) {
+export function unlockPage(ctx) {
   const { session } = ctx;
-  const role = session?.role || 'anon';
-  const status = role === 'anon'
-    ? `<p style="color:var(--mut)">Enter a password below to unlock extra access. Locked out? Wait a minute and try again — repeated wrong guesses trigger a temporary lockout.</p>`
-    : `<p><span class="badge ${role === 'admin' ? 'cat' : 'ans'}">${role === 'admin' ? 'Admin unlocked' : 'Member unlocked'}</span></p>
-       <form method="post" action="/api/logout" style="margin-top:12px"><button class="btn secondary" type="submit">Lock again (log out)</button></form>`;
   const body = `<div class="wrap" style="padding:32px 20px;max-width:560px" id="main">
-    <h1 style="font-family:var(--disp)">Unlock access</h1>
-    ${status}
-    ${role === 'anon' ? `
-    <div class="seg" role="tablist" aria-label="Unlock type" style="margin:16px 0">
-      <button class="seg-btn is-on" data-tab="viewer" role="tab" aria-selected="true">Member</button>
-      <button class="seg-btn" data-tab="admin" role="tab" aria-selected="false">Admin</button>
-    </div>
+    <h1 style="font-family:var(--disp)">Admin unlock</h1>
+    <p style="color:var(--mut)">Enter the admin password to manage the collection. Access stays in this browser tab only — closing the tab locks it again. Locked out? Wait a minute and try again — repeated wrong guesses trigger a temporary lockout.</p>
+    <div id="unlock-status"></div>
     <form id="unlock-form">
-      <label class="sort-wrap" style="display:block;margin-bottom:10px">Password
+      <label class="sort-wrap" style="display:block;margin-bottom:10px">Admin password
         <input id="unlock-pw" type="password" autocomplete="current-password" required minlength="8"
           style="display:block;width:100%;margin-top:6px;padding:11px 12px;border-radius:10px;border:1px solid var(--line2);background:var(--panel);color:inherit;font-size:15px">
       </label>
       <p id="unlock-err" class="mode-note" hidden></p>
-      <button class="btn" type="submit" style="width:100%">Unlock</button>
-    </form>` : ''}
+      <button class="btn" type="submit" style="width:100%">Unlock admin</button>
+    </form>
   </div>
   <script src="/unlock.js" defer></script>`;
-  return layout({ title: 'Unlock access', body, session });
+  return layout({ title: 'Admin unlock', body, session });
 }

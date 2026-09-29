@@ -6,15 +6,15 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { openDb, getMeta, setMeta } from './server/db.mjs';
 import {
-  hashPassword, verifyPassword, newToken, tokenHash, parseCookies,
-  sessionCookie, clearSessionCookie, rateLimiter, lockoutTracker, ipHash, uaFamily,
+  hashPassword, verifyPassword, newToken, tokenHash,
+  rateLimiter, lockoutTracker, ipHash, uaFamily,
 } from './server/crypto.mjs';
 import { buildIndexes, forRole, loadRows, publicView } from './server/content.mjs';
 import { search, suggest } from './search.js';
 import { layout, esc } from './server/templates.mjs';
 import { landing, searchPage, resourcePage, taxonomyPage, aboutPage, unlockPage, savedPage, parseSearchParams } from './server/pages.mjs';
 import {
-  requireAdmin, adminMissing, apiAdminStats, adminDashboard, adminResources, adminAudit, adminSettings,
+  adminMissing, apiAdminStats, adminDashboard, adminResources, adminAudit, adminSettings,
   apiResourceUpdate, apiResourceCreate, apiResourceDelete, apiBulkImport, runPurge,
 } from './server/admin.mjs';
 
@@ -77,33 +77,26 @@ function bumpAggregate(day, kind, key) {
   } catch { /* noop */ }
 }
 
-// ---- sessions ----------------------------------------------------------------
-const ROLE_TTL = { anon: 30 * 86400, viewer: 7 * 86400, admin: 12 * 3600 };
-function getSession(req, createAnon = true) {
-  const cookies = parseCookies(req.headers.cookie);
-  const tok = cookies.sehs_session;
-  if (tok) {
-    const row = db.prepare('SELECT * FROM sessions WHERE token_hash = ?').get(tokenHash(tok));
-    if (row && row.expires_at > nowIso()) {
-      if (Date.now() - Date.parse(row.last_seen_at) > 5 * 60 * 1000) {
-        db.prepare('UPDATE sessions SET last_seen_at = ? WHERE token_hash = ?').run(nowIso(), row.token_hash);
-      }
-      return { ...row, token: tok };
-    }
-  }
-  if (!createAnon) return null;
-  const token = newToken();
-  const now = nowIso();
-  const ip = clientIp(req);
-  db.prepare(`INSERT INTO sessions(token_hash, role, created_at, expires_at, last_seen_at, ip_hash, ua_family, terms_version)
-    VALUES (?, 'anon', ?, ?, ?, ?, ?, 0)`)
-    .run(tokenHash(token), now, new Date(Date.now() + ROLE_TTL.anon * 1000).toISOString(),
-      now, ipHash(ip, saltForIp()), uaFamily(req.headers['user-agent']));
-  return { token, role: 'anon', fresh: true };
+// ---- admin auth (bearer token, NO cookies) ------------------------------------------
+// The admin password exchanges for a random 256-bit bearer token kept in the
+// browser tab's sessionStorage and sent as an Authorization header. No cookies
+// are ever set: no ambient credentials means CSRF is impossible by construction.
+// Token dies with the tab (sessionStorage) and expires server-side in 12h.
+const ADMIN_TTL_SEC = 12 * 3600;
+function bearerToken(req) {
+  const h = req.headers.authorization || '';
+  const m = h.match(/^Bearer ([A-Za-z0-9_-]{43,44})$/);
+  return m ? m[1] : null;
 }
-function setSessionCookie(res, session) {
-  const ttl = ROLE_TTL[session.role] || ROLE_TTL.anon;
-  res.setHeader('Set-Cookie', sessionCookie(session.token, { maxAgeSec: ttl, secure: SECURE }));
+function getAdmin(req) {
+  const tok = bearerToken(req);
+  if (!tok) return null;
+  const row = db.prepare("SELECT * FROM sessions WHERE token_hash = ? AND role = 'admin'").get(tokenHash(tok));
+  if (!row || row.expires_at <= nowIso()) return null;
+  if (Date.now() - Date.parse(row.last_seen_at) > 5 * 60 * 1000) {
+    db.prepare('UPDATE sessions SET last_seen_at = ? WHERE token_hash = ?').run(nowIso(), row.token_hash);
+  }
+  return { ...row, token: tok };
 }
 
 // ---- rate limits ---------------------------------------------------------------
@@ -144,47 +137,9 @@ function readBody(req, maxBytes = 100 * 1024) {
   });
 }
 
-// ---- consent + terms ---------------------------------------------------------------
-function consentGiven(req) {
-  const c = parseCookies(req.headers.cookie).sehs_consent || '';
-  return c === 'v1' || c.startsWith('v1|');
-}
-function consentCookie(secure) {
-  const v = `v1|${new Date().toISOString().slice(0, 10)}`;
-  const parts = [`sehs_consent=${v}`, 'Path=/', 'SameSite=Lax', 'Max-Age=31536000'];
-  if (secure) parts.push('Secure');
-  return parts.join('; ');
-}
-function clearConsentCookie(secure) {
-  const parts = ['sehs_consent=', 'Path=/', 'SameSite=Lax', 'Max-Age=0'];
-  if (secure) parts.push('Secure');
-  return parts.join('; ');
-}
+// ---- terms (public text; acceptance is per-tab client state, see gate.js) --------
 function currentTermsVersion() {
   return Number(getMeta(db, 'terms_version') || 1);
-}
-async function apiConsent(req, res) {
-  let body;
-  try { body = JSON.parse(await readBody(req, 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
-  if (body.accept === true) {
-    logEvent('consent', { data: { accept: true } });
-    secureHeaders(res);
-    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8', 'Set-Cookie': consentCookie(SECURE) });
-    res.end(JSON.stringify({ ok: true }));
-    return;
-  }
-  // withdraw: clear consent + kill session
-  const cookies = parseCookies(req.headers.cookie);
-  if (cookies.sehs_session) {
-    try { db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(tokenHash(cookies.sehs_session)); } catch { /* noop */ }
-  }
-  logEvent('consent', { data: { accept: false } });
-  secureHeaders(res);
-  res.writeHead(200, {
-    'Content-Type': 'application/json; charset=utf-8',
-    'Set-Cookie': [clearConsentCookie(SECURE), clearSessionCookie(SECURE)],
-  });
-  res.end(JSON.stringify({ ok: true, withdrawn: true }));
 }
 function apiTerms(_req, res) {
   const v = currentTermsVersion();
@@ -192,29 +147,9 @@ function apiTerms(_req, res) {
   if (!row) return sendJson(res, 500, { ok: false, error: 'unavailable' });
   return sendJson(res, 200, { version: row.version, summary: row.summary_md, body: row.body_md });
 }
-function apiTermsStatus(_req, res, session) {
-  const v = currentTermsVersion();
-  const row = session.fresh ? null : db.prepare('SELECT terms_version FROM sessions WHERE token_hash = ?').get(tokenHash(session.token));
-  const accepted = !!row && Number(row.terms_version) >= v;
-  return sendJson(res, 200, { ok: true, accepted, version: v });
-}
-function apiTermsAccept(_req, res, session) {
-  if (session.fresh) return sendJson(res, 401, { ok: false, error: 'Session required.' });
-  const v = currentTermsVersion();
-  db.prepare('UPDATE sessions SET terms_version = ?, last_seen_at = ? WHERE token_hash = ?')
-    .run(v, nowIso(), tokenHash(session.token));
-  logEvent('terms_accept', { data: { version: v } });
-  return sendJson(res, 200, { ok: true, version: v });
-}
-function termsAccepted(session) {
-  if (session.fresh) return false;
-  const row = db.prepare('SELECT terms_version FROM sessions WHERE token_hash = ?').get(tokenHash(session.token));
-  return !!row && Number(row.terms_version) >= currentTermsVersion();
-}
 
 // ---- API handlers ------------------------------------------------------------------
-async function apiUnlock(req, res, session, ip) {
-  if (!consentGiven(req)) return sendJson(res, 403, { ok: false, consentRequired: true, error: 'Please accept cookies first.' });
+async function apiUnlock(req, res, ip) {
   if (!rlUnlock.allow('u:' + ip).ok) {
     logEvent('lockout', { data: { endpoint: 'unlock' } });
     return sendJson(res, 429, { ok: false, error: 'Too many attempts. Try again shortly.' });
@@ -223,44 +158,41 @@ async function apiUnlock(req, res, session, ip) {
   if (locked) return sendJson(res, 429, { ok: false, error: 'Locked out.', retryAfter: locked });
   let body;
   try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
-  const which = body.which === 'admin' ? 'admin' : 'viewer';
   const pw = String(body.password || '');
   if (!pw || pw.length > 500) {
     unlockLockouts.recordFail(ip);
-    logEvent('unlock_fail', { data: { which } });
+    logEvent('unlock_fail', { data: { which: 'admin' } });
     return sendJson(res, 401, { ok: false, error: 'Incorrect password. Please try again.' });
   }
-  const row = db.prepare('SELECT * FROM passwords WHERE role = ?').get(which);
+  const row = db.prepare('SELECT * FROM passwords WHERE role = ?').get('admin');
   if (!row || !verifyPassword(pw, row.hash, row.salt)) {
     const e = unlockLockouts.recordFail(ip);
-    logEvent('unlock_fail', { data: { which, fails: e.fails } });
+    logEvent('unlock_fail', { data: { which: 'admin', fails: e.fails } });
     return sendJson(res, 401, { ok: false, error: 'Incorrect password. Please try again.' });
   }
   unlockLockouts.recordSuccess(ip);
   const token = newToken();
   const now = nowIso();
-  // rotate: one active privileged session per token; drop old sessions of same role+ip? keep simple: insert new
   db.prepare(`INSERT INTO sessions(token_hash, role, created_at, expires_at, last_seen_at, ip_hash, ua_family, terms_version)
-    VALUES (?, ?, ?, ?, ?, ?, ?, (SELECT COALESCE(MAX(version),0) - 1 FROM terms))`)
-    .run(tokenHash(token), which, now, new Date(Date.now() + ROLE_TTL[which] * 1000).toISOString(),
+    VALUES (?, 'admin', ?, ?, ?, ?, ?, 0)`)
+    .run(tokenHash(token), now, new Date(Date.now() + ADMIN_TTL_SEC * 1000).toISOString(),
       now, ipHash(ip, saltForIp()), uaFamily(req.headers['user-agent']));
-  logEvent('unlock', { data: { which } });
+  logEvent('unlock', { data: { which: 'admin' } });
   // purge expired sessions/grants opportunistically
   try {
     db.prepare(`DELETE FROM sessions WHERE expires_at < ?`).run(now);
     db.prepare(`DELETE FROM grants WHERE expires_at < ?`).run(new Date(Date.now() - 7 * 86400000).toISOString());
   } catch { /* noop */ }
-  setSessionCookie(res, { token, role: which });
-  return sendJson(res, 200, { ok: true, role: which });
+  // Token returned in body (never a cookie): the tab keeps it in sessionStorage.
+  return sendJson(res, 200, { ok: true, role: 'admin', token, expiresIn: ADMIN_TTL_SEC });
 }
 
-function apiLogout(_req, res, session) {
-  if (session && !session.fresh) {
-    try { db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(tokenHash(session.token)); } catch { /* noop */ }
+function apiLogout(req, res) {
+  const admin = getAdmin(req);
+  if (admin) {
+    try { db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(tokenHash(admin.token)); } catch { /* noop */ }
   }
-  secureHeaders(res);
-  res.writeHead(302, { Location: '/', 'Set-Cookie': clearSessionCookie(SECURE) });
-  res.end();
+  return sendJson(res, 200, { ok: true });
 }
 
 function findResource(publicId) {
@@ -272,31 +204,25 @@ function apiMissing(res) {
   return sendJson(res, 404, { ok: false, error: 'Resource not found.' });
 }
 
-async function apiAccess(_req, res, session, ip, publicId) {
-  if (!consentGiven(_req)) return sendJson(res, 403, { ok: false, consentRequired: true, error: 'Please accept cookies first.' });
-  if (!termsAccepted(session)) {
-    return sendJson(res, 403, { ok: false, termsRequired: true, version: currentTermsVersion(), error: 'Please accept the Terms & Conditions first.' });
-  }
-  const rl = rlAccess.allow('a:' + (session.token || ip));
+async function apiAccess(req, res, ip, publicId) {
+  const rl = rlAccess.allow('a:' + ip);
   if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Too many requests. Slow down.' });
   const row = findResource(publicId);
-  const role = session.role;
-  const allowed = row && !!row.visibility && (row.access_level === 'public' || role === 'viewer' || role === 'admin');
-  if (!allowed) {
+  // Everything is public; only visibility/status gate access. Uniform 404 otherwise.
+  if (!row || !row.visibility) {
     logEvent('open_denied', { data: {} });
     return apiMissing(res);
   }
-  if (row.status === 'unavailable' && role !== 'admin') {
+  if (row.status === 'unavailable') {
     logEvent('open_denied', { resourceId: row.id, data: { reason: 'unavailable' } });
     return sendJson(res, 410, { ok: false, error: 'This resource is temporarily unavailable.' });
   }
-  // Consent + Terms already enforced above — only authorised sessions reach here.
-  const token = newToken(24);  const now = nowIso();
+  const token = newToken(24);
+  const now = nowIso();
   db.prepare(`INSERT INTO grants(token, resource_id, session_hash, created_at, expires_at, used_at)
-    VALUES (?, ?, ?, ?, ?, NULL)`)
-    .run(token, row.id, session.fresh ? null : tokenHash(session.token),
-      now, new Date(Date.now() + 15 * 60 * 1000).toISOString());
-  logEvent('open', { resourceId: row.id, data: { role } });
+    VALUES (?, ?, NULL, ?, ?, NULL)`)
+    .run(token, row.id, now, new Date(Date.now() + 15 * 60 * 1000).toISOString());
+  logEvent('open', { resourceId: row.id, data: {} });
   bumpAggregate(now.slice(0, 10), 'resource', row.public_id);
   return sendJson(res, 200, { ok: true, openUrl: `/open/${token}` });
 }
@@ -322,11 +248,10 @@ function openGrant(_req, res, token) {
   res.end();
 }
 
-function apiSearch(_req, res, session, sp) {
-  const role = session.role;
-  const index = forRole(indexes, role);
+function apiSearch(_req, res, sp) {
+  const index = forRole(indexes);
   const p = parseSearchParams(sp);
-  const rowMap = new Map(loadRows(db, role).map(r => [r.public_id, r]));
+  const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
   const filter = (rec) => {
     if (p.cat.length && !p.cat.includes(rec.category)) return false;
     if (p.provider.length && !(rec.tags || []).some(t => p.provider.includes(t))) return false;
@@ -334,8 +259,7 @@ function apiSearch(_req, res, session, sp) {
   };
   const t0 = Date.now();
   let res2 = search(index, p.q, { filter });
-  let arr = res2.results.filter(x => {
-    const type = index.docs.find(d => d.rec.id === x.rec.id)?.type || '';
+  let arr = res2.results.filter(x => {    const type = index.docs.find(d => d.rec.id === x.rec.id)?.type || '';
     x._type = type;
     if (p.type.length && !p.type.includes(type)) return false;
     if (p.year && (x.rec._year || '') !== p.year) return false;
@@ -366,23 +290,22 @@ function apiSearch(_req, res, session, sp) {
   });
 }
 
-function apiSuggest(_req, res, session, sp) {
+function apiSuggest(_req, res, sp) {
   const prefix = (sp.get('prefix') || '').slice(0, 60);
-  const out = suggest(forRole(indexes, session.role), prefix, 8)
+  const out = suggest(forRole(indexes), prefix, 8)
     .map(s => ({ label: s.label, kind: s.kind, count: s.count }));
   return sendJson(res, 200, { ok: true, suggestions: out });
 }
 
-// Saved/recents hydration: tier-aware, order-preserving, hard-capped.
-function apiByIds(_req, res, session, sp) {
-  const role = session.role;
+// Saved/recents hydration: order-preserving, hard-capped (everything public).
+function apiByIds(_req, res, sp) {
   const ids = (sp.get('ids') || '').split(',').map(s => s.trim()).filter(s => /^[0-9a-f]{32}$/.test(s)).slice(0, 100);
   if (!ids.length) return sendJson(res, 200, { ok: true, results: [] });
-  const where = role === 'viewer' || role === 'admin' ? `visibility = 1` : `visibility = 1 AND access_level = 'public'`;
+  const where = `visibility = 1`;
   const placeholders = ids.map(() => '?').join(',');
   const rows = db.prepare(`SELECT * FROM resources WHERE ${where} AND public_id IN (${placeholders})`).all(...ids);
   const byId = new Map(rows.map(r => [r.public_id, r]));
-  const index = forRole(indexes, role);
+  const index = forRole(indexes);
   const docById = new Map(index.docs.map(d => [d.rec.id, d]));
   const results = ids.map(id => {
     const row = byId.get(id);
@@ -406,36 +329,34 @@ const server = http.createServer(async (req, res) => {
         req.headers['x-requested-with'] !== 'fetch') {
         return sendJson(res, 403, { ok: false, error: 'Invalid request.' });
       }
-      const session = getSession(req);
-      if (session.fresh) setSessionCookie(res, session);
+      const session = null; // public API is stateless (IP rate limits); admin uses bearer tokens
       if (url.pathname === '/api/health') return sendJson(res, 200, { ok: true });
       if (url.pathname === '/api/stats') {
-        const role = session.role;
-        const where = role === 'viewer' || role === 'admin' ? `visibility = 1` : `visibility = 1 AND access_level = 'public'`;
-        const total = db.prepare(`SELECT COUNT(*) AS n FROM resources WHERE ${where}`).get().n;
-        return sendJson(res, 200, { ok: true, publicResources: total, role });
+        const total = db.prepare(`SELECT COUNT(*) AS n FROM resources WHERE visibility = 1`).get().n;
+        return sendJson(res, 200, { ok: true, publicResources: total });
       }
-      if (url.pathname === '/api/session') return sendJson(res, 200, { ok: true, role: session.role });
-      if (url.pathname === '/api/search' && req.method === 'GET') return apiSearch(req, res, session, url.searchParams);
+      if (url.pathname === '/api/me') {
+        const admin = getAdmin(req);
+        return sendJson(res, 200, { ok: true, role: admin ? 'admin' : null });
+      }
+      if (url.pathname === '/api/search' && req.method === 'GET') return apiSearch(req, res, url.searchParams);
       if (url.pathname === '/api/suggest' && req.method === 'GET') {
         if (!rlSuggest.allow('s:' + ip).ok) return sendJson(res, 429, { ok: false, error: 'Too many requests.' });
-        return apiSuggest(req, res, session, url.searchParams);
+        return apiSuggest(req, res, url.searchParams);
       }
       if (url.pathname === '/api/by-ids' && req.method === 'GET') {
         if (!rlSuggest.allow('b:' + ip).ok) return sendJson(res, 429, { ok: false, error: 'Too many requests.' });
-        return apiByIds(req, res, session, url.searchParams);
+        return apiByIds(req, res, url.searchParams);
       }
-      if (url.pathname === '/api/unlock' && req.method === 'POST') return apiUnlock(req, res, session, ip);
-      if (url.pathname === '/api/logout') return apiLogout(req, res, session);
-      if (url.pathname === '/api/consent' && req.method === 'POST') return apiConsent(req, res);
+      if (url.pathname === '/api/unlock' && req.method === 'POST') return apiUnlock(req, res, ip);
+      if (url.pathname === '/api/logout' && req.method === 'POST') return apiLogout(req, res);
       if (url.pathname === '/api/terms' && req.method === 'GET') return apiTerms(req, res);
-      if (url.pathname === '/api/terms/status' && req.method === 'GET') return apiTermsStatus(req, res, session);
-      if (url.pathname === '/api/terms/accept' && req.method === 'POST') return apiTermsAccept(req, res, session);
       const m = url.pathname.match(/^\/api\/access\/([A-Za-z0-9_-]{1,64})$/);
-      if (m && req.method === 'POST') return apiAccess(req, res, session, ip, m[1]);
-      // ---- admin API (role-gated, uniform 404 otherwise) ----
+      if (m && req.method === 'POST') return apiAccess(req, res, ip, m[1]);
+      // ---- admin API (bearer-gated, uniform 404 otherwise) ----
       if (url.pathname.startsWith('/api/admin/')) {
-        if (!requireAdmin(session)) return adminMissing(res, sendJson);
+        const admin = getAdmin(req);
+        if (!admin) return adminMissing(res, sendJson);
         if (url.pathname === '/api/admin/stats' && req.method === 'GET') {
           const s = apiAdminStats(db);
           return sendJson(res, 200, s);
@@ -481,14 +402,14 @@ const server = http.createServer(async (req, res) => {
           return sendJson(res, 200, { ok: true });
         }
         if (url.pathname === '/api/admin/sessions/revoke-all' && req.method === 'POST') {
-          db.prepare(`DELETE FROM sessions WHERE role IN ('viewer','admin')`).run();
+          db.prepare(`DELETE FROM sessions WHERE role = 'admin'`).run();
           logEvent('admin', { data: { action: 'revoke_all' } });
           return sendJson(res, 200, { ok: true });
         }
         if (url.pathname === '/api/admin/password' && req.method === 'POST') {
           let body;
           try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
-          const role = body.role === 'admin' ? 'admin' : 'viewer';
+          const role = 'admin'; // single-password system: admin only
           const next = String(body.next || '');
           if (next.length < 16 || next.length > 500) return sendJson(res, 400, { ok: false, error: 'New password must be 16+ characters.' });
           const adminRow = db.prepare('SELECT * FROM passwords WHERE role = ?').get('admin');
@@ -500,7 +421,7 @@ const server = http.createServer(async (req, res) => {
             .run(hash, salt, nowIso(), role);
           // revoke all sessions of that role except the caller's own
           db.prepare('DELETE FROM sessions WHERE role = ? AND token_hash != ?')
-            .run(role, tokenHash(session.token));
+            .run(role, tokenHash(admin.token));
           logEvent('admin', { data: { action: 'rotate_password', role } });
           return sendJson(res, 200, { ok: true, relogin: false });
         }
@@ -540,14 +461,11 @@ const server = http.createServer(async (req, res) => {
     if (g && req.method === 'GET') return openGrant(req, res, g[1]);
 
     if (req.method !== 'GET') { secureHeaders(res); res.writeHead(405); res.end('method not allowed'); return; }
-    const session = getSession(req);
-    // set fresh anon cookie on page loads too
-    const ctx = { db, indexes, session };
-    const needsCookie = session.fresh;
-    const html = (code, body) => {
-      if (needsCookie) setSessionCookie(res, session);
-      sendHtml(res, code, body);
-    };
+    // Pages are public; the header shows an Admin link only with a valid bearer session.
+    // Page shells carry no sensitive data — all admin data loads via bearer-authed API.
+    const admin = getAdmin(req);
+    const ctx = { db, indexes, session: admin ? { role: 'admin' } : null };
+    const html = (code, body) => sendHtml(res, code, body);
     if (url.pathname === '/') return html(200, landing(ctx));
     if (url.pathname === '/search') return html(200, searchPage(ctx, url.searchParams));
     const rm = url.pathname.match(/^\/r\/([A-Za-z0-9_-]{1,64})$/);
@@ -560,22 +478,12 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/about') return html(200, aboutPage(ctx));
     if (url.pathname === '/saved') return html(200, savedPage(ctx));
     if (url.pathname === '/unlock') return html(200, unlockPage(ctx));
-    if (url.pathname === '/admin') {
-      if (!requireAdmin(session)) { secureHeaders(res); res.writeHead(404); res.end('not found'); return; }
-      return html(200, adminDashboard({ db, indexes, session }));
-    }
-    if (url.pathname === '/admin/resources') {
-      if (!requireAdmin(session)) { secureHeaders(res); res.writeHead(404); res.end('not found'); return; }
-      return html(200, adminResources({ db, indexes, session }, url.searchParams));
-    }
-    if (url.pathname === '/admin/audit') {
-      if (!requireAdmin(session)) { secureHeaders(res); res.writeHead(404); res.end('not found'); return; }
-      return html(200, adminAudit({ db, indexes, session }, url.searchParams));
-    }
-    if (url.pathname === '/admin/settings') {
-      if (!requireAdmin(session)) { secureHeaders(res); res.writeHead(404); res.end('not found'); return; }
-      return html(200, adminSettings({ db, indexes, session }));
-    }
+    // Admin pages serve inert shells to everyone; ALL data loads through
+    // bearer-authed /api/admin/* calls (navigation requests can't carry headers).
+    if (url.pathname === '/admin') return html(200, adminDashboard({ db, indexes, session: null }));
+    if (url.pathname === '/admin/resources') return html(200, adminResources({ db, indexes, session: null }, url.searchParams));
+    if (url.pathname === '/admin/audit') return html(200, adminAudit({ db, indexes, session: null }, url.searchParams));
+    if (url.pathname === '/admin/settings') return html(200, adminSettings({ db, indexes, session: null }));
     return serveStatic(url.pathname, res);
   } catch (e) {
     try { sendJson(res, 500, { ok: false, error: 'unavailable' }); } catch { /* closed */ }

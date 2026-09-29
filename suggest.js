@@ -1,10 +1,9 @@
-// Autocomplete for server-rendered search boxes + recent searches.
-// Suggestions come from /api/suggest (dataset-derived, tier-aware).
+// Autocomplete for server-rendered search boxes + recent searches (localStorage).
+// Suggestions come from /api/suggest (dataset-derived).
 (function () {
   'use strict';
   var input = document.querySelector('input[name="q"]');
   if (!input) return;
-  function consented() { return /(?:^|;\s*)sehs_consent=v1/.test(document.cookie || ''); }
   // build dropdown next to the search box
   var wrap = input.closest('.search-wrap') || input.parentElement;
   if (getComputedStyle(wrap).position === 'static') wrap.style.position = 'relative';
@@ -18,7 +17,6 @@
 
   function recents() {
     var out = [];
-    if (!consented()) return out;
     try {
       var raw = localStorage.getItem('sehs-recent-searches') || '[]';
       out = JSON.parse(raw).filter(Boolean).slice(0, 4);
@@ -26,7 +24,7 @@
     return out;
   }
   function pushRecent(q) {
-    if (!consented() || !q) return;
+    if (!q) return;
     try {
       var list = JSON.parse(localStorage.getItem('sehs-recent-searches') || '[]');
       list = [q].concat(list.filter(function (x) { return x !== q; })).slice(0, 8);
@@ -116,5 +114,4 @@
   });
   var form = input.closest('form');
   if (form) form.addEventListener('submit', function () { pushRecent(input.value.trim()); });
-  document.addEventListener('sehs:consent', fetchSugg);
 })();

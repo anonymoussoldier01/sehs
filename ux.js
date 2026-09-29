@@ -1,10 +1,8 @@
 // Everyday quality-of-life: density, bookmarks, recents, back-to-top, shortcuts,
-// copy-link buttons, client-side facet search. LocalStorage only after consent.
+// copy-link buttons, client-side facet search. localStorage only (zero cookies).
 (function () {
   'use strict';
-  function consented() { return /(?:^|;\s*)sehs_consent=v1/.test(document.cookie || ''); }
   function store(k, v) {
-    if (!consented()) return false;
     try {
       if (v === undefined) return localStorage.getItem(k);
       if (v === null) localStorage.removeItem(k);
@@ -140,5 +138,4 @@
   paintSaved();
   var dt = document.getElementById('density-toggle');
   syncDens(dt);
-  document.addEventListener('sehs:consent', function () { paintSaved(); });
 })();

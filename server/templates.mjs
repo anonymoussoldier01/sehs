@@ -8,8 +8,8 @@ export function esc(s) {
 const NAV = [['/', 'Home'], ['/search', 'Browse'], ['/subjects', 'Subjects'], ['/providers', 'Providers'], ['/about', 'About']];
 
 export function layout({ title, desc = '', body, active = '', session = null, extraHead = '' }) {
-  const lockLabel = !session || session.role === 'anon' ? 'Unlock' : session.role === 'admin' ? 'Admin · ' + esc(session.roleLabel || 'admin') : 'Member';
-  const lockHref = !session || session.role === 'anon' ? '/unlock' : session.role === 'admin' ? '/admin' : '/unlock?member=1';
+  // No per-visitor state on the server (no cookies): the header always shows
+  // a neutral Admin link; admin.js reveals state once a bearer token exists.
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,7 +38,7 @@ ${extraHead}
     </nav>
     <div class="top-actions">
       <button id="filters-toggle" class="btn secondary only-mobile" aria-expanded="false" aria-controls="filters" hidden>Filters</button>
-      <a class="btn secondary small" href="${lockHref}">${esc(lockLabel)}</a>
+      <a class="btn secondary small" href="/unlock">Admin</a>
       <button id="theme-toggle" class="icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" aria-pressed="false">◐</button>
     </div>
   </div>
@@ -49,26 +49,8 @@ ${extraHead}
     <h2>About this directory</h2>
     <p>A searchable collection of SEHS selective-entry study resources. Search runs on our index — opening a resource takes you to its hosted file.</p>
   </div>
-  <div class="foot-actions"><a class="link-btn" href="/about">About</a><a class="link-btn" href="/saved">Saved</a><a class="link-btn" href="/unlock">Access</a><button class="link-btn" id="cookie-settings">Cookie settings</button></div>
+  <div class="foot-actions"><a class="link-btn" href="/about">About</a><a class="link-btn" href="/saved">Saved</a><a class="link-btn" href="/unlock">Admin</a></div>
 </footer>
-<div class="modal-backdrop" id="consent-gate" hidden>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="consent-title">
-    <h2 id="consent-title">Cookies required to enter</h2>
-    <p style="color:var(--mut)">This site needs to store a small amount of data in your browser to work at all. No tracking, no ads, no third parties — ever.</p>
-    <ul style="color:var(--mut);font-size:14px;padding-left:20px">
-      <li><strong>Consent record</strong> — remembers you accepted (12 months).</li>
-      <li><strong>Session</strong> — only if you unlock access or open resources.</li>
-      <li><strong>Preferences</strong> — theme and layout, on this device only.</li>
-    </ul>
-    <div id="consent-details" hidden>
-      <p style="color:var(--mut);font-size:13.5px">We do not use analytics, advertising, or cross-site tracking cookies. Sessions expire automatically (members 7 days, admins 12 hours). You can withdraw consent anytime via “Cookie settings” in the footer, which wipes local data and ends sessions. Raw usage statistics, if enabled, are auto-purged after 30 days.</p>
-    </div>
-    <div class="actions" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
-      <button class="btn" id="consent-accept">Accept &amp; enter</button>
-      <button class="btn secondary" id="consent-details-toggle">Cookie details</button>
-    </div>
-  </div>
-</div>
 <div class="modal-backdrop" id="terms-modal" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="terms-title">
     <h2 id="terms-title">Terms &amp; Conditions <span id="terms-version" style="font-size:13px;color:var(--faint)"></span></h2>
