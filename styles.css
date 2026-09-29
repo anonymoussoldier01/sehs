@@ -9,7 +9,7 @@
   --r-s: 8px; --r-m: 12px; --r-l: 16px; --r-pill: 999px; --r-xs: 6px;
   --bg: #f6f6fb; --bg2: #efeff7; --panel: #ffffff; --card: #ffffff;
   --line: #e4e4ef; --line2: #d3d3e6;
-  --txt: #191a2b; --mut: #5c5e76; --faint: #8e90a8;
+  --txt: #191a2b; --mut: #5c5e76; --faint: #6d7089;
   --acc: #4f46e5; --acc2: #4338ca; --acc-soft: #eeedfd; --acc-line: #c9c6f8;
   --ok: #15803d; --ok-bg: #dcf3e5;
   --warn: #b45309; --warn-bg: #fdf0d8;
@@ -176,7 +176,15 @@ mark { background: var(--mark-bg); color: var(--mark-fg, inherit); border-radius
 /* ---------- cards & rows (parts kit) ---------- */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--sp-3); }
 .grid.list { grid-template-columns: 1fr; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-m); padding: var(--sp-4) var(--sp-5); display: flex; gap: var(--sp-3); box-shadow: var(--shadow-sm); transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; animation: rise .25s ease both; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-m); padding: var(--sp-4) var(--sp-5); display: flex; gap: var(--sp-3); box-shadow: var(--shadow-sm); transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; animation: rise .3s ease both; }
+.grid .card:nth-child(2) { animation-delay: .03s; }
+.grid .card:nth-child(3) { animation-delay: .06s; }
+.grid .card:nth-child(4) { animation-delay: .09s; }
+.grid .card:nth-child(5) { animation-delay: .12s; }
+.grid .card:nth-child(6) { animation-delay: .15s; }
+.grid .card:nth-child(7) { animation-delay: .18s; }
+.grid .card:nth-child(8) { animation-delay: .21s; }
+.grid .card:nth-child(n+9) { animation-delay: .24s; }
 .card:hover { transform: translateY(-2px); border-color: var(--acc-line); box-shadow: var(--shadow-md); }
 @keyframes rise { from { opacity: 0; transform: translateY(5px); } }
 .file-ico { flex: none; width: 40px; height: 40px; border-radius: var(--r-s); display: grid; place-items: center; font-size: 10px; font-weight: 800; letter-spacing: .02em; }

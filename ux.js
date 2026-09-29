@@ -120,7 +120,30 @@
             (v.answersIncluded ? '<span class="badge ans">Answers included</span>' : '') +
             '</div><div class="card-foot"><span></span><a class="btn small" href="/r/' + v.id + '">Open →</a></div></div></article>';
         }).join('');
-        paintSaved();
+  /* animated stat count-ups (respects reduced motion via CSS gate + matchMedia) */
+  (function countups() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll('[data-countup]').forEach(function (el) {
+      var target = Number(el.getAttribute('data-countup')) || 0;
+      if (target <= 0) return;
+      var t0 = null, dur = 900;
+      function frame(t) {
+        if (!t0) t0 = t;
+        var k = Math.min(1, (t - t0) / dur);
+        var eased = 1 - Math.pow(1 - k, 3);
+        el.textContent = Math.round(target * eased).toLocaleString();
+        if (k < 1) requestAnimationFrame(frame);
+      }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) { io.disconnect(); requestAnimationFrame(frame); }
+        });
+      });
+      io.observe(el);
+    });
+  })();
+
+  paintSaved();
       }).catch(function () { el.innerHTML = '<p style="color:var(--mut)">Could not load saved items.</p>'; });
   }
   var savedGrid = document.getElementById('saved-grid');

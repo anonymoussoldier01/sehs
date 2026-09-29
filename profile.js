@@ -127,5 +127,30 @@
     }
   });
   window.__sehsAff = affParam;
+  // Tuned-for-you shelf on the landing page: quick links from top affinities.
+  (function tunedShelf() {
+    var shelf = document.getElementById('tuned-shelf');
+    var grid = document.getElementById('tuned-grid');
+    if (!shelf || !grid) return;
+    var p = load(PKEY, { subjects: {}, providers: {}, at: {} });
+    var scored = [];
+    for (const k of Object.keys(p.subjects || {})) {
+      var w = decayed(p.subjects[k], (p.at || {})[k]);
+      if (w >= 1.5) scored.push({ label: k, w: w });
+    }
+    for (const k of Object.keys(p.providers || {})) {
+      var w2 = decayed(p.providers[k], (p.at || {})[k]);
+      if (w2 >= 1.5) scored.push({ label: k, w: w2 });
+    }
+    if (!scored.length) return;
+    scored.sort(function (a, b) { return b.w - a.w; });
+    grid.innerHTML = scored.slice(0, 6).map(function (s) {
+      var pretty = s.label.split(/[-_\s]/).map(function (w) { return w ? w[0].toUpperCase() + w.slice(1) : w; }).join(' ');
+      return '<div class="disc-tile"><h3>' + pretty.replace(/[<>&]/g, function (c) { return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]; }) +
+        '</h3><p>Because you have been opening these</p><a class="link-btn" href="/search?q=' +
+        encodeURIComponent(s.label) + '">Explore →</a></div>';
+    }).join('');
+    shelf.hidden = false;
+  })();
   paintChip();
 })();

@@ -30,6 +30,16 @@ export function landing(ctx) {
   const subjCount = new Map();
   for (const d of index.docs) for (const s of (d.rec.subjects || [])) subjCount.set(s, (subjCount.get(s) || 0) + 1);
   const topSubj = [...subjCount.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6);
+  // trending: top-opened in the last 7 days (anonymous aggregates only)
+  const since = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+  const trending = ctx.db.prepare(`SELECT key, SUM(count) c FROM daily_aggregates
+    WHERE kind = 'resource' AND day >= ? GROUP BY key ORDER BY c DESC LIMIT 6`).all(since)
+    .map(r => ({ row: rowMap.get(r.key), opens: r.c })).filter(x => x.row);
+  const trendingCards = trending.map(({ row }) => {
+    const d = docById.get(row.public_id);
+    return resultRow(publicView(row), d ? d.displayTitle : row.title, [], true);
+  }).join('');
+  const stat = (label, n) => `<div><dt>${label}</dt><dd data-countup="${n}">${Number(n).toLocaleString()}</dd></div>`;
   const body = `
   <section class="wrap hero" aria-label="Search">
     <h1>Find exactly what you need to study.</h1>
@@ -42,16 +52,18 @@ export function landing(ctx) {
       </div>
     </form>
     <dl class="stats" aria-label="Collection statistics">
-      <div><dt>Resources</dt><dd>${stats.total.toLocaleString()}</dd></div>
-      <div><dt>Subjects</dt><dd>${stats.subjects}</dd></div>
-      <div><dt>Providers</dt><dd>${stats.providers}</dd></div>
-      <div><dt>With answers</dt><dd>${stats.answers.toLocaleString()}</dd></div>
-      <div><dt>PDFs</dt><dd>${stats.pdfs.toLocaleString()}</dd></div>
+      ${stat('Resources', stats.total)}
+      ${stat('Subjects', stats.subjects)}
+      ${stat('Providers', stats.providers)}
+      ${stat('With answers', stats.answers)}
+      ${stat('PDFs', stats.pdfs)}
     </dl>
   </section>
   <div class="wrap layout single" id="discovery">
     <main aria-label="Browse resources">
       <section class="disc-section" id="recent-strip" hidden><div class="disc-head"><h2>Recently viewed</h2></div><div class="disc-grid" id="recent-grid"></div></section>
+      <section class="disc-section" id="tuned-shelf" hidden><div class="disc-head"><h2>Tuned for you <small>based on what you open · stored only in this browser</small></h2></div><div class="disc-grid" id="tuned-grid"></div></section>
+      ${trendingCards ? `<section class="disc-section"><div class="disc-head"><h2>Trending this week</h2></div><div class="disc-grid">${trendingCards}</div></section>` : ''}
       <section class="disc-section"><div class="disc-head"><h2>Practice tests <small>${practice.length ? '' : ''}</small></h2><a class="link-btn" href="/search?cat=practice-test">View all →</a></div>
         <div class="disc-grid">${practice.map(card).join('')}</div></section>
       <section class="disc-section"><div class="disc-head"><h2>Resources with answers</h2><a class="link-btn" href="/search?answers=1">View all →</a></div>
