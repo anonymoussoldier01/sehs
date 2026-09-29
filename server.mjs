@@ -13,6 +13,10 @@ import { buildIndexes, forRole, loadRows, publicView } from './server/content.mj
 import { search, suggest } from './search.js';
 import { layout, esc } from './server/templates.mjs';
 import { landing, searchPage, resourcePage, taxonomyPage, aboutPage, unlockPage, savedPage, parseSearchParams } from './server/pages.mjs';
+import {
+  requireAdmin, adminMissing, apiAdminStats, adminDashboard, adminResources, adminAudit, adminSettings,
+  apiResourceUpdate, apiResourceCreate, apiResourceDelete, apiBulkImport, runPurge,
+} from './server/admin.mjs';
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir);
@@ -352,7 +356,10 @@ function apiSearch(_req, res, session, sp) {
     if (!row) return null;
     return { ...publicView(row), displayTitle: x.displayTitle, score: Math.round(x.score * 10) / 10 };
   }).filter(Boolean);
-  if (p.q.trim()) bumpAggregate(nowIso().slice(0, 10), 'query', p.q.trim().toLowerCase().slice(0, 120));
+  if (p.q.trim()) {
+    bumpAggregate(nowIso().slice(0, 10), 'query', p.q.trim().toLowerCase().slice(0, 120));
+    if (total === 0) logEvent('search_zero', { data: { q: p.q.trim().slice(0, 120) } });
+  }
   return sendJson(res, 200, {
     ok: true, total, page, pages, per: p.per, mode: res2.mode, corrected: res2.corrected,
     ms: Date.now() - t0, results: items,
@@ -394,6 +401,11 @@ const server = http.createServer(async (req, res) => {
     // public API with global rate limit
     if (url.pathname.startsWith('/api/')) {
       if (!rlApi.allow('g:' + ip).ok) return sendJson(res, 429, { ok: false, error: 'Too many requests.' });
+      // CSRF: state-changing API calls must come from our fetch clients (logout form exempt)
+      if (['POST', 'PATCH', 'PUT', 'DELETE'].includes(req.method) && url.pathname !== '/api/logout' &&
+        req.headers['x-requested-with'] !== 'fetch') {
+        return sendJson(res, 403, { ok: false, error: 'Invalid request.' });
+      }
       const session = getSession(req);
       if (session.fresh) setSessionCookie(res, session);
       if (url.pathname === '/api/health') return sendJson(res, 200, { ok: true });
@@ -421,6 +433,105 @@ const server = http.createServer(async (req, res) => {
       if (url.pathname === '/api/terms/accept' && req.method === 'POST') return apiTermsAccept(req, res, session);
       const m = url.pathname.match(/^\/api\/access\/([A-Za-z0-9_-]{1,64})$/);
       if (m && req.method === 'POST') return apiAccess(req, res, session, ip, m[1]);
+      // ---- admin API (role-gated, uniform 404 otherwise) ----
+      if (url.pathname.startsWith('/api/admin/')) {
+        if (!requireAdmin(session)) return adminMissing(res, sendJson);
+        if (url.pathname === '/api/admin/stats' && req.method === 'GET') {
+          const s = apiAdminStats(db);
+          return sendJson(res, 200, s);
+        }
+        if (url.pathname === '/api/admin/resources' && req.method === 'POST') {
+          let body;
+          try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+          const r = apiResourceCreate(db, body, rebuildIndexes);
+          return sendJson(res, r.status, r.body);
+        }
+        if (url.pathname === '/api/admin/resources/bulk' && req.method === 'POST') {
+          let body;
+          try { body = JSON.parse(await readBody(req, 500 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+          const r = apiBulkImport(db, body, rebuildIndexes);
+          return sendJson(res, r.status, r.body);
+        }
+        const rm = url.pathname.match(/^\/api\/admin\/resources\/(\d+)$/);
+        if (rm) {
+          if (req.method === 'GET') {
+            const row = db.prepare('SELECT * FROM resources WHERE id = ?').get(Number(rm[1]));
+            if (!row) return adminMissing(res, sendJson);
+            return sendJson(res, 200, { ok: true, resource: publicView(row) });
+          }
+          if (req.method === 'PATCH') {
+            let body;
+            try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+            const r = apiResourceUpdate(db, rm[1], body, rebuildIndexes);
+            return sendJson(res, r.status, r.body);
+          }
+          if (req.method === 'DELETE') {
+            const r = apiResourceDelete(db, rm[1], rebuildIndexes);
+            return sendJson(res, r.status, r.body);
+          }
+          return adminMissing(res, sendJson);
+        }
+        if (url.pathname === '/api/admin/sessions/revoke' && req.method === 'POST') {
+          let body;
+          try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+          const rid = Number(body.rowid);
+          if (!rid) return sendJson(res, 400, { ok: false, error: 'Invalid request.' });
+          db.prepare('DELETE FROM sessions WHERE rowid = ?').run(rid);
+          logEvent('admin', { data: { action: 'revoke_session' } });
+          return sendJson(res, 200, { ok: true });
+        }
+        if (url.pathname === '/api/admin/sessions/revoke-all' && req.method === 'POST') {
+          db.prepare(`DELETE FROM sessions WHERE role IN ('viewer','admin')`).run();
+          logEvent('admin', { data: { action: 'revoke_all' } });
+          return sendJson(res, 200, { ok: true });
+        }
+        if (url.pathname === '/api/admin/password' && req.method === 'POST') {
+          let body;
+          try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+          const role = body.role === 'admin' ? 'admin' : 'viewer';
+          const next = String(body.next || '');
+          if (next.length < 16 || next.length > 500) return sendJson(res, 400, { ok: false, error: 'New password must be 16+ characters.' });
+          const adminRow = db.prepare('SELECT * FROM passwords WHERE role = ?').get('admin');
+          if (!adminRow || !verifyPassword(String(body.current || ''), adminRow.hash, adminRow.salt)) {
+            return sendJson(res, 401, { ok: false, error: 'Current admin password is incorrect.' });
+          }
+          const { hash, salt } = hashPassword(next);
+          db.prepare('UPDATE passwords SET hash = ?, salt = ?, rotated_at = ? WHERE role = ?')
+            .run(hash, salt, nowIso(), role);
+          // revoke all sessions of that role except the caller's own
+          db.prepare('DELETE FROM sessions WHERE role = ? AND token_hash != ?')
+            .run(role, tokenHash(session.token));
+          logEvent('admin', { data: { action: 'rotate_password', role } });
+          return sendJson(res, 200, { ok: true, relogin: false });
+        }
+        if (url.pathname === '/api/admin/terms' && req.method === 'POST') {
+          let body;
+          try { body = JSON.parse(await readBody(req, 100 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+          const summary = String(body.summary || '').slice(0, 600).trim();
+          const btext = String(body.body || '').slice(0, 20000).trim();
+          if (!summary || !btext) return sendJson(res, 400, { ok: false, error: 'Summary and body are required.' });
+          const maxV = db.prepare('SELECT COALESCE(MAX(version),0) v FROM terms').get().v;
+          db.prepare('INSERT INTO terms(version, body_md, summary_md, created_at, created_by) VALUES (?, ?, ?, ?, ?)')
+            .run(maxV + 1, btext, summary, nowIso(), 'admin');
+          setMeta(db, 'terms_version', String(maxV + 1));
+          logEvent('admin', { data: { action: 'terms_publish', version: maxV + 1 } });
+          return sendJson(res, 200, { ok: true, version: maxV + 1 });
+        }
+        if (url.pathname === '/api/admin/retention' && req.method === 'POST') {
+          let body;
+          try { body = JSON.parse(await readBody(req)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+          const days = Math.min(365, Math.max(7, Number(body.days) || 30));
+          setMeta(db, 'retention_days', String(days));
+          logEvent('admin', { data: { action: 'retention', days } });
+          return sendJson(res, 200, { ok: true, days });
+        }
+        if (url.pathname === '/api/admin/purge' && req.method === 'POST') {
+          const r = runPurge(db);
+          logEvent('admin', { data: { action: 'purge', deleted: r.deleted } });
+          return sendJson(res, 200, { ok: true, ...r });
+        }
+        return adminMissing(res, sendJson);
+      }
       return sendJson(res, 404, { ok: false, error: 'Not found.' });
     }
 
@@ -450,8 +561,20 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/saved') return html(200, savedPage(ctx));
     if (url.pathname === '/unlock') return html(200, unlockPage(ctx));
     if (url.pathname === '/admin') {
-      if (session.role !== 'admin') { secureHeaders(res); res.writeHead(404); res.end('not found'); return; }
-      return html(200, layout({ title: 'Admin', body: '<div class="wrap" style="padding:32px 20px"><h1>Admin</h1><p>Dashboard lands in the next phase.</p></div>', session }));
+      if (!requireAdmin(session)) { secureHeaders(res); res.writeHead(404); res.end('not found'); return; }
+      return html(200, adminDashboard({ db, indexes, session }));
+    }
+    if (url.pathname === '/admin/resources') {
+      if (!requireAdmin(session)) { secureHeaders(res); res.writeHead(404); res.end('not found'); return; }
+      return html(200, adminResources({ db, indexes, session }, url.searchParams));
+    }
+    if (url.pathname === '/admin/audit') {
+      if (!requireAdmin(session)) { secureHeaders(res); res.writeHead(404); res.end('not found'); return; }
+      return html(200, adminAudit({ db, indexes, session }, url.searchParams));
+    }
+    if (url.pathname === '/admin/settings') {
+      if (!requireAdmin(session)) { secureHeaders(res); res.writeHead(404); res.end('not found'); return; }
+      return html(200, adminSettings({ db, indexes, session }));
     }
     return serveStatic(url.pathname, res);
   } catch (e) {
