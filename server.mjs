@@ -259,19 +259,29 @@ function apiSearch(_req, res, sp) {
   };
   const t0 = Date.now();
   let res2 = search(index, p.q, { filter });
+  // on-device affinity re-ranking (tie-break only): ?aff=subject:3,provider:2
+  const aff = parseAffinity(sp.get('aff'));
   let arr = res2.results.filter(x => {    const type = index.docs.find(d => d.rec.id === x.rec.id)?.type || '';
     x._type = type;
     if (p.type.length && !p.type.includes(type)) return false;
     if (p.year && (x.rec._year || '') !== p.year) return false;
     if (p.aud.length && !p.aud.includes(x.rec._audience || 'general')) return false;
     if (p.answers && !(x.rec.tags || []).includes('answers')) return false;
+    if (aff.size) {
+      let b = 0;
+      for (const s of (x.rec.subjects || [])) b += aff.get('s:' + String(s).toLowerCase()) || 0;
+      for (const t of (x.rec.tags || [])) b += aff.get('t:' + String(t).toLowerCase()) || 0;
+      x.affBoost = Math.min(3, b * 0.15);
+    }
     return true;
   });
+  const affOn = aff.size > 0;
   if (p.sort === 'title-az') arr.sort((a, b) => a.displayTitle.localeCompare(b.displayTitle));
   else if (p.sort === 'title-za') arr.sort((a, b) => b.displayTitle.localeCompare(a.displayTitle));
   else if (p.sort === 'newest') arr.sort((a, b) => String(b.rec.dateModified || '').localeCompare(String(a.rec.dateModified || '')) || b.score - a.score);
   else if (p.sort === 'type') arr.sort((a, b) => String(a._type).localeCompare(String(b._type)) || a.displayTitle.localeCompare(b.displayTitle));
   else if (p.sort === 'answers') arr.sort((a, b) => (((b.rec.tags || []).includes('answers')) - ((a.rec.tags || []).includes('answers'))) || b.score - a.score);
+  else if (affOn) arr.sort((a, b) => (b.score + (b.affBoost || 0)) - (a.score + (a.affBoost || 0)));
   const total = arr.length;
   const pages = Math.max(1, Math.ceil(total / p.per));
   const page = Math.min(p.page, pages);
@@ -286,8 +296,38 @@ function apiSearch(_req, res, sp) {
   }
   return sendJson(res, 200, {
     ok: true, total, page, pages, per: p.per, mode: res2.mode, corrected: res2.corrected,
+    dropped: res2.dropped || [], related: res2.related || [], tuned: affOn,
     ms: Date.now() - t0, results: items,
   });
+}
+
+// ?aff=s:mathematics:3,t:acer:2 — validated, capped affinity vector (tie-break only)
+function parseAffinity(raw) {
+  const m = new Map();
+  if (!raw) return m;
+  for (const part of String(raw).slice(0, 400).split(',')) {
+    const mm = part.match(/^([st]):([a-z0-9-]{2,30}):(\d{1,2})$/);
+    if (mm) m.set(`${mm[1]}:${mm[2]}`, Math.min(10, Number(mm[3])));
+    if (m.size >= 12) break;
+  }
+  return m;
+}
+
+// Trending: top-opened resources, last 7 days (anonymous aggregates only).
+function apiTrending(_req, res) {
+  const since = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+  const rows = db.prepare(`SELECT key, SUM(count) c FROM daily_aggregates
+    WHERE kind = 'resource' AND day >= ? GROUP BY key ORDER BY c DESC LIMIT 8`).all(since);
+  const index = forRole(indexes);
+  const docById = new Map(index.docs.map(d => [d.rec.id, d]));
+  const items = [];
+  for (const r of rows) {
+    const row = db.prepare('SELECT * FROM resources WHERE public_id = ? AND visibility = 1').get(r.key);
+    if (!row) continue;
+    const d = docById.get(r.key);
+    items.push({ ...publicView(row), displayTitle: d ? d.displayTitle : row.title, opens: r.c });
+  }
+  return sendJson(res, 200, { ok: true, results: items });
 }
 
 function apiSuggest(_req, res, sp) {
@@ -348,6 +388,7 @@ const server = http.createServer(async (req, res) => {
         if (!rlSuggest.allow('b:' + ip).ok) return sendJson(res, 429, { ok: false, error: 'Too many requests.' });
         return apiByIds(req, res, url.searchParams);
       }
+      if (url.pathname === '/api/trending' && req.method === 'GET') return apiTrending(req, res);
       if (url.pathname === '/api/unlock' && req.method === 'POST') return apiUnlock(req, res, ip);
       if (url.pathname === '/api/logout' && req.method === 'POST') return apiLogout(req, res);
       if (url.pathname === '/api/terms' && req.method === 'GET') return apiTerms(req, res);

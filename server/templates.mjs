@@ -38,6 +38,7 @@ ${extraHead}
     </nav>
     <div class="top-actions">
       <button id="filters-toggle" class="btn secondary only-mobile" aria-expanded="false" aria-controls="filters" hidden>Filters</button>
+      <button id="palette-open" class="icon-btn" title="Quick search (Ctrl+K)" aria-label="Quick search">⌘K</button>
       <a class="btn secondary small" href="/unlock">Admin</a>
       <button id="theme-toggle" class="icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" aria-pressed="false">◐</button>
     </div>
@@ -82,6 +83,8 @@ ${extraHead}
 <script src="/gate.js" defer></script>
 <script src="/ux.js" defer></script>
 <script src="/suggest.js" defer></script>
+<script src="/profile.js" defer></script>
+<script src="/palette.js" defer></script>
 </body>
 </html>`;
 }

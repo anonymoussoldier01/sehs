@@ -1,5 +1,5 @@
 // Page handlers: landing, search, resource, taxonomy, about, unlock.
-import { search, normalizeQuery, computeStats, PROVIDERS } from '../search.js';
+import { search, normalizeQuery, computeStats, PROVIDERS, moreLikeThis } from '../search.js';
 import { toRec, publicView, loadRows, forRole, fmtBytes } from './content.mjs';
 import { layout, esc, pretty, resultRow, pagerHtml, emptyBlock, highlight, QUICK } from './templates.mjs';
 
@@ -160,8 +160,8 @@ export function searchPage(ctx, sp) {
   const chips = [];
   if (p.q) chips.push(`<span class="pill-x">“${esc(p.q)}”<a href="${base.replace(/&$/, '').replace(/q=[^&]*&?/, '').replace(/\?$/, '') || '/search'}" aria-label="Remove query">✕</a></span>`);
 
-  const modeNote = total > 0 && (res.mode === 'partial' || res.mode === 'fuzzy')
-    ? `<span class="mode-note">${res.mode === 'fuzzy' && res.corrected ? `Showing results for “${esc(res.corrected)}”. ` : `No exact matches — showing closest matches. `}</span>` : '';
+  const modeNote = total > 0 && (res.mode === 'partial' || res.mode === 'fuzzy' || res.mode === 'drop' || (res.related && res.related.length))
+    ? `<span class="mode-note">${res.mode === 'fuzzy' && res.corrected ? `Showing results for “${esc(res.corrected)}”. ` : res.mode === 'drop' && res.dropped.length ? `Ignoring “${esc(res.dropped.join(' '))}” — showing closest matches. ` : `No exact matches — showing closest matches. `}${res.related && res.related.length ? `Including related: ${esc(res.related.join(', '))}. ` : ''}</span>` : '';
 
   const body = `
   <div class="wrap layout" id="main">
@@ -226,25 +226,13 @@ export function resourcePage(ctx, publicId) {
   const index = forRole(indexes);
   const doc = index.docs.find(d => d.rec.id === publicId);
   const displayTitle = doc ? doc.displayTitle : row.title;
-  // related: same subject +3, provider +2, year +1, tag overlap +1
-  const tags = new Set(JSON.parse(row.tags || '[]'));
-  const rel = [];
+  // related: TF-IDF cosine more-like-this (content similarity, not heuristics)
   const rows = loadRows(db);
-  for (const r of rows) {
-    if (r.public_id === publicId) continue;
-    let s = 0;
-    const rt = new Set(JSON.parse(r.tags || '[]'));
-    if (r.subject && r.subject === row.subject) s += 3;
-    if (r.provider && r.provider === row.provider) s += 2;
-    if (r.year && r.year === row.year) s += 1;
-    for (const t of rt) if (tags.has(t) && t !== 'google-drive') s += 1;
-    if (s > 0) rel.push({ r, s });
-  }
-  rel.sort((a, b) => b.s - a.s || String(a.r.title).localeCompare(String(b.r.title)));
   const rowMap = new Map(rows.map(r => [r.public_id, r]));
-  const related = rel.slice(0, 6).map(({ r }) => {
-    const d = index.docs.find(x => x.rec.id === r.public_id);
-    return resultRow(publicView(r), d ? d.displayTitle : r.title, [], false);
+  const related = moreLikeThis(index, publicId, 6).map(x => {
+    const r = rowMap.get(x.rec.id);
+    if (!r) return '';
+    return resultRow(publicView(r), x.displayTitle, [], false);
   }).join('');
   const facts = [
     ['File type', pretty(v.fileType) + (row.size_bytes ? ` · ${fmtBytes(row.size_bytes)}` : '')],
