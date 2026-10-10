@@ -14,11 +14,41 @@ export default function About() {
   }, []);
   return (
     <div className="mx-auto max-w-[760px] px-5 py-7">
-      <h1 className="font-display text-3xl font-bold">About this directory</h1>
-      <p className="mt-2 text-[15px]" style={{ color: 'var(--mut)' }}>
+      <p className="editorial-kicker">An independent study companion</p>
+      <h1 className="mt-2 font-display text-4xl font-bold leading-tight sm:text-5xl">Practice, organised.<br />Pressure, <em>off</em>.</h1>
+      <hr className="editorial-rule" />
+      <p className="reading mt-2 text-[17px]" style={{ color: 'var(--mut)' }}>
         A searchable collection of {n ? Number(n).toLocaleString() : ''} selective-entry study resources — practice papers, notes, flashcards, mocks and study guides. Free for anyone studying, no
-        account needed. Search runs on our own index; opening a resource takes you to its hosted file.
+        account needed. Search runs on our own index; every paper reads inside the site.
       </p>
+      <div className="mt-6 grid gap-px overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--line2)', background: 'var(--line)' }}>
+        {[
+          ['What this site is', 'A calm study instrument: an index, a reader, and practice tools that respect your time and your data.'],
+          ['What it is not', 'Not official material, not affiliated with any school or test provider, and never a promise of results.'],
+        ].map(([h, b]) => (
+          <div key={h} className="p-4" style={{ background: 'var(--panel)' }}>
+            <h2 className="text-sm font-extrabold uppercase tracking-[0.14em]" style={{ color: 'var(--acc)' }}>{h}</h2>
+            <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>{b}</p>
+          </div>
+        ))}
+      </div>
+      <h2 className="mb-2 mt-8 font-display text-xl font-bold">Four principles</h2>
+      <ol className="flex flex-col gap-4">
+        {[
+          ['Practice over promises', 'Timed mocks, flashcards and drills with honest scoring. We never predict scores or selection outcomes.'],
+          ['Owners keep ownership', 'Files belong to their providers. We link, never re-host — and remove listings on valid request.'],
+          ['Minimum data, maximum calm', 'No accounts, no ads, no trackers. Your library lives in your browser; raw analytics delete after 30 days.'],
+          ['Usefulness earns return visits', 'No streak-shaming, no locks, no urgency. A clear next step every time you arrive.'],
+        ].map(([h, b], k) => (
+          <li key={h} className="flex gap-4">
+            <span className="principle-num tnum pt-1">0{k + 1}</span>
+            <div>
+              <h3 className="font-display text-[16px] font-bold">{h}</h3>
+              <p className="mt-0.5 text-[15px]" style={{ color: 'var(--mut)' }}>{b}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
       <h2 className="mt-6 text-base font-bold">Which test is this for?</h2>
       <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
         Selective school entry exams in the ACER style: timed maths, quantitative and verbal reasoning, reading comprehension and written expression. Mocks mirror the

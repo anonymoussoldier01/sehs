@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { Select } from '../components/ui/select';
 import { Textarea } from '../components/ui/textarea';
 import { api, pretty } from '../lib/api';
-import { keys, pushRecent } from '../lib/store';
+import { keys, pushRecent, bumpInsight } from '../lib/store';
 import { repo } from '../lib/repo';
 import { useTerms, useToast } from '../providers';
 import { BlurFade, Empty, Skeleton, AnimatedTooltip, SpotlightCard } from '../components/magic';
@@ -50,6 +50,7 @@ export default function Resource() {
         const r = j.results[0];
         setV(r);
         pushRecent(r.id, r.displayTitle || r.title);
+        bumpInsight('opens');
         const prev = repo.readingProgress.get()[r.id];
         setOpenedBefore(prev?.at || null);
         repo.readingProgress.touch(r.id);
@@ -631,6 +632,9 @@ function PreviewPanel({ id, kind, title }) {
           )
         )}
         {/* Saved annotations render above the frame; the annotate overlay captures gestures. */}
+        {annotating && loaded && !err && (
+          <div aria-hidden="true" className="blueprint-grid pointer-events-none absolute inset-0" />
+        )}
         {loaded && !err && anns.map((a, k) => (
           <span
             key={a.id}
@@ -672,8 +676,7 @@ function PreviewPanel({ id, kind, title }) {
           <div
             className="absolute inset-0"
             style={{ cursor: 'crosshair', touchAction: 'none' }}
-            onMouseDown={onDown}
-            onMouseMove={onMove}
+            onMouseDown={onDown}            onMouseMove={onMove}
             onMouseUp={onUp}
             onTouchStart={(e) => onDown(e.touches[0])}
             onTouchMove={(e) => onMove(e.touches[0])}

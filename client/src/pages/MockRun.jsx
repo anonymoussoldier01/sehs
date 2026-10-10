@@ -9,7 +9,7 @@ import { Button } from '../components/ui/button';
 import { Progress } from '../components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { api } from '../lib/api';
-import { keys, recordMistake } from '../lib/store';
+import { keys, recordMistake, bumpInsight } from '../lib/store';
 import { repo } from '../lib/repo';
 import { useToast } from '../providers';
 import { useMotionProfile } from '../lib/motion';
@@ -186,6 +186,7 @@ export default function MockRun() {
       /* review queue is best-effort */
     }
     repo.attempts.record(id, { score: r.score, total: r.total, seed });
+    bumpInsight('mocks');
     persist(id, { seed, qids: order.map((q) => q.stem), endAt, answers, flags, i, submitted: true });
   }, [done, mock, order, answers, flags, i, id, seed, endAt]);
 
@@ -391,12 +392,19 @@ export default function MockRun() {
       <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
         {mock.strands.join(' · ')} · {mock.minutes} min{acc.extraTimeMult > 1 ? ` (+${Math.round((acc.extraTimeMult - 1) * 100)}% extra time)` : ''} · {qs.length} questions · seed <span className="tnum">{String(seed).slice(0, 12)}</span>
       </p>
-      <div className="mt-2.5 flex flex-wrap items-center gap-3" role="timer" aria-label={`${formatMMSS(secsLeft)} remaining`}>
-        <div className="tnum font-display text-[26px] font-extrabold" style={lowTime ? { color: 'var(--bad)' } : undefined}>
-          {lowTime ? '⚠ ' : ''}{formatMMSS(secsLeft)}
-        </div>
-        <span className="text-sm" style={{ color: 'var(--mut)' }}>
-          Q{i + 1}/{qs.length} · {q.strand} · {q.verification === 'verified' ? 'verified' : 'draft sample'}
+      <div className={`hud-bezel mt-2.5 flex flex-wrap items-center gap-x-5 gap-y-2 px-4 py-2.5 ${lowTime ? 'hud-caution' : ''}`} role="timer" aria-label={`${formatMMSS(secsLeft)} remaining`}>
+        <span className="hud-readout" aria-hidden="true">
+          T-minus<br /><strong className="tnum" style={lowTime ? { color: 'var(--bad)', fontSize: 22 } : { fontSize: 22 }}>{lowTime ? '⚠ ' : ''}{formatMMSS(secsLeft)}</strong>
+          {lowTime && <span className="ml-2 font-extrabold" style={{ color: 'var(--bad)' }}>FINAL MINUTE</span>}
+        </span>
+        <span className="hud-readout" aria-hidden="true">
+          Question<br /><strong className="tnum">{i + 1} / {qs.length}</strong>
+        </span>
+        <span className="hud-readout" aria-hidden="true">
+          Strand<br /><strong>{q.strand}</strong>
+        </span>
+        <span className="hud-readout hidden sm:block" aria-hidden="true">
+          Seed<br /><strong className="tnum">{String(seed).slice(0, 8)}</strong>
         </span>
         <span className="ml-auto flex flex-wrap gap-1.5">
           <AnimatedTooltip tip="Flag for review" shortcut="F">
@@ -425,7 +433,7 @@ export default function MockRun() {
             animate={{ opacity: 1, x: 0 }}
             exit={mp.animate ? { opacity: 0, x: -16 } : undefined}
             transition={{ duration: 0.16 }}
-            className="rounded-2xl border p-[18px]"
+            className="hud-corners rounded-2xl border p-[18px]"
             style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}
           >
             {q.passage && (
@@ -468,7 +476,7 @@ export default function MockRun() {
               })}
             </div>
             <p className="mt-2 text-xs" style={{ color: 'var(--faint)' }}>
-              Keys 1–{q.options.length} or A–{'ABCDE'[q.options.length - 1]} select · ←/→ move · F flags · autosaved
+              Keys 1–{q.options.length} or A–{'ABCDE'[q.options.length - 1]} select · ←/→ move · F flags · autosaved · {q.verification === 'verified' ? 'verified' : 'draft sample'}
             </p>
           </motion.div>
         </AnimatePresence>
@@ -482,7 +490,7 @@ export default function MockRun() {
                 title={'Question ' + (k + 1) + (flags[k] ? ' (flagged)' : '')}
                 aria-label={'Go to question ' + (k + 1)}
                 aria-current={k === i ? 'true' : undefined}
-                className="grid h-9 place-items-center rounded-lg border text-xs font-bold tabular-nums"
+                className={`grid h-9 place-items-center rounded-lg border text-xs font-bold tabular-nums ${k === i ? 'hud-lamp' : ''}`}
                 style={{
                   borderColor: k === i ? 'var(--acc)' : 'var(--line2)',
                   borderWidth: k === i ? 2 : 1,

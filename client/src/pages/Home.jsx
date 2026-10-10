@@ -88,6 +88,13 @@ function Hero() {
         <BlurFade delay={0.28}>
           <VanishInput onSearch={(v) => navigate('/search?q=' + encodeURIComponent(v))} />
           <p className="mt-2 text-xs" style={{ color: 'var(--faint)' }}>Press <kbd className="kbd">/</kbd> anywhere to jump here</p>
+          <p className="telemetry mt-2" aria-label="Live collection readout">
+            lib <strong>{stats?.publicResources ? Number(stats.publicResources).toLocaleString() : '…'}</strong>
+            {' · '}mocks <strong>{telemetry ? telemetry.mocks : '…'}</strong>
+            {' · '}decks <strong>{deckCount ?? '…'}</strong>
+            {' · '}prompts <strong>{telemetry ? telemetry.writing : '…'}</strong>
+            {' · '}free <strong>forever</strong>
+          </p>
         </BlurFade>
       </div>
     </section>
@@ -172,6 +179,13 @@ export default function Home() {
       .catch(() => {});
   }, []);
   const [fresh] = useApi(() => api.fresh().catch(() => ({ results: [] })), []);
+  const [telemetry, setTelemetry] = useState(null);
+  useEffect(() => {
+    api
+      .nativeStats()
+      .then((j) => setTelemetry(j.counts))
+      .catch(() => {});
+  }, []);
   const [trending] = useApi(() => api.trending().catch(() => ({ results: [] })), []);
   const [search] = useApi(() => api.search({ q: '', per: 24 }).catch(() => null), []);
   const [recents, setRecents] = useState([]);

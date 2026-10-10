@@ -7,7 +7,7 @@ import { Select } from '../components/ui/select';
 import { api, pretty } from '../lib/api';
 import { bumpInsight } from '../lib/store';
 import { BlurFade, Empty, Skeleton, AnimatedGrid } from '../components/magic';
-import { Pager, ResourceCard, useSaved } from '../components/cards';
+import { Pager, ResourceCard, highlight, useSaved } from '../components/cards';
 
 const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
 
@@ -98,7 +98,7 @@ export default function Search() {
   const tokens = useMemo(() => tokensOf(q), [q]);
   const total = data?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / 24));
-  const { toggle } = useSaved();
+  const { saved, toggle } = useSaved();
 
   // Keyboard: ↑/↓ move between results, Enter opens, S saves the focused card.
   useEffect(() => {
@@ -238,6 +238,7 @@ export default function Search() {
               {[
                 ['grid', '▦', 'Grid view'],
                 ['list', '☰', 'List view'],
+                ['ledger', '≣', 'Ledger table view'],
               ].map(([v, ico, label]) => (
                 <button
                   key={v}
@@ -289,7 +290,7 @@ export default function Search() {
         <p className="mb-3 text-xs" style={{ color: 'var(--faint)' }}>Tip: ↑ ↓ to move · Enter to open · S to save</p>
 
         {loading ? (
-          <div className={`grid gap-3.5 ${view === 'list' ? 'grid-cols-1' : 'sm:grid-cols-2'}`}>
+          <div className={`grid gap-3.5 ${view === 'list' || view === 'ledger' ? 'grid-cols-1' : 'sm:grid-cols-2'}`}>
             {Array.from({ length: 6 }, (_, i) => (
               <Skeleton key={i} />
             ))}
@@ -344,13 +345,58 @@ export default function Search() {
           </Empty>
         ) : (
           <>
-            <AnimatedGrid className={`grid gap-3.5 ${view === 'list' || compact ? 'grid-cols-1' : 'sm:grid-cols-2'}`}>
-              {(data.results || []).map((v, i) => (
-                <BlurFade key={v.id} delay={Math.min(i, 6) * 0.04}>
-                  <ResourceCard v={v} title={v.displayTitle} tokens={tokens} showDesc={!compact} />
-                </BlurFade>
-              ))}
-            </AnimatedGrid>
+            {view === 'ledger' && !compact ? (
+              <div className="overflow-x-auto rounded-2xl border" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
+                <table className="ledger-table">
+                  <caption className="sr-only">Resources as an index table</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">#</th>
+                      <th scope="col">Title</th>
+                      <th scope="col">Type</th>
+                      <th scope="col">Year</th>
+                      <th scope="col">Answers</th>
+                      <th scope="col"><span className="sr-only">Save</span></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(data.results || []).map((v, i) => (
+                      <tr key={v.id} data-result-id={v.id}>
+                        <td className="tnum" style={{ color: 'var(--faint)' }}>{(page - 1) * 24 + i + 1}</td>
+                        <td>
+                          <Link data-result-link to={'/r/' + v.id} className="link-slide font-semibold hover:text-[var(--acc)]">
+                            {highlight(v.displayTitle || v.title, tokens)}
+                          </Link>
+                          <span className="block text-xs" style={{ color: 'var(--faint)' }}>{pretty(v.category)}{v.provider ? ` · ${pretty(v.provider)}` : ''}</span>
+                        </td>
+                        <td className="tnum">{TYPE_LABEL[v.fileType] || v.fileType}</td>
+                        <td className="tnum">{v.year || '—'}</td>
+                        <td>{v.answersIncluded ? <span aria-label="Answers included">✓</span> : <span style={{ color: 'var(--faint)' }}>—</span>}</td>
+                        <td>
+                          <button
+                            onClick={() => toggle(v.id)}
+                            aria-pressed={String(saved.has(v.id))}
+                            aria-label={saved.has(v.id) ? 'Remove from saved' : 'Save this resource'}
+                            className="icon-hover grid h-9 w-9 place-items-center rounded-lg border text-sm"
+                            style={{ borderColor: 'var(--line2)', color: saved.has(v.id) ? 'var(--acc)' : 'var(--mut)' }}
+                          >
+                            {saved.has(v.id) ? '★' : '☆'}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <AnimatedGrid className={`grid gap-3.5 ${view === 'list' || compact ? 'grid-cols-1' : 'sm:grid-cols-2'}`}>
+                {(data.results || []).map((v, i) => (
+                  <BlurFade key={v.id} delay={Math.min(i, 6) * 0.04}>
+                    <ResourceCard v={v} title={v.displayTitle} tokens={tokens} showDesc={!compact} />
+                  </BlurFade>
+                ))}
+              </AnimatedGrid>
+            )}
             <Pager
               page={page}
               pages={pages}

@@ -34,6 +34,7 @@ export const api = {
   mock: (id) => get('/api/mocks/' + encodeURIComponent(id)),
   writing: () => get('/api/writing'),
   reading: () => get('/api/reading'),
+  nativeStats: () => get('/api/native-stats'),
   announcement: () => get('/api/announcement').catch(() => ({ body: null })),
   terms: () => get('/api/terms'),
   access: (id) => post('/api/access/' + encodeURIComponent(id), {}),

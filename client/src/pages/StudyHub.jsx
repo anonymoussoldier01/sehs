@@ -128,6 +128,7 @@ export default function StudyHub() {
 
       <FirstRun />
       <ReviewQueue />
+      <ActivityChart />
 
       <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">Your exam</h2>
       <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
@@ -452,6 +453,54 @@ function ReviewQueue() {
           </div>
         ))}
       </div>
+    </>
+  );
+}
+
+// ---------- Activity: last 14 days from the real on-device ledger ----------
+function ActivityChart() {
+  const [ledger] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(keys.insights) || 'null');
+    } catch {
+      return null;
+    }
+  });
+  const days = [];
+  for (let back = 13; back >= 0; back--) {
+    const d = new Date(Date.now() - back * 86400000).toISOString().slice(0, 10);
+    const entry = ledger?.days?.[d] || {};
+    days.push({ d, n: Object.values(entry).reduce((a, b) => a + (Number(b) || 0), 0) });
+  }
+  const max = Math.max(1, ...days.map((x) => x.n));
+  const total = days.reduce((a, b) => a + b.n, 0);
+  return (
+    <>
+      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">
+        Activity <span className="text-sm font-semibold" style={{ color: 'var(--faint)' }}>last 14 days · {total} events</span>
+      </h2>
+      {total === 0 ? (
+        <p className="text-sm" style={{ color: 'var(--mut)' }}>
+          Nothing charted yet — searches, opens and finished mocks draw bars here, in this browser only.
+        </p>
+      ) : (
+        <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+          <div className="flex h-24 items-end gap-1.5" role="img" aria-label={`Study activity, ${total} events in the last 14 days`}>
+            {days.map(({ d, n }) => (
+              <div key={d} className="flex flex-1 flex-col items-center gap-1" title={`${d}: ${n} events`}>
+                <span
+                  className="w-full rounded-t-md"
+                  style={{ height: `${Math.max(3, Math.round((n / max) * 88))}px`, background: n ? 'var(--primary)' : 'var(--bg2)', border: n ? undefined : '1px solid var(--line)' }}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="mt-1.5 flex justify-between text-[11px] tabular-nums" style={{ color: 'var(--faint)' }}>
+            <span>{days[0].d.slice(5)}</span>
+            <span>{days[13].d.slice(5)}</span>
+          </div>
+        </div>
+      )}
     </>
   );
 }
