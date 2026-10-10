@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { api } from '../lib/api';
 import { keys } from '../lib/store';
-import { BlurFade, Skeleton, SpotlightCard } from '../components/magic';
+import { Skeleton, SpotlightCard } from '../components/magic';
 import { Lamp } from '../components/ace';
 import { InteractiveHover } from '../components/bits';
 
@@ -12,7 +12,7 @@ export default function Mocks() {
   const [mocks, setMocks] = useState(null);
   const [best, setBest] = useState({});
   useEffect(() => {
-    document.title = 'Timed mocks — SEHS Study';
+    document.title = 'Timed mocks · SEHS Study';
     let live = true;
     api
       .mocks()
@@ -47,8 +47,7 @@ export default function Mocks() {
       ) : (
         <div className="mt-4 grid gap-3.5 sm:grid-cols-2">
           {mocks.map((m) => (
-            <BlurFade key={m.id}>
-              <SpotlightCard className="h-full rounded-2xl border shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+            <SpotlightCard key={m.id} className="h-full rounded-2xl border shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
                 <div className="flex h-full flex-col p-[18px]">
                   <h3 className="font-display text-[15.5px] font-bold">{m.title}</h3>
                   <p className="mb-1 mt-0.5 text-[13px]" style={{ color: 'var(--mut)' }}>
@@ -71,7 +70,6 @@ export default function Mocks() {
                   </p>
                 </div>
               </SpotlightCard>
-            </BlurFade>
           ))}
         </div>
       )}

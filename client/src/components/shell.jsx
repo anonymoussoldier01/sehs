@@ -415,7 +415,7 @@ export function Palette() {
           />
           <Command.List className="mt-2.5 max-h-[50vh] overflow-auto">
             <Command.Empty className="px-3.5 py-2.5 text-sm" style={{ color: 'var(--mut)' }}>
-              No matches — press Enter to search.
+              No matches. Press Enter to search.
             </Command.Empty>
             {q.trim() && (
               <Command.Item

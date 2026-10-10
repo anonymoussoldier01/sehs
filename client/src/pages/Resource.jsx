@@ -11,7 +11,7 @@ import { api, pretty } from '../lib/api';
 import { keys, pushRecent, bumpInsight } from '../lib/store';
 import { repo } from '../lib/repo';
 import { useTerms, useToast } from '../providers';
-import { BlurFade, Empty, Skeleton, AnimatedTooltip, SpotlightCard } from '../components/magic';
+import { Empty, Skeleton, AnimatedTooltip, SpotlightCard } from '../components/magic';
 import { ResourceCard, highlight } from '../components/cards';
 import { useSaved } from '../components/cards';
 
@@ -56,7 +56,7 @@ export default function Resource() {
         repo.readingProgress.touch(r.id);
         setNote(repo.notes.get(r.id));
         setNoteState('saved');
-        document.title = `${r.displayTitle || r.title} — SEHS Study`;
+        document.title = `${r.displayTitle || r.title} · SEHS Study`;
         const words = (r.displayTitle || r.title || '').split(/\s+/).slice(0, 3).join(' ');
         api
           .search({ q: words, per: 7 })
@@ -75,7 +75,7 @@ export default function Resource() {
       await api.report(id, reason, detail);
       setRepOpen(false);
       setDetail('');
-      toast('Thanks — report received');
+      toast('Thanks. Report received');
     } catch (err) {
       toast(err.message || 'Could not send report');
     }
@@ -116,7 +116,7 @@ export default function Resource() {
       const decks = JSON.parse(localStorage.getItem(keys.decks) || '[]');
       decks.push({ title: 'AI: ' + (v.displayTitle || v.title || '').slice(0, 60), cards: aiCards });
       localStorage.setItem(keys.decks, JSON.stringify(decks));
-      toast('Saved — see Study hub');
+      toast('Saved. See Study hub');
     } catch {
       toast('Could not save');
     }
@@ -209,7 +209,7 @@ export default function Resource() {
       )}
       {openedBefore && (
         <p className="mt-1 text-[13px]" style={{ color: 'var(--faint)' }}>
-          You opened this before ({new Date(openedBefore).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}) — your note and place are kept below.
+          You opened this before ({new Date(openedBefore).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}). Your note and place are kept below.
         </p>
       )}
       <div className="mb-[18px] mt-1.5 flex flex-wrap gap-1.5">
@@ -270,7 +270,7 @@ export default function Resource() {
         <div className="mb-7 rounded-2xl border border-dashed p-[18px]" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
           <h2 className="font-display text-[15.5px] font-bold">Can&apos;t read this file type here yet</h2>
           <p className="mt-1 max-w-[62ch] text-sm" style={{ color: 'var(--mut)' }}>
-            The built-in viewer reads PDFs and images. {v.fileType === 'docx' ? 'Word documents' : 'This file'} can&apos;t be displayed inside the site yet — we removed external file links, so for now this listing is details only. If this file matters to you, report it and we&apos;ll prioritise support.
+            The built-in viewer reads PDFs and images. {v.fileType === 'docx' ? 'Word documents' : 'This file'} can&apos;t be displayed inside the site yet. We removed external file links, so for now this listing is details only. If this file matters to you, report it and we&apos;ll prioritise support.
           </p>
           <p className="mt-2.5">
             <Button size="sm" variant="secondary" onClick={() => setRepOpen(true)}>
@@ -285,7 +285,7 @@ export default function Resource() {
           <section className="rounded-2xl p-[18px]" style={{ background: 'var(--ok-paper, #FBFAF6)' }} aria-label="Possible answer keys">
           <h3 className="mt-0 font-display text-[15.5px] font-bold">Possible answer key</h3>
           <p className="mb-2 mt-0 text-[13px]" style={{ color: 'var(--mut)' }}>
-            Inferred from the collection index (title match) — check it covers this paper before trusting it.
+            Inferred from the collection index (title match). Check it covers this paper before trusting it.
           </p>
           <ul className="flex flex-col gap-1.5">
             {answerKeys.map((r) => (
@@ -424,10 +424,8 @@ export default function Resource() {
         <section>
           <h2 className="mb-3 font-display text-xl font-bold">Related resources</h2>
           <div className="grid gap-3.5 sm:grid-cols-2">
-            {related.map((r, i) => (
-              <BlurFade key={r.id} delay={i * 0.04}>
-                <ResourceCard v={r} showDesc={false} />
-              </BlurFade>
+            {related.map((r) => (
+              <ResourceCard key={r.id} v={r} showDesc={false} />
             ))}
           </div>
         </section>
@@ -607,7 +605,7 @@ function PreviewPanel({ id, kind, title }) {
             <div>
               <p className="text-sm font-bold">Preview didn&apos;t load</p>
               <p className="mt-1 max-w-[52ch] text-[13px]" style={{ color: 'var(--mut)' }}>
-                {err} — this file refuses embedding. Try your saved note and related resources below, or report it so we can fix the listing.
+                {err}. This file refuses embedding. Try your saved note and related resources below, or report it so we can fix the listing.
               </p>
               <p className="mt-3 flex justify-center gap-2">
                 <Button size="sm" variant="secondary" onClick={load}>
@@ -681,7 +679,7 @@ function PreviewPanel({ id, kind, title }) {
             onTouchStart={(e) => onDown(e.touches[0])}
             onTouchMove={(e) => onMove(e.touches[0])}
             onTouchEnd={(e) => onUp(e.changedTouches[0])}
-            aria-label="Annotation layer — drag to highlight, tap to pin a note"
+            aria-label="Annotation layer. Drag to highlight, tap to pin a note"
           />
         )}
       </div>
@@ -729,7 +727,7 @@ function PreviewPanel({ id, kind, title }) {
                 <span aria-hidden="true" className="h-4 w-4 flex-none rounded-full border" style={{ background: (ANN_COLOURS.find((x) => x.id === a.color) || ANN_COLOURS[0]).solid, borderColor: 'var(--line2)' }} />
                 <span className="min-w-0 flex-1 truncate">
                   <strong>{a.kind === 'pin' ? `Pin ${k + 1}` : 'Highlight'}</strong>
-                  {a.text ? <span style={{ color: 'var(--mut)' }}> — {a.text}</span> : <span style={{ color: 'var(--faint)' }}> — no note</span>}
+                  {a.text ? <span style={{ color: 'var(--mut)' }}> · {a.text}</span> : <span style={{ color: 'var(--faint)' }}> · no note</span>}
                 </span>
                 <button onClick={() => jumpAnn(a)} className="min-h-[36px] rounded-lg px-2 text-[13px] font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>
                   Show
@@ -743,7 +741,7 @@ function PreviewPanel({ id, kind, title }) {
         </div>
       )}
       <p className="border-t px-4 py-2 text-xs" style={{ borderColor: 'var(--line)', color: 'var(--faint)' }}>
-        Marks sit on top of the page and stay in this browser — they aren&apos;t written into the file and won&apos;t follow downloads. Press ? for shortcuts.
+        Marks sit on top of the page and stay in this browser. They aren&apos;t written into the file and won&apos;t follow downloads. Press ? for shortcuts.
       </p>
     </div>
   );

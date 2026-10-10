@@ -155,7 +155,7 @@ export function VanishInput({ onSearch, phrases = HERO_PHRASES }) {
           <span className="pointer-events-none absolute inset-0 flex items-center overflow-hidden text-[17px]" style={{ color: 'var(--faint)' }} aria-hidden="true">
             <AnimatePresence mode="wait">
               <motion.span key={pi} initial={motionOk() ? { opacity: 0, y: 10 } : false} animate={{ opacity: 1, y: 0 }} exit={motionOk() ? { opacity: 0, y: -10 } : undefined} transition={{ duration: 0.3 }}>
-                Search papers, decks, topics — {phrases[pi]}
+                Search papers, decks, topics: {phrases[pi]}
               </motion.span>
             </AnimatePresence>
           </span>

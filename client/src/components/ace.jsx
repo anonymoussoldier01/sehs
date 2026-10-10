@@ -181,7 +181,7 @@ export function TracingBeam({ children, className }) {
     <div ref={ref} className={cn('relative', className)}>
       <div aria-hidden="true" className="absolute -left-5 top-0 hidden h-full w-[3px] overflow-hidden rounded-full md:block" style={{ background: 'var(--line)' }}>
         {animate ? (
-          <motion.div className="w-full origin-top rounded-full" style={{ scaleY: scrollYProgress, height: '100%', background: 'linear-gradient(to bottom, var(--primary), #6d28d9)' }} />
+          <motion.div className="w-full origin-top rounded-full" style={{ scaleY: scrollYProgress, height: '100%', background: 'linear-gradient(to bottom, var(--primary), #38bdf8)' }} />
         ) : (
           <div className="h-full w-full" style={{ background: 'var(--acc-line)' }} />
         )}
@@ -419,7 +419,7 @@ export function SnapCarousel({ children, label }) {
 }
 
 // ---------- Evervault (scramble reveal on hover) ----------
-const GLYPHS = '!<>-_\\/[]{}—=+*^?#________';
+const GLYPHS = '!<>-_\\/[]{}§=+*^?#________';
 export function Evervault({ text, className }) {
   const [out, setOut] = useState(text);
   const raf = useRef(0);

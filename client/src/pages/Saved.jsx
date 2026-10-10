@@ -23,7 +23,7 @@ export default function Saved() {
   const [name, setName] = useState('');
 
   useEffect(() => {
-    document.title = 'Your library — SEHS Study';
+    document.title = 'Your library · SEHS Study';
     if (!savedIds.length) {
       setItems([]);
       return;
@@ -66,7 +66,7 @@ export default function Saved() {
         </div>
       ) : !items.length ? (
         <p className="mt-4 text-sm" style={{ color: 'var(--mut)' }}>
-          Nothing here yet — tap ☆ Save on any resource and it will show up here.
+          Nothing here yet. Tap ☆ Save on any resource and it will show up here.
         </p>
       ) : (
         <AnimatedGrid className="mt-4 grid gap-3.5 sm:grid-cols-2">
@@ -79,7 +79,7 @@ export default function Saved() {
       <h2 className="mb-3 mt-6 font-display text-xl font-bold">Folders</h2>
       {!lists.length ? (
         <p className="text-sm" style={{ color: 'var(--mut)' }}>
-          No folders yet — tap “+” on any resource card, or create one below.
+          No folders yet. Tap “+” on any resource card, or create one below.
         </p>
       ) : (
         <div className="grid gap-3.5 sm:grid-cols-2">

@@ -9,14 +9,14 @@ import { keys, touchStreak, useLocal, useSyncedLocal } from '../lib/store';
 import { repo, exportData, deleteAllData } from '../lib/repo';
 import { WobbleCard } from '../components/ace';
 import { useToast } from '../providers';
-import { BlurFade, ShinyBadge, Skeleton, AnimatedGrid, TypingText, SpotlightCard } from '../components/magic';
+import { ShinyBadge, Skeleton, AnimatedGrid, TypingText, SpotlightCard } from '../components/magic';
 
 function useExam() {
   const [date, setDate] = useLocal(keys.examDate, null);
   const [streak, setStreak] = useState(0);
   useEffect(() => {
     setStreak(touchStreak());
-    document.title = 'Study hub — SEHS Study';
+    document.title = 'Study hub · SEHS Study';
   }, []);
   const diff = date ? Math.ceil((new Date(date + 'T00:00:00') - Date.now()) / 86400000) : null;
   return { date, setDate, streak, diff };
@@ -87,7 +87,7 @@ export default function StudyHub() {
     try {
       const j = await api.aiFlashcards(aiTopic.trim().slice(0, 120));
       setLocalDecks((d) => [...d, { title: 'AI: ' + aiTopic.trim().slice(0, 60), cards: j.cards }]);
-      setAiMsg(`Made ${j.cards.length} cards — find them under Your decks.`);
+      setAiMsg(`Made ${j.cards.length} cards. Find them under Your decks.`);
       setAiTopic('');
     } catch (e) {
       setAiMsg('AI unavailable: ' + e.message);
@@ -123,7 +123,7 @@ export default function StudyHub() {
     <div className="mx-auto max-w-[1000px] px-5 py-7">
       <h1 className="font-display text-3xl font-bold">Study hub</h1>
       <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
-        Flashcards, quizzes and goals — stored in this browser.
+        Flashcards, quizzes and goals, stored in this browser.
       </p>
 
       <FirstRun />
@@ -134,7 +134,7 @@ export default function StudyHub() {
       <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         <div className="flex flex-wrap items-center gap-4">
           {[
-            ['Countdown', diff === null ? '—' : diff >= 0 ? `${diff} day${diff === 1 ? '' : 's'}` : 'Exam week — good luck'],
+            ['Countdown', diff === null ? 'Not set' : diff >= 0 ? `${diff} day${diff === 1 ? '' : 's'}` : 'Exam week. Good luck'],
             ['Days active', `${streak}`],
             ['Cards mastered', String(mastered)],
           ].map(([l, v]) => (
@@ -248,8 +248,7 @@ export default function StudyHub() {
       ) : (
         <AnimatedGrid className="grid gap-3.5 sm:grid-cols-2">
           {decks.map((d) => (
-            <BlurFade key={d.id}>
-              <SpotlightCard className="h-full rounded-2xl border shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+            <SpotlightCard key={d.id} className="h-full rounded-2xl border shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
               <div className="h-full rounded-2xl p-[18px]">
                 <h3 className="font-display text-[15.5px] font-bold">{d.title}</h3>
                 <p className="mb-1 mt-0.5 text-[13px]" style={{ color: 'var(--mut)' }}>
@@ -262,8 +261,7 @@ export default function StudyHub() {
                   Study →
                 </Link>
               </div>
-              </SpotlightCard>
-            </BlurFade>
+            </SpotlightCard>
           ))}
         </AnimatedGrid>
       )}
@@ -339,9 +337,9 @@ export default function StudyHub() {
             </div>
           ))
         ) : (
-          <p className="text-sm" style={{ color: 'var(--mut)' }}>
-            No personal decks yet — create one below.
-          </p>
+            <p className="text-sm" style={{ color: 'var(--mut)' }}>
+              No personal decks yet. Create one below.
+            </p>
         )}
       </div>
       <div className="mt-3 rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
@@ -371,7 +369,7 @@ export default function StudyHub() {
       </div>
 
       <div className="mt-6">
-        <ShinyBadge>Streaks, Leitner boxes and plans — all on-device</ShinyBadge>
+        <ShinyBadge>On-device streaks, Leitner boxes and plans</ShinyBadge>
       </div>
 
       <YourData />
@@ -401,9 +399,9 @@ function FirstRun() {
   };
   return (
     <div className="mt-6 rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }}>
-      <h2 className="font-display text-[20px] font-bold">Start here — pick one small step</h2>
+      <h2 className="font-display text-[20px] font-bold">Start here: pick one small step</h2>
       <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
-        New here? Choose a goal and do ten focused minutes. Your progress appears on this page — real numbers only, never samples.
+        New here? Choose a goal and do ten focused minutes. Your progress appears on this page. Real numbers only, never samples.
       </p>
       <p className="mt-3 flex flex-wrap gap-2">
         <Button size="sm" variant="default" onClick={() => begin('/mocks')}>Take the short diagnostic</Button>
@@ -445,7 +443,7 @@ function ReviewQueue() {
               {it.nextDue && it.nextDue > today ? '○' : '●'}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate font-semibold">{it.stem}</span>
+              <span className="block truncate font-semibold" title={it.stem}>{it.stem}</span>
               <span className="text-xs" style={{ color: 'var(--faint)' }}>{it.strand} · box {it.box || 1} · due {it.nextDue || 'now'}</span>
             </span>
             <Button size="sm" variant="secondary" onClick={() => navigate('/drills')}>Practise</Button>
@@ -481,7 +479,7 @@ function ActivityChart() {
       </h2>
       {total === 0 ? (
         <p className="text-sm" style={{ color: 'var(--mut)' }}>
-          Nothing charted yet — searches, opens and finished mocks draw bars here, in this browser only.
+          Nothing charted yet. Searches, opens and finished mocks draw bars here, in this browser only.
         </p>
       ) : (
         <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
@@ -645,7 +643,7 @@ function Weaknesses() {
             </div>
             {!!vq && (
               <div className="mt-3">
-                <h4 className="text-sm font-bold">Fresh {vq.strand} variants — same skills, new questions</h4>
+                <h4 className="text-sm font-bold">Fresh {vq.strand} variants: same skills, new questions</h4>
                 {vq.questions.map((qq, i) => (
                   <div key={i} className="mt-2 rounded-xl border p-3" style={{ borderColor: 'var(--line)' }}>
                     <p className="text-[13.5px]">

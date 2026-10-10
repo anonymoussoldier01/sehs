@@ -134,7 +134,7 @@ function FirstVisitTerms() {
       className="fixed inset-0 z-[80] grid place-items-center overflow-auto bg-black/60 p-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
-      aria-label="Terms and Conditions — please read"
+      aria-label="Terms and Conditions: please read"
     >
       <motion.div
         initial={{ scale: 0.97, y: 12 }}
@@ -208,7 +208,7 @@ function Layout() {
           <div>
             <h2 className="font-display text-base font-bold">About this directory</h2>
             <p className="mb-2 mt-1 max-w-[80ch] text-[13.5px]" style={{ color: 'var(--mut)' }}>
-              A searchable collection of selective-entry study resources — past papers, notes, flashcards, mocks and guides. Free for anyone studying, no account needed.
+              A searchable collection of selective-entry study resources: past papers, notes, flashcards, mocks and guides. Free for anyone studying, no account needed.
             </p>
             <p className="text-xs tabular-nums" style={{ color: 'var(--faint)' }}>
               We use cookies + local storage to remember your theme, library and progress. Anonymous usage counts auto-delete after 30 days.{' '}
@@ -217,7 +217,7 @@ function Layout() {
               </Link>
             </p>
             <p className="mt-1 text-xs" style={{ color: 'var(--faint)' }}>
-              Independent study resource — not affiliated with the Victorian Department of Education, ACER, or any exam provider.
+              Independent study resource, not affiliated with the Victorian Department of Education, ACER, or any exam provider.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-0.5">

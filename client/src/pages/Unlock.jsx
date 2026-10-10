@@ -16,7 +16,7 @@ export default function Unlock() {
   });
   const navigate = useNavigate();
   useEffect(() => {
-    document.title = 'Admin unlock — SEHS Study';
+    document.title = 'Admin unlock · SEHS Study';
   }, []);
 
   const submit = async (e) => {
@@ -32,7 +32,7 @@ export default function Unlock() {
       window.__sehsAdmin = j.token;
       navigate('/admin');
     } catch (ex) {
-      setErr(ex.retryAfter ? `Too many attempts — try again in ${ex.retryAfter}s.` : 'Incorrect password. Please try again.');
+      setErr(ex.retryAfter ? `Too many attempts. Try again in ${ex.retryAfter}s.` : 'Incorrect password. Please try again.');
       setPw('');
     }
   };
@@ -74,7 +74,7 @@ export default function Unlock() {
     <div className="mx-auto max-w-[560px] px-5 py-8">
       <h1 className="font-display text-3xl font-bold">Admin unlock</h1>
       <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
-        Enter the admin password to manage the collection. Access stays in this browser tab only — closing the tab locks it again.
+        Enter the admin password to manage the collection. Access stays in this browser tab only. Closing the tab locks it again.
       </p>
       <form onSubmit={submit} className="mt-3">
         <label className="mb-2.5 block text-sm font-semibold" style={{ color: 'var(--mut)' }}>

@@ -4,7 +4,7 @@ ROOT = os.path.join(os.path.dirname(__file__), '..', 'data', 'native')
 
 reading = {"passages": []}
 P = [
- ("The Lighthouse Keeper", "fiction", "The lighthouse stood white against the grey sea. Mara had kept its lamp for eleven years, and she knew every gull by its cry. That night the storm took the radio, the spare bulb, and — worst of all — her certainty. When the small boat appeared between waves, she had only the old oil lamp and her own judgement.",
+ ("The Lighthouse Keeper", "fiction", "The lighthouse stood white against the grey sea. Mara had kept its lamp for eleven years, and she knew every gull by its cry. That night the storm took the radio, the spare bulb, and, worst of all, her certainty. When the small boat appeared between waves, she had only the old oil lamp and her own judgement.",
   [("What does the lighthouse symbolise?", ["Safety","Danger","Isolation","Guidance"], 3, "It guides the boat despite the storm."),
    ("Why is Mara uncertain?", ["She is new","Equipment failed","She is afraid of boats","The sea is calm"], 1, "Radio, bulb and certainty are gone."),
    ("'knew every gull by its cry' suggests?", ["She is lonely","She is observant","She is deaf","She dislikes birds"], 1, "Detail shows long attention."),
@@ -60,11 +60,11 @@ mocks = {"mocks":[
 ]}
 open(os.path.join(ROOT,'mocks.json'),'w').write(json.dumps(mocks, indent=1))
 
-guides = {"exam":{"blocks":[{"name":"Mathematics + Quantitative Reasoning","minutes":60,"format":"MCQ, paper booklet, no calculator"},{"name":"Reading + Verbal Reasoning","minutes":55,"format":"MCQ, ~75Q in 2026, paper booklet"},{"name":"Writing","minutes":40,"format":"2 handwritten tasks (~20 min each)"}],"totalTasks":"2h 35m","dayLength":"~4h with registration + breaks","syllabusCap":"Year 8 curriculum only","selection":"85% rank / 10% equity / 5% principal"},
+guides = {"exam":{"blocks":[{"name":"Mathematics + Quantitative Reasoning","minutes":60,"format":"MCQ, paper booklet, no calculator"},{"name":"Reading + Verbal Reasoning","minutes":55,"format":"MCQ, counts not published, paper booklet"},{"name":"Writing","minutes":40,"format":"2 handwritten tasks (~20 min each)"}],"totalTasks":"2h 35m","dayLength":"~4h with registration + breaks","syllabusCap":"Year 8 curriculum only","selection":"~1,000 Year 9 places; up to 5% principal discretion (verified, vic.gov.au)"},
 "schools":[{"name":"Melbourne High School","note":"Boys, South Yarra. Year 9 entry via exam."},{"name":"Mac.Robertson Girls' High School","note":"Girls, Melbourne. Year 9 entry via exam."},{"name":"Nossal High School","note":"Co-ed, Berwick."},{"name":"Suzanne Cory High School","note":"Co-ed, Werribee."}],
 "pacing":{"mathsQR":"~90s per Q: 2 passes (easy first, mark-and-return).","readingVR":"~44s per Q: don't linger; evidence-pointer for reading.","writing":"5 plan / 13 write / 2 check per task."},
 "plans":{"twelveWeek":["Wk1-2: vocab T1 + maths facts + 1 diagnostic","Wk3-6: VR/QR builders one type/day + weekly mini","Wk7-10: full blocks timed + mistake bank","Wk11-12: 2 full mocks + writing 2x/week + taper"],"crash4Week":["Daily: 30 vocab + 20 VR + 20 QR + 1 passage + 1 prompt plan"]},
 "faq":[{"q":"Calculator?","a":"No."},{"q":"How many questions?","a":"ACER doesn't publish counts. Train to minutes."},{"q":"Writing types?","a":"Usually 1 persuasive + 1 narrative/creative in 40 min."}],
-"glossary":[{"term":"Analogies","def":"A:B :: C:? — match the relationship."},{"term":"BODMAS","def":"Brackets, Orders, Division/Multiplication, Addition/Subtraction."}]}
+"glossary":[{"term":"Analogies","def":"A:B :: C:? means match the relationship."},{"term":"BODMAS","def":"Brackets, Orders, Division/Multiplication, Addition/Subtraction."}]}
 open(os.path.join(ROOT,'guides.json'),'w').write(json.dumps(guides, indent=1))
 print("packs done")

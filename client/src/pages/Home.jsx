@@ -2,14 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, pretty } from '../lib/api';
 import { keys } from '../lib/store';
+import { Layers } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { AuroraText, BlurFade, DeckCard, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText, DotPattern, Magnet, ClickSpark, StarBorder, TextGenerate, BlurText, SpotlightCard } from '../components/magic';
 import { ResourceCard } from '../components/cards';
-import { BoxReveal, SpinningText, VanishInput, Typewriter, ScrollVelocity, Ripple, InteractiveHover, OrbitingCircles } from '../components/bits';
+import { SpinningText, VanishInput, Typewriter, ScrollVelocity, Ripple, InteractiveHover, OrbitingCircles } from '../components/bits';
 import { BentoGrid, BentoCard, MiniTimer, MiniViewer, MiniDeck, MiniPen, MiniBars, MiniLines, ContainerScroll, AuroraBg, SnapCarousel, Evervault, Lamp } from '../components/ace';
 
-function useApi(fn, deps) {
-  const [data, setData] = useState(null);
+const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
+
+function useApi(fn, deps) {  const [data, setData] = useState(null);
   const [err, setErr] = useState(null);
   useEffect(() => {
     let live = true;
@@ -54,7 +56,7 @@ function Hero() {
         </BlurFade>
         <BlurFade delay={0.16}>
           <p className="lede" style={{ color: 'var(--mut)', fontSize: 17, maxWidth: '62ch', margin: '0 0 22px' }}>
-            Past papers, flashcards and timed mocks for Victoria&apos;s selective entry exam — the ACER test Year 8 students sit for Year 9 entry into Melbourne High, Mac.Rob, Nossal and Suzanne Cory. No account, just study.
+            Past papers, flashcards and timed mocks for Victoria&apos;s selective entry exam: the ACER test Year 8 students sit for Year 9 entry into Melbourne High, Mac.Rob, Nossal and Suzanne Cory. No account, just study.
           </p>
         </BlurFade>
         <BlurFade delay={0.22}>
@@ -151,7 +153,7 @@ function LearnPreview() {
           </div>
           {picked !== null && (
             <p className="mt-1 text-[13.5px]" style={{ color: picked === q.answer ? 'var(--ok)' : 'var(--mut)' }}>
-              {picked === q.answer ? 'Correct. ' : 'Not quite — the answer is highlighted. '}
+              {picked === q.answer ? 'Correct. ' : 'Not quite. The answer is highlighted. '}
               {q.explain || ''}
             </p>
           )}
@@ -207,12 +209,12 @@ export default function Home() {
         by[m.strand] = (by[m.strand] || 0) + 1;
       });
       const top = Object.keys(by).sort((a, b) => by[b] - by[a])[0];
-      if (top && by[top] >= 2) setNext({ text: `Your misses pile up in ${top} — hit drills or a mock.`, href: '/drills' });
+      if (top && by[top] >= 2) setNext({ text: `Your misses pile up in ${top}, hit drills or a mock.`, href: '/drills' });
       else if (misses.length) setNext({ text: `Review ${misses.length} logged misses in the study hub.`, href: '/study' });
     } catch {
       /* noop */
     }
-    document.title = 'SEHS Study — flashcards, mocks & past papers';
+    document.title = 'SEHS Study · flashcards, mocks & past papers';
   }, []);
 
   const subjects = useMemo(() => {
@@ -287,14 +289,14 @@ export default function Home() {
         <Lamp
           kicker="Victorian selective entry · Year 9 intake"
           title="Four schools. One exam. Walk in ready."
-          sub="Around 1,000 Year 9 places across Melbourne High, Mac.Robertson Girls', Nossal and Suzanne Cory. Offers come from the official selection process — this site exists so you meet exam day prepared, not surprised."
+          sub="Around 1,000 Year 9 places across Melbourne High, Mac.Robertson Girls', Nossal and Suzanne Cory. Offers come from the official selection process. This site exists so you meet exam day prepared, not surprised."
         />
         <div className="mx-auto mt-4 max-w-[420px]">
           <OrbitingCircles core="✦" items={['MHS', 'MRG', 'NHS', 'SCS']} radius={72} duration={20} />
         </div>
         <div className="mt-4 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            ['Melbourne High', 'MHS', 'Boys · South Yarra', 'The academic powerhouse on the hill — generations of high achievers.'],
+            ['Melbourne High', 'MHS', 'Boys · South Yarra', 'The academic powerhouse on the hill, generations of high achievers.'],
             ['Mac.Robertson Girls’', 'MRG', 'Girls · Melbourne', 'A storied inner-city school for high-achieving girls.'],
             ['Nossal', 'NHS', 'Co-ed · Berwick', 'Modern co-ed excellence in the south-east.'],
             ['Suzanne Cory', 'SCS', 'Co-ed · Werribee', 'Purpose-built selective schooling in the west.'],
@@ -321,10 +323,8 @@ export default function Home() {
       <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Recents</h2>
       {recents.length ? (
         <AnimatedGrid className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-          {recents.slice(0, 6).map((v, i) => (
-            <BlurFade key={v.id} delay={i * 0.05}>
-              <ResourceCard v={v} showDesc={false} />
-            </BlurFade>
+          {recents.slice(0, 6).map((v) => (
+            <ResourceCard key={v.id} v={v} showDesc={false} />
           ))}
         </AnimatedGrid>
       ) : (
@@ -340,7 +340,7 @@ export default function Home() {
           </div>
           <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
             <h3 className="font-display text-[15.5px] font-bold">Question of the day</h3>
-            <p className="text-xs" style={{ color: 'var(--faint)' }}>AI-generated sample — practise only, not official material.</p>
+            <p className="text-xs" style={{ color: 'var(--faint)' }}>AI-generated sample, practise only, not official material.</p>
             <Qotd />
           </div>
         </div>
@@ -361,7 +361,7 @@ export default function Home() {
                 <span className="grid h-8 w-8 flex-none place-items-center rounded-lg border text-sm" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }}>
                   ▢
                 </span>
-                <span className="truncate font-semibold">{v.displayTitle || v.title}</span>
+                <span className="truncate font-semibold" title={v.displayTitle || v.title}>{v.displayTitle || v.title}</span>
                 <span className="ml-auto flex-none text-xs" style={{ color: 'var(--faint)' }}>
                   Recently opened →
                 </span>
@@ -386,7 +386,7 @@ export default function Home() {
             to="/mocks"
             title="Timed mocks"
             desc="Full-length blocks with real timing, instant scoring and explanations. Fresh questions every attempt."
-            badge="Most loved"
+            badge="Timed · auto-scored"
             header={<MiniTimer />}
           />
         </StarBorder>
@@ -406,10 +406,8 @@ export default function Home() {
         For your next session <small className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}>from the library</small>
       </h2>
       <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3" style={{ gridAutoFlow: 'row' }}>
-        {subjects.map(([s, c], i) => (
-          <BlurFade key={s} delay={i * 0.04}>
-            <DeckCard to={'/search?q=' + encodeURIComponent(s)} icon="▢" title={pretty(s)} sub={`${c} resources · flashcards + papers`} badge={`${c} resources`} />
-          </BlurFade>
+        {subjects.map(([s, c]) => (
+          <DeckCard key={s} to={'/search?q=' + encodeURIComponent(s)} icon={<Layers className="h-5 w-5" aria-hidden="true" />} title={pretty(s)} sub={`${c} resources · flashcards + papers`} badge={`${c} resources`} />
         ))}
       </div>
 
@@ -419,7 +417,7 @@ export default function Home() {
       <LearnPreview />
 
       <ContainerScroll
-        title="Read inside the site — no new tabs"
+        title="Read inside the site: no new tabs"
         sub="Every paper opens in the built-in viewer with your notes, progress and related material alongside. One tap from any card."
       >
         <div style={{ background: 'var(--ok-paper, #FBFAF6)' }}>
@@ -441,7 +439,7 @@ export default function Home() {
             ))}
             <div className="flex gap-2 pt-1">
               <span className="rounded-lg px-2.5 py-1 text-[11px] font-bold" style={{ background: 'var(--acc-soft)', color: 'var(--acc)' }}>✓ Answers included</span>
-              <span className="rounded-lg px-2.5 py-1 text-[11px] font-bold" style={{ background: 'var(--bg2)', color: 'var(--mut)' }}>My note — saved ✓</span>
+              <span className="rounded-lg px-2.5 py-1 text-[11px] font-bold" style={{ background: 'var(--bg2)', color: 'var(--mut)' }}>My note · saved ✓</span>
             </div>
           </div>
         </div>
@@ -491,18 +489,40 @@ export default function Home() {
       )}
 
       <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Resources with answers <small className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}><Link to="/search?answers=1" style={{ color: 'var(--acc)' }}>View all</Link></small></h2>
-      <div className="grid gap-3.5 sm:grid-cols-2">
-        {answers.map((v) => (
-          <ResourceCard key={v.id} v={v} />
-        ))}
+      <div className="overflow-x-auto rounded-2xl border" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
+        <table className="ledger-table">
+          <caption className="sr-only">Recent resources that include answers</caption>
+          <thead>
+            <tr>
+              <th scope="col">Title</th>
+              <th scope="col">Type</th>
+              <th scope="col"><span className="sr-only">Open</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            {answers.slice(0, 5).map((v) => (
+              <tr key={v.id}>
+                <td>
+                  <Link to={'/r/' + v.id} className="link-slide font-semibold hover:text-[var(--acc)]">
+                    {v.displayTitle || v.title}
+                  </Link>
+                </td>
+                <td className="tnum">{TYPE_LABEL[v.fileType] || v.fileType}</td>
+                <td><Link to={'/r/' + v.id} aria-label={`Read ${v.displayTitle || v.title}`} className="font-bold" style={{ color: 'var(--acc)' }}>→</Link></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">PDF papers <small className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}><Link to="/search?type=pdf" style={{ color: 'var(--acc)' }}>View all</Link></small></h2>
-      <div className="grid gap-3.5 sm:grid-cols-2">
+      <SnapCarousel label="PDF papers">
         {pdfs.map((v) => (
-          <ResourceCard key={v.id} v={v} />
+          <div key={v.id} className="w-[300px] flex-none snap-start sm:w-[340px]">
+            <ResourceCard v={v} />
+          </div>
         ))}
-      </div>
+      </SnapCarousel>
 
       <AuroraBg className="mt-10 px-6 py-10 text-center sm:px-10">
         <p className="text-xs font-extrabold uppercase tracking-[0.2em]" style={{ color: 'var(--acc)' }}>Not sure where to start?</p>
@@ -510,7 +530,7 @@ export default function Home() {
           <TextGenerate words="Take the short diagnostic." />
         </h2>
         <p className="mx-auto mt-2 max-w-[52ch] text-[15px]" style={{ color: 'var(--mut)' }}>
-          <Typewriter lines={['Ten minutes. Real timing.', 'Find your gaps in maths, reasoning, reading.', 'Get a concrete next step — no account.']} />
+          <Typewriter lines={['Ten minutes. Real timing.', 'Find your gaps in maths, reasoning, reading.', 'Get a concrete next step, no account.']} />
         </p>
         <p className="mt-5 flex flex-wrap justify-center gap-2.5">
           <Ripple>
@@ -537,7 +557,7 @@ function Qotd() {
   return (
     <div>
       <p className="text-sm" style={{ color: 'var(--mut)' }}>
-        {item.stem} — {item.options.join(' / ')}
+        {item.stem}: {item.options.join(' / ')}
       </p>
       {show && (
         <p className="mt-1 text-[13.5px]">

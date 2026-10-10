@@ -65,7 +65,7 @@ export default function Drills() {
   const [aiIdx, setAiIdx] = useState(0);
 
   useEffect(() => {
-    document.title = 'Maths drills — SEHS Study';
+    document.title = 'Maths drills · SEHS Study';
   }, []);
 
   const next = (k) => {
@@ -116,7 +116,7 @@ export default function Drills() {
       setMsg('');
     } catch (e) {
       setMsg('AI unavailable: ' + e.message);
-      toast('AI unavailable — drills below still work');
+      toast('AI unavailable. Drills below still work');
     }
   };
 
@@ -129,7 +129,7 @@ export default function Drills() {
       </p>
       <h1 className="mt-1 font-display text-3xl font-bold">Maths drills (infinite)</h1>
       <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
-        Generative Year-8 drills with instant working. Streak{streak > 1 ? `: ${streak} 🔥` : ' stays in this browser.'}
+        Generative Year-8 drills with instant working. {streak > 1 ? `${streak}-day run, kept in this browser.` : 'Your run stays in this browser.'}
       </p>
       <div className="my-3 flex flex-wrap gap-2">
         {KINDS.map(([k, l]) => (

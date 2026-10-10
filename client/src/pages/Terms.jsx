@@ -7,7 +7,7 @@ export default function Terms() {
   const [t, setT] = useState(null);
   const [err, setErr] = useState(false);
   useEffect(() => {
-    document.title = 'Terms & Conditions — SEHS Study';
+    document.title = 'Terms and Conditions · SEHS Study';
     let live = true;
     api
       .terms()
@@ -24,7 +24,7 @@ export default function Terms() {
       </p>
       <h1 className="mt-1 font-display text-3xl font-bold">Terms &amp; Conditions {t && <span className="text-lg font-normal" style={{ color: 'var(--faint)' }}>v{t.version}</span>}</h1>
       {!t && !err && <div className="mt-4"><Skeleton /></div>}
-      {err && <p className="mt-4 text-sm" style={{ color: 'var(--mut)' }}>Couldn’t load the terms right now — please try again shortly.</p>}
+      {err && <p className="mt-4 text-sm" style={{ color: 'var(--mut)' }}>Couldn’t load the terms right now. Please try again shortly.</p>}
       {t && (
         <>
           <p className="reading mt-2 text-[15px] font-semibold" style={{ color: 'var(--mut)' }}>{t.summary}</p>

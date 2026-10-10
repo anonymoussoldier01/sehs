@@ -1,4 +1,4 @@
-// Shared motion layer — the single source of truth for timing (see docs/MOTION.md).
+// Shared motion layer. The single source of truth for timing (see docs/MOTION.md).
 // No component invents its own durations/easings; import from here.
 import { useCallback, useEffect, useState } from 'react';
 

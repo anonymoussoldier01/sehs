@@ -41,7 +41,7 @@ export default function Writing() {
   const timer = useRef(null);
 
   useEffect(() => {
-    document.title = 'Writing studio — SEHS Study';
+    document.title = 'Writing studio · SEHS Study';
     let live = true;
     api
       .writing()
@@ -275,7 +275,7 @@ export default function Writing() {
             {grades.slice(0, 8).map((g, i) => (
               <p key={i} className="flex justify-between text-[13px] tabular-nums">
                 <span style={{ color: 'var(--mut)' }}>{g.at} · {g.kind}</span>
-                <strong>{g.overall != null ? `${g.overall}/5` : '—'}</strong>
+                <strong>{g.overall != null ? `${g.overall}/5` : '–'}</strong>
               </p>
             ))}
           </div>

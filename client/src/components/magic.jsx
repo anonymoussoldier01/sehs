@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Search as SearchIcon } from 'lucide-react';
 import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
@@ -52,6 +53,7 @@ export function AuroraText({ children, className }) {
 }
 
 // ---------- ShinyBadge ----------
+// Single pill label: real status text, no glow stack, no animated sheen.
 export function ShinyBadge({ children, className }) {
   return (
     <span
@@ -62,10 +64,11 @@ export function ShinyBadge({ children, className }) {
       style={{ background: 'var(--panel)', borderColor: 'var(--line2)', color: 'var(--mut)' }}
     >
       <span
-        className="h-[7px] w-[7px] rounded-full"
-        style={{ background: 'var(--primary)', boxShadow: '0 0 10px var(--primary)' }}
+        className="h-[7px] w-[7px] flex-none rounded-full"
+        style={{ background: 'var(--acc)' }}
+        aria-hidden="true"
       />
-      <span className="shiny-text">{children}</span>
+      <span>{children}</span>
     </span>
   );
 }
@@ -344,8 +347,8 @@ export function DeckCard({ to, icon, title, sub, badge }) {
     >
       <span className="flex items-start justify-between gap-2">
         <span
-          className="grid h-[42px] w-[42px] place-items-center rounded-xl border text-[19px]"
-          style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }}
+          className="grid h-[42px] w-[42px] place-items-center rounded-xl border"
+          style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)', color: 'var(--acc)' }}
         >
           {icon}
         </span>
@@ -386,10 +389,11 @@ export function Empty({ title, msg, children }) {
       style={{ borderColor: 'var(--line2)', background: 'var(--panel)', color: 'var(--mut)' }}
     >
       <div
-        className="mx-auto grid h-16 w-16 -rotate-3 place-items-center rounded-[20px] border text-3xl"
-        style={{ background: 'var(--bg2)', borderColor: 'var(--line)' }}
+        className="mx-auto grid h-16 w-16 -rotate-3 place-items-center rounded-[20px] border"
+        style={{ background: 'var(--bg2)', borderColor: 'var(--line)', color: 'var(--faint)' }}
+        aria-hidden="true"
       >
-        🔍
+        <SearchIcon className="h-7 w-7" />
       </div>
       <h2 className="mb-1.5 mt-3.5 font-display text-xl font-bold" style={{ color: 'var(--txt)' }}>
         {title}
@@ -563,7 +567,7 @@ export function Magnet({ children, strength = 18, className }) {
 }
 
 // ---------- ClickSpark (React Bits) ----------
-// Brief spark burst on click. Marketing buttons only — never exam/viewer.
+// Brief spark burst on click. Marketing buttons only, never exam/viewer.
 export function ClickSpark({ children, className, onClick, color = 'var(--primary)' }) {
   const [sparks, setSparks] = useState([]);
   const id = useRef(0);

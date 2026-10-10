@@ -30,7 +30,7 @@ export default function Guide() {
       <Lamp
         kicker="ACER format · verified"
         title="Three timed blocks. One calm plan."
-        sub="Maths + Quant 60 min · Reading + Verbal 55 min · Writing 40 min — 2 hours 35 minutes of tasks, Year-8 curriculum cap, paper booklets."
+        sub="Maths + Quant 60 min · Reading + Verbal 55 min · Writing 40 min: 2 hours 35 minutes of tasks, Year-8 curriculum cap, paper booklets."
       />
       <TextReveal
         className="mx-auto mt-6 max-w-[62ch] text-center font-display text-xl font-bold"
@@ -43,7 +43,7 @@ export default function Guide() {
             {
               kicker: 'Block 1 · 60 min',
               title: 'Maths + Quantitative Reasoning',
-              desc: 'Curriculum maths (number, algebra, geometry, stats) plus patterns, series, matrices, Venn and spatial. Roughly 90 seconds a question — easy first, mark-and-return.',
+              desc: 'Curriculum maths (number, algebra, geometry, stats) plus patterns, series, matrices, Venn and spatial. Roughly 90 seconds a question: easy first, mark-and-return.',
               link: { to: '/mocks/maths-qr-60', label: 'Start this block' },
               visual: <MiniTimer />,
             },
@@ -56,8 +56,8 @@ export default function Guide() {
             },
             {
               kicker: 'Block 3 · 40 min',
-              title: 'Writing — two tasks',
-              desc: 'Usually one persuasive and one creative piece (unverified split — prepare for both). Five minutes planning, thirteen writing, two checking. Target 250–350 words.',
+              title: 'Writing: two tasks',
+              desc: 'Usually one persuasive and one creative piece (unverified split, so prepare for both). Five minutes planning, thirteen writing, two checking. Target 250–350 words.',
               link: { to: '/writing', label: 'Open the writing studio' },
               visual: <MiniPen />,
             },
@@ -116,20 +116,20 @@ export default function Guide() {
       <h2 className="mb-3 mt-8 font-display text-xl font-bold">FAQ</h2>
       <Faq
         items={[
-          { q: 'Calculator?', a: 'No — practise every mock and drill without one.' },
-          { q: 'Question counts?', a: 'Unverified: ACER doesn’t publish them — train to the minutes (60 / 55 / 40), not to assumed counts.' },
-          { q: 'Writing?', a: 'Two tasks in 40 minutes (verified). Unverified: usually one persuasive and one creative — prepare for both.' },
+          { q: 'Calculator?', a: 'No. Practise every mock and drill without one.' },
+          { q: 'Question counts?', a: 'Unverified: ACER doesn’t publish them, so train to the minutes (60 / 55 / 40), not to assumed counts.' },
+          { q: 'Writing?', a: 'Two tasks in 40 minutes (verified). Unverified: usually one persuasive and one creative, so prepare for both.' },
           { q: 'Offers?', a: 'Around 1,000 Year 9 places; up to 5% of places may be offered at a principal’s discretion (verified, vic.gov.au). We don’t model cut-offs or predict results.' },
         ]}
       />
       <h2 className="mb-3 mt-8 font-display text-xl font-bold">Sources</h2>
       <div className="rounded-2xl border p-[18px] text-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         <ul className="flex flex-col gap-1.5" style={{ color: 'var(--mut)' }}>
-          <li><a className="link-slide font-semibold" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/prepare">ACER — Prepare (exam format, 3 blocks, 2h 35m)</a></li>
-          <li><a className="link-slide font-semibold" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/exam-day">ACER — Exam day (schedule, answer booklets)</a></li>
-          <li><a className="link-slide font-semibold" style={{ color: 'var(--acc)' }} href="https://www.vic.gov.au/selective-entry-high-schools">Victorian Government — Selective entry high schools</a></li>
+          <li><a className="link-slide font-semibold" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/prepare">ACER: Prepare (exam format, 3 blocks, 2h 35m)</a></li>
+          <li><a className="link-slide font-semibold" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/exam-day">ACER: Exam day (schedule, answer booklets)</a></li>
+          <li><a className="link-slide font-semibold" style={{ color: 'var(--acc)' }} href="https://www.vic.gov.au/selective-entry-high-schools">Victorian Government: Selective entry high schools</a></li>
         </ul>
-        <p className="mt-2 text-[13px]" style={{ color: 'var(--faint)' }}>Independent guide — not affiliated with the Department of Education or ACER. Check the official pages for the current year.</p>
+        <p className="mt-2 text-[13px]" style={{ color: 'var(--faint)' }}>Independent guide, not affiliated with the Department of Education or ACER. Check the official pages for the current year.</p>
       </div>
       <Vortex className="mt-8 px-6 py-10 text-center">
         <h2 className="font-display text-2xl font-bold" style={{ color: '#E8EDF7' }}>Feel the timing before exam day</h2>

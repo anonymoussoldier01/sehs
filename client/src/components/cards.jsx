@@ -29,7 +29,7 @@ export function useSaved() {
   const toggle = (id) => {
     setSaved((list) => {
       const has = list.includes(id);
-      toast(has ? 'Removed from saved' : 'Saved — find it under Your library');
+      toast(has ? 'Removed from saved' : 'Saved. Find it under Your library');
       return has ? list.filter((x) => x !== id) : [id, ...list].slice(0, 500);
     });
   };
@@ -65,7 +65,7 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
             desc={v.description}
             meta={[subj, v.provider ? pretty(v.provider) : null, v.answersIncluded ? 'Answers included' : null].filter(Boolean).join(' · ')}
           >
-            <span className="link-slide transition-colors hover:text-[var(--acc)]">{highlight(displayTitle, tokens)}</span>
+            <span className="link-slide transition-colors hover:text-[var(--acc)]" title={displayTitle}>{highlight(displayTitle, tokens)}</span>
           </LinkPreview>
         </h3>
         <div className="text-xs font-semibold" style={{ color: 'var(--mut)' }}>
@@ -73,7 +73,7 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
           {v.provider ? ` › ${pretty(v.provider)}` : ''}
         </div>
         {showDesc && v.description ? (
-          <p className="line-clamp-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--mut)' }}>
+          <p className="line-clamp-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--mut)' }} title={v.description}>
             {highlight(v.description, tokens)}
           </p>
         ) : null}

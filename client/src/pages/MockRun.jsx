@@ -1,4 +1,4 @@
-// Timed mock runner — Calm profile. Timer runs on absolute timestamps
+// Timed mock runner: Calm profile. Timer runs on absolute timestamps
 // (startedAt/endAt persisted) so it survives backgrounding and refresh.
 // Answers/flags/position autosave; refresh resumes. Question order is
 // deterministic from the attempt seed (stored; shareable via ?seed=).
@@ -86,7 +86,7 @@ export default function MockRun() {
           return;
         }
         setMock(j.mock);
-        document.title = `${j.mock.title} — SEHS Study`;
+        document.title = `${j.mock.title} · SEHS Study`;
         const saved = loadSaved(id);
         if (saved && !saved.submitted && saved.endAt > Date.now() && saved.qids?.length) {
           setResumeOffer(saved);
@@ -123,7 +123,7 @@ export default function MockRun() {
     setI(Math.min(resumeOffer.i || 0, (resumeOffer.qids || []).length - 1));
     setEndAt(resumeOffer.endAt);
     setResumeOffer(null);
-    toast('Session restored — welcome back');
+    toast('Session restored. Welcome back');
   }, [resumeOffer, mock, toast]);
 
   const discardSaved = useCallback(() => {
@@ -271,7 +271,7 @@ export default function MockRun() {
       <div className="mx-auto max-w-[640px] px-5 py-10">
         <h1 className="font-display text-2xl font-bold">Resume your mock?</h1>
         <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
-          {mock.title} — {(resumeOffer.answers || []).filter((a) => a !== undefined && a !== -1).length} of {(resumeOffer.qids || []).length} answered,
+          {mock.title} · {(resumeOffer.answers || []).filter((a) => a !== undefined && a !== -1).length} of {(resumeOffer.qids || []).length} answered,
           {' '}{formatMMSS(Math.max(0, Math.floor((resumeOffer.endAt - Date.now()) / 1000)))} left on the clock.
         </p>
         <p className="mt-3 flex gap-2">
@@ -303,7 +303,7 @@ export default function MockRun() {
             Score: {result.score} / {result.total}
           </h3>
           <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
-            {perfect ? 'A clean set — well done. Try a fresh seed or a different block next.'
+            {perfect ? 'A clean set. Well done. Try a fresh seed or a different block next.'
               : misses.length ? `Review the ${misses.length} question${misses.length === 1 ? '' : 's'} below, starting with the flagged ones.`
               : 'Review below, then retry with a fresh seed.'}
           </p>
@@ -367,7 +367,7 @@ export default function MockRun() {
                 <DialogTitle>Submit this mock?</DialogTitle>
                 <DialogDescription>
                   {unanswered ? `You have ${unanswered} unanswered question${unanswered === 1 ? '' : 's'}. ` : 'Every question has an answer. '}
-                  Submission is final for this attempt — your score and review will be saved.
+                  Submission is final for this attempt. Your score and review will be saved.
                 </DialogDescription>
               </DialogHeader>
               <p className="flex gap-2">
@@ -438,7 +438,7 @@ export default function MockRun() {
           >
             {q.passage && (
               <details className="mb-3 rounded-xl border p-3" style={{ borderColor: 'var(--line)', background: 'var(--ok-paper, #FBFAF6)' }}>
-                <summary className="cursor-pointer text-sm font-bold">📖 {q.passage.title} — read passage</summary>
+                <summary className="cursor-pointer text-sm font-bold">{q.passage.title} (read passage)</summary>
                 <p className="reading mt-2 max-h-[220px] overflow-auto whitespace-pre-wrap text-sm" style={{ color: 'var(--mut)' }}>
                   {q.passage.text}
                 </p>
@@ -598,7 +598,7 @@ function ResultsReview({ qs, answers, times }) {
           ))}
         </dl>
       ) : (
-        <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>Not enough data for a topic breakdown yet — finish a full mock to unlock it.</p>
+        <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>Not enough data for a topic breakdown yet. Finish a full mock to unlock it.</p>
       )}
       <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Filter review">
         <AnimatedTabs
@@ -609,7 +609,7 @@ function ResultsReview({ qs, answers, times }) {
         />
       </div>
       {filter === 'flagged' ? (
-        <p className="mt-2 text-sm" style={{ color: 'var(--mut)' }}>Flags are for during the mock — they clear on submit. Use Incorrect or Skipped to revise.</p>
+        <p className="mt-2 text-sm" style={{ color: 'var(--mut)' }}>Flags are for during the mock. They clear on submit. Use Incorrect or Skipped to revise.</p>
       ) : visible.map(({ qq, k, picked, ok }) => (
         <ResultCard key={k} n={k} q={qq} picked={picked} ok={ok} secs={times[k]} />
       ))}
@@ -685,7 +685,7 @@ function MissTools({ misses, coach, setCoach, variants, setVariants }) {
       {coach && <p className="mt-2 whitespace-pre-wrap text-[13.5px]">{coach}</p>}
       {!!variants?.length && (
         <div className="mt-2">
-          <h4 className="font-bold">Fresh variants — same skills, new questions</h4>
+          <h4 className="font-bold">Fresh variants: same skills, new questions</h4>
           <VariantQuiz questions={variants} />
         </div>
       )}
@@ -752,7 +752,7 @@ function ResultCard({ n, q, picked, ok, secs }) {
       <p className="mt-0.5 text-sm" style={{ color: ok ? 'var(--ok)' : 'var(--bad)' }}>
         {ok ? '✓ ' : '✗ '}
         {picked >= 0 ? q.options[picked] : '(skipped)'}
-        {ok ? '' : ' — correct: ' + q.options[q.answer]}
+        {ok ? '' : '. Correct: ' + q.options[q.answer]}
         {secs != null && <span className="tnum" style={{ color: 'var(--faint)' }}> · {secs}s</span>}
       </p>
       <p className="text-[13px]" style={{ color: 'var(--mut)' }}>

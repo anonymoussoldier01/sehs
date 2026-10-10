@@ -38,3 +38,8 @@ Layered surfaces (background → raised → overlay); neutral ramp with slight b
 
 ## 8. Layout + components
 8px grid; 12-col desktop; page templates (marketing, app-with-sidebar, full-focus, reading, form/settings, empty/error); three emphasis levels max per screen; optical alignment; nested radii; 3 radii + 4 elevations. One polished inventory (buttons, inputs, selects, palette, chips, tags, sliding tabs, tables, tooltips, popovers, dialogs, mobile drawers, toasts, layout-matching skeletons, empty/error states, progress rings/bars, shortcut hints) with default/hover/focus-visible/active/disabled/loading/error/selected states. Internal noindex `/design` route is the visual-QA target.
+
+## 9. Dials, dark default, and antislop alignment
+Dial: ENERGY 2 / RHYTHM 3 / MOTION 2. The marketing surfaces say hello (orbit, velocity ribbon, aurora CTA); the app works quietly; exam and viewer drop to MOTION 1 (Calm). Sections deliberately vary (bento, ledger strip, carousel, split feature, full-bleed viewer moment, timeline), so RHYTHM 3 is structural, not decorative.
+Dark is the default because the product is a night-desk study instrument: long low-light sessions, paper-warm reading surfaces, one cyan accent. Both themes are fully designed with a persisted toggle (never an afterthought).
+Antislop collisions, resolved: the single bento section is content-hierarchy driven (live skeleton headers per mode), not a default mosaic, so R-05 is satisfied. Palette holds to ink blue + cyan + functional semantics (purple purged 2026-10-10). No pattern in this file asks for a banned default.

@@ -6,7 +6,7 @@ import { Label } from '../components/ui/label';
 import { Select } from '../components/ui/select';
 import { api, pretty } from '../lib/api';
 import { bumpInsight } from '../lib/store';
-import { BlurFade, Empty, Skeleton, AnimatedGrid } from '../components/magic';
+import { Empty, Skeleton, AnimatedGrid } from '../components/magic';
 import { Pager, ResourceCard, highlight, useSaved } from '../components/cards';
 
 const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
@@ -53,7 +53,7 @@ export default function Search() {
   };
 
   useEffect(() => {
-    document.title = q ? `Results for “${q}” — SEHS Study` : 'Browse resources — SEHS Study';
+    document.title = q ? `Results for “${q}” · SEHS Study` : 'Browse resources · SEHS Study';
   }, [q]);
 
   useEffect(() => {
@@ -205,7 +205,7 @@ export default function Search() {
             </span>
             {!!data && total > 0 && (data.mode === 'partial' || data.mode === 'fuzzy') && (
               <span className="inline-block rounded-[10px] border border-dashed px-2.5 py-[7px] text-[13px] font-semibold" style={{ color: 'var(--warn, #92400e)', background: 'var(--warn-bg, #fdf0d8)', borderColor: 'var(--amber, #b45309)' }}>
-                {data.mode === 'fuzzy' && data.corrected ? `Showing results for “${data.corrected}”. ` : 'No exact matches — showing closest matches. '}
+                {data.mode === 'fuzzy' && data.corrected ? `Showing results for “${data.corrected}”. ` : 'No exact matches, showing closest matches. '}
               </span>
             )}
           </div>
@@ -370,8 +370,8 @@ export default function Search() {
                           <span className="block text-xs" style={{ color: 'var(--faint)' }}>{pretty(v.category)}{v.provider ? ` · ${pretty(v.provider)}` : ''}</span>
                         </td>
                         <td className="tnum">{TYPE_LABEL[v.fileType] || v.fileType}</td>
-                        <td className="tnum">{v.year || '—'}</td>
-                        <td>{v.answersIncluded ? <span aria-label="Answers included">✓</span> : <span style={{ color: 'var(--faint)' }}>—</span>}</td>
+                        <td className="tnum">{v.year || '–'}</td>
+                        <td>{v.answersIncluded ? <span aria-label="Answers included">✓</span> : <span style={{ color: 'var(--faint)' }}>–</span>}</td>
                         <td>
                           <button
                             onClick={() => toggle(v.id)}
@@ -390,10 +390,8 @@ export default function Search() {
               </div>
             ) : (
               <AnimatedGrid className={`grid gap-3.5 ${view === 'list' || compact ? 'grid-cols-1' : 'sm:grid-cols-2'}`}>
-                {(data.results || []).map((v, i) => (
-                  <BlurFade key={v.id} delay={Math.min(i, 6) * 0.04}>
-                    <ResourceCard v={v} title={v.displayTitle} tokens={tokens} showDesc={!compact} />
-                  </BlurFade>
+                {(data.results || []).map((v) => (
+                  <ResourceCard key={v.id} v={v} title={v.displayTitle} tokens={tokens} showDesc={!compact} />
                 ))}
               </AnimatedGrid>
             )}

@@ -9,7 +9,7 @@ export default function Subjects({ subject }) {
   const [rows, setRows] = useState(null);
   const isSubj = !!subject;
   useEffect(() => {
-    document.title = `${isSubj ? 'Subjects' : 'Providers'} — SEHS Study`;
+    document.title = `${isSubj ? 'Subjects' : 'Providers'} · SEHS Study`;
     let live = true;
     api
       .search({ q: '', per: 96 })
@@ -33,7 +33,7 @@ export default function Subjects({ subject }) {
       <h1 className="font-display text-3xl font-bold">Browse by {isSubj ? 'subject' : 'provider'}</h1>
       <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
         {rows ? `${rows.length} ${isSubj ? 'subjects' : 'providers'} in the collection.` : 'Loading…'}
-        {isSubj ? ' Follow the selective-entry strands — maths, reasoning, reading, writing.' : ''}
+        {isSubj ? ' Follow the selective-entry strands: maths, reasoning, reading, writing.' : ''}
       </p>
       {!rows ? (
         <div className="mt-4 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">

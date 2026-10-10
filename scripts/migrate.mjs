@@ -123,7 +123,7 @@ async function ensurePassword(db, now) {
   } else {
     console.log('');
     console.log('================================================================');
-    console.log('  GENERATED ADMIN PASSWORD (shown ONCE — save it now):');
+    console.log('  GENERATED ADMIN PASSWORD (shown ONCE, save it now):');
     console.log(`    ${pw}`);
     console.log('================================================================');
     console.log('');

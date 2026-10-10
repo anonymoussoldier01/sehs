@@ -1,4 +1,4 @@
-// URL validation — rate-limited checker reporting ok / broken / restricted / unchecked.
+// URL validation: rate-limited checker reporting ok, broken, restricted, or unchecked.
 // Default is a dry run (reports everything as unchecked). Live checks need --live
 // and are capped (default 50, --all for the full set, 1 request per ~500ms).
 // Usage: node scripts/validate-urls.mjs [--live] [--all] [--out state/url-check.json]
@@ -16,7 +16,7 @@ const targets = all ? links : links.slice(0, 50);
 
 const results = [];
 if (!live) {
-  for (const r of targets) results.push({ id: r.id, url: r.url, status: 'unchecked', note: 'dry run — pass --live to check' });
+  for (const r of targets) results.push({ id: r.id, url: r.url, status: 'unchecked', note: 'dry run: pass --live to check' });
 } else {
   let i = 0;
   for (const r of targets) {
@@ -52,5 +52,5 @@ if (live) {
   fs.writeFileSync(out, JSON.stringify({ at: new Date().toISOString(), counts, results }, null, 2));
   console.log(`report: ${out}`);
 } else {
-  console.log('dry run — no report written. Pass --live to check (rate-limited).');
+  console.log('dry run: no report written. Pass --live to check (rate-limited).');
 }

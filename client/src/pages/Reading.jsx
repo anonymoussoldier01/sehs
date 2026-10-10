@@ -20,7 +20,7 @@ export default function Reading() {
   const [answered, setAnswered] = useState(0);
 
   useEffect(() => {
-    document.title = 'Reading studio — SEHS Study';
+    document.title = 'Reading studio · SEHS Study';
     let live = true;
     api
       .reading()

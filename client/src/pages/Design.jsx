@@ -38,7 +38,7 @@ export default function Design() {
   const [specTab, setSpecTab] = useState('one');
   const [boom, setBoom] = useState(false);
   useEffect(() => {
-    document.title = 'Design system — SEHS Study (internal)';
+    document.title = 'Design system · SEHS Study (internal)';
     const meta = document.createElement('meta');
     meta.name = 'robots';
     meta.content = 'noindex';
@@ -60,11 +60,11 @@ export default function Design() {
         </span>
       </h1>
       <p className="reading mt-2 text-[15px]" style={{ color: 'var(--mut)' }}>
-        Thesis: a calm, precise study instrument — ink on deep navy, with the warmth of a well-marked exam paper.
+        Thesis: a calm, precise study instrument. Ink on deep navy, with the warmth of a well-marked exam paper.
         Motion profile here: <strong>{motion.profile}</strong> (setting: {motion.setting}).
       </p>
 
-      <Row label="Tokens — surfaces & text">
+      <Row label="Tokens: surfaces and text">
         <div className="grid w-full grid-cols-2 gap-2.5 sm:grid-cols-4">
           <Swatch name="Background" css="var(--bg)" />
           <Swatch name="Raised" css="var(--panel)" />
@@ -79,14 +79,14 @@ export default function Design() {
 
       <Row label="Type scale (fluid, tabular numerals where it counts)">
         <div className="w-full">
-          <p style={{ fontSize: 'clamp(38px,6vw,64px)', fontFamily: 'var(--font-display)', fontWeight: 700, lineHeight: 1.05 }}>Display — practise with precision</p>
-          <p className="font-display text-2xl font-bold">Heading — organise your week</p>
-          <p className="text-[15px]">Body — calm, plain Australian English in sentence case.</p>
+          <p style={{ fontSize: 'clamp(38px,6vw,64px)', fontFamily: 'var(--font-display)', fontWeight: 700, lineHeight: 1.05 }}>Display: practise with precision</p>
+          <p className="font-display text-2xl font-bold">Heading: organise your week</p>
+          <p className="text-[15px]">Body: calm, plain Australian English in sentence case.</p>
           <p className="tnum text-2xl font-semibold">Timer 59:59 · Score 38 / 40 · Q12</p>
         </div>
       </Row>
 
-      <Row label="Buttons — all states">
+      <Row label="Buttons: all states">
         <Button variant="default">Start mock exam</Button>
         <Button variant="secondary">Save to my list</Button>
         <Button variant="default" disabled>Disabled</Button>
@@ -132,7 +132,7 @@ export default function Design() {
         </Button>
       </Row>
 
-      <Row label="Second-wave magic — Magic UI · Aceternity · React Bits (all gated by the motion setting)">
+      <Row label="Second-wave magic: Magic UI, Aceternity, React Bits (all gated by the motion setting)">
         <div className="grid w-full gap-2.5 sm:grid-cols-2">
           <SpotlightCard className="rounded-2xl border p-4" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
             <p className="text-sm font-bold">SpotlightCard</p>
@@ -146,7 +146,7 @@ export default function Design() {
           </StarBorder>
         </div>
         <div className="w-full rounded-2xl border p-4" style={{ borderColor: 'var(--line)' }}>
-          <p className="text-sm font-bold">TextGenerate — <TextGenerate words="Practise with precision, calmly." /></p>
+          <p className="text-sm font-bold">TextGenerate: <TextGenerate words="Practise with precision, calmly." /></p>
           <BlurText as="p" className="mt-1 text-sm font-bold">BlurText reveals headings word by word on scroll.</BlurText>
         </div>
         <Magnet><Button variant="default">Magnet button</Button></Magnet>
@@ -154,7 +154,7 @@ export default function Design() {
         <AnimatedTabs label="design-spec" tabs={[{ id: 'one', label: 'One' }, { id: 'two', label: 'Two' }]} value={specTab} onChange={setSpecTab} />
         <AnimatedTooltip tip="Shortcut included" shortcut="S"><Button size="sm" variant="secondary">Hover me</Button></AnimatedTooltip>
         <Tilt className="rounded-2xl border px-4 py-3 text-sm font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
-          Tilt card — hover to tilt
+          Tilt card (hover to tilt)
         </Tilt>
         <div className="relative h-24 w-full overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--line)' }}>
           <DotPattern />
@@ -168,7 +168,7 @@ export default function Design() {
         </div>
       </Row>
 
-      <Row label="Third wave — Aceternity · MagicUI · React Bits (motion-gated, calm in exam/viewer)">
+      <Row label="Third wave: Aceternity, MagicUI, React Bits (motion-gated, calm in exam/viewer)">
         <div className="w-full overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--line)' }}>
           <Lamp kicker="Specimen" title="Lamp header" sub="Glowing section headers for mocks and guides." />
         </div>
@@ -196,11 +196,11 @@ export default function Design() {
         <p className="w-full text-sm">Evervault hover: <Evervault text="SECRET-SAUCE-123" /></p>
       </Row>
 
-      <Row label="States — loading, empty, error, offline">
+      <Row label="States: loading, empty, error, offline">
         <div className="grid w-full gap-2.5 sm:grid-cols-2">
           <div className="rounded-xl border p-4" style={{ borderColor: 'var(--line)' }}>
             <p className="text-sm font-bold">Loading</p>
-            <p className="text-[13px]" style={{ color: 'var(--mut)' }}>Skeletons match the final layout with a subtle shimmer — never a spinner on a blank page.</p>
+            <p className="text-[13px]" style={{ color: 'var(--mut)' }}>Skeletons match the final layout with a subtle shimmer. Never a spinner on a blank page.</p>
           </div>
           <div className="rounded-xl border p-4" style={{ borderColor: 'var(--line)' }}>
             <p className="text-sm font-bold">Empty</p>

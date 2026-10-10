@@ -4,9 +4,9 @@
 // Usage: node scripts/terms-v2.mjs
 import { openDatabase, setMeta } from '../server/db.mjs';
 
-const SUMMARY = `Independent study site. Materials belong to their owners — personal study use only, never redistribute. Practice content is unofficial: no score predictions, no guaranteed outcomes. Access events are logged for security; raw analytics auto-delete after 30 days. If you are under 18, use this site with a parent or guardian. See the full terms before continuing.`;
+const SUMMARY = `Independent study site. Materials belong to their owners: personal study use only, never redistribute. Practice content is unofficial, with no score predictions and no guaranteed outcomes. Access events are logged for security; raw analytics auto-delete after 30 days. If you are under 18, use this site with a parent or guardian. See the full terms before continuing.`;
 
-const BODY = `# Terms & Conditions — SEHS Study (v2)
+const BODY = `# Terms & Conditions: SEHS Study (v2)
 
 **Last updated:** 2026-10-10. These terms were written for students and families to actually read. If any part is unclear, ask a parent, guardian or teacher before continuing.
 
@@ -16,7 +16,7 @@ SEHS Study is an **independent** study resource for Victorian selective-entry pr
 ## 2. Who this site is for
 The site is designed for Year 8 students preparing for Year 9 selective entry in Victoria, and the adults supporting them. **If you are under 18, please use this site with a parent or guardian**, and let them read these terms and the Privacy page with you.
 
-## 3. What the site is — and is not
+## 3. What the site is, and is not
 We provide an index of study resources plus original practice tools (flashcards, timed mocks, drills, guides, writing prompts). We **link to** third-party files; we do not host them and do not claim ownership of them. Nothing here is official exam material. Practice questions, scores, feedback and study plans are **practice aids only**: they are not marking, not predictions of exam results, and not a promise of selection or any outcome.
 
 ## 4. Acceptable use
@@ -29,10 +29,10 @@ All resource titles, files and provider materials remain the property of their r
 - We do not copy proprietary question banks and do not present any question as official. Original questions are labelled \`verified\` (method and date recorded) or \`draft\`.
 
 ## 6. Privacy
-We collect the minimum needed to run the site: access events (resource, time, outcome), rate-limit and security signals (IP addresses are hashed, never stored raw), and anonymous aggregate counts. Raw analytics auto-delete after 30 days. Your library, notes, decks and progress live **in your own browser** (cookies and local storage) unless you export them — clearing site data removes them. There are no accounts, no third-party advertising, and no third-party tracking scripts. See the Privacy page for detail.
+We collect the minimum needed to run the site: access events (resource, time, outcome), rate-limit and security signals (IP addresses are hashed, never stored raw), and anonymous aggregate counts. Raw analytics auto-delete after 30 days. Your library, notes, decks and progress live **in your own browser** (cookies and local storage) unless you export them. Clearing site data removes them. There are no accounts, no third-party advertising, and no third-party tracking scripts. See the Privacy page for detail.
 
 ## 7. AI-assisted features
-Tutors, graders, planners and generated questions are automated aids. They can be wrong. Writing feedback is **practice feedback, not official marking**. Do not rely on AI output for decisions about applications or study pathways. We do not log the content of your AI prompts — only aggregate mode and length counts used to guard shared quotas.
+Tutors, graders, planners and generated questions are automated aids. They can be wrong. Writing feedback is **practice feedback, not official marking**. Do not rely on AI output for decisions about applications or study pathways. We do not log the content of your AI prompts, only aggregate mode and length counts used to guard shared quotas.
 
 ## 8. Accuracy and availability
 Study content may contain errors despite review. Linked files live on third-party services and may move, break, change, or refuse embedding. Resources are provided **as-is**, without any guarantee of availability, accuracy, or fitness for any purpose.

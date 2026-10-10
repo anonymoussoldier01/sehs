@@ -13,7 +13,7 @@ export default function SharedList() {
     let live = true;
     try {
       const ids = JSON.parse(atob(code.replace(/-/g, '+').replace(/_/g, '/'))).filter((s) => /^[0-9a-f]{32}$/.test(s)).slice(0, 100);
-      document.title = `Shared folder (${ids.length}) — SEHS Study`;
+      document.title = `Shared folder (${ids.length}) · SEHS Study`;
       if (!ids.length) {
         setItems([]);
         return;
@@ -58,7 +58,7 @@ export default function SharedList() {
         </div>
       )}
       <p className="mt-2 text-xs" style={{ color: 'var(--faint)' }}>
-        {pretty('shared')} via encoded public IDs — validated server-side.
+          {pretty('shared')} via encoded public IDs, validated server-side.
       </p>
     </div>
   );

@@ -81,7 +81,7 @@ export default function Deck() {
   };
 
   useEffect(() => {
-    if (deck) document.title = `${deck.title} — SEHS Study`;
+    if (deck) document.title = `${deck.title} · SEHS Study`;
   }, [deck]);
 
   const switchMode = (m) => {
@@ -152,7 +152,7 @@ function Flip({ cards, order, pos, setPos, flipped, setFlipped, box, setBox }) {
           key={i}
           role="button"
           tabIndex={0}
-          aria-label="Flashcard — activate to flip, swipe right if you knew it, left if not"
+          aria-label="Flashcard. Activate to flip. Swipe right if you knew it, left if not"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.6}
@@ -197,7 +197,7 @@ function Flip({ cards, order, pos, setPos, flipped, setFlipped, box, setBox }) {
             <p className="m-0 text-xl font-bold">{flipped ? '' : c.front}</p>
             {!flipped && (
               <p className="m-0 text-[13px]" style={{ color: 'var(--faint)' }}>
-                Front — tap to reveal
+                Front. Tap to reveal
               </p>
             )}
             {flipped && <div style={{ transform: 'rotateY(180deg)' }} className="flex flex-col gap-2.5" />}
@@ -212,7 +212,7 @@ function Flip({ cards, order, pos, setPos, flipped, setFlipped, box, setBox }) {
               </p>
               <p className="m-0 text-xl font-bold">{c.back}</p>
               <p className="m-0 text-[13px]" style={{ color: 'var(--faint)' }}>
-                Back — tap to flip
+                Back. Tap to flip
                 {c.resourceId && (
                   <>
                     {' '}
@@ -264,7 +264,7 @@ function Learn({ cards, order, pos, setPos, opts, setBox, box }) {
               onClick={() => {
                 const right = o === cc.back;
                 setBox(j, right ? Math.min(4, box(j) + 1) : 1);
-                toast(right ? 'Correct ✓' : 'Not quite — answer: ' + cc.back);
+                toast(right ? 'Correct ✓' : 'Not quite. Answer: ' + cc.back);
                 setPos((p) => (p + 1) % order.length);
               }}
               className="rounded-[10px] border px-4 py-3 text-left text-sm font-semibold transition-all hover:-translate-y-px"
@@ -289,7 +289,7 @@ function Test({ cards, order, test, setTest }) {
             Score: {test.score} / {test.total}
           </h3>
           <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
-            {perfect ? 'Perfect. 🎉' : test.score >= test.total * 0.7 ? 'Solid — review the misses below.' : 'Keep practising — review below.'}
+            {perfect ? 'Perfect score. Well done.' : test.score >= test.total * 0.7 ? 'Solid. Review the misses below.' : 'Keep practising. Review below.'}
           </p>
           <button
             onClick={() => setTest({ i: 0, score: 0, total: Math.min(10, cards.length), answers: [] })}
@@ -307,7 +307,7 @@ function Test({ cards, order, test, setTest }) {
             <p style={{ color: a.ok ? 'var(--ok)' : 'var(--bad)' }}>
               {a.ok ? '✓ ' : '✗ '}
               {a.picked}
-              {a.ok ? '' : ' — correct: ' + a.back}
+              {a.ok ? '' : '. Correct: ' + a.back}
             </p>
           </div>
         ))}

@@ -12,13 +12,13 @@ export default function Request() {
   const [detail, setDetail] = useState('');
   const [msg, setMsg] = useState('');
   useEffect(() => {
-    document.title = 'Request a resource — SEHS Study';
+    document.title = 'Request a resource · SEHS Study';
   }, []);
   const send = async (e) => {
     e.preventDefault();
     try {
       await api.request(title, detail);
-      setMsg('Received — thank you.');
+      setMsg('Received. Thank you.');
       setTitle('');
       setDetail('');
     } catch (err) {
@@ -34,10 +34,10 @@ export default function Request() {
       </p>
       <h1 className="mt-1 font-display text-3xl font-bold">Request a resource</h1>
       <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
-        Tell us what&apos;s missing — an administrator reviews every request. Please don&apos;t include personal details.
+        Tell us what&apos;s missing. An administrator reviews every request. Please don&apos;t include personal details.
       </p>
       <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
-        Tip: <Link to="/search" className="font-bold underline" style={{ color: 'var(--acc)' }}>search the collection first</Link> — your resource may already be here under a different title.
+        Tip: <Link to="/search" className="font-bold underline" style={{ color: 'var(--acc)' }}>search the collection first</Link>. Your resource may already be here under a different title.
       </p>
       <form onSubmit={send} className="mt-3 grid gap-2.5">
         <Input value={title} onChange={(e) => setTitle(e.target.value)} required minLength={4} maxLength={200} placeholder="What are you looking for? (e.g. 2023 ACER verbal reasoning)" aria-label="Request title" />

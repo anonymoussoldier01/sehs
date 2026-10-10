@@ -27,3 +27,6 @@ Hero signature (highlighter draw + live sample question) · entrance choreograph
 
 ## Third-party animated components
 Adopted: none new (existing `magic.jsx` audited: AuroraText/WordRotate/NumberTicker/Marquee/Particles/Meteors kept on marketing surfaces only, bound to tokens, gated by motion profile). Rejected: stock parallax/confetti/template effects (see DECISIONS.md D6).
+
+## Motion purposes (R-19/R-31, 2026-10-10)
+Per-card entrance choreography removed from search, mocks, decks, recents, subjects and related grids (layout animation only). Section-level entrances kept (hero, headers, panels). Every remaining technique carries a one-line written purpose in DECISIONS.md D12.

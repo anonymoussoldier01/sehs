@@ -111,7 +111,7 @@ export function TermsProvider({ children }) {
               <h2 className="font-display text-xl font-bold">
                 Terms &amp; Conditions{' '}
                 <span className="text-sm font-normal" style={{ color: 'var(--faint)' }}>
-                  v{pending.version} — this browser tab only
+                  v{pending.version} · this browser tab only
                 </span>
               </h2>
               <p className="mt-1 font-semibold" style={{ color: 'var(--mut)' }}>
@@ -157,7 +157,7 @@ export function TermsProvider({ children }) {
 }
 
 // ---------- resource opener (grant flow) ----------
-// Terms are accepted FIRST, in this tab — only then is the file opened.
+// Terms are accepted FIRST, in this tab. Only then is the file opened.
 // No about:blank pre-open, no placeholder tabs. If the browser still blocks
 // the new tab, the granted URL is handed back as a real link (never a dead end).
 export function useOpener() {
@@ -179,8 +179,8 @@ export function useOpener() {
         }
         const w = window.open(j.openUrl, '_blank', 'noopener');
         if (!w) {
-          // Blocked — hand the granted URL back so the caller renders a real link.
-          toast('Popup blocked — your file is ready below');
+          // Blocked: hand the granted URL back so the caller renders a real link.
+          toast('Popup blocked. Your file is ready below');
           return { url: j.openUrl, blocked: true };
         }
         return { url: j.openUrl, blocked: false };

@@ -1,7 +1,7 @@
-// Repository interface — all persisted learner data lives behind these functions.
+// Repository interface: all persisted learner data lives behind these functions.
 // Today the adapter is localStorage (no accounts by design; see docs/DECISIONS.md D2).
 // Migration path to accounts: implement the same function names against a REST
-// backend (e.g. /api/me/*) and swap this module's internals — UI code must not
+// backend (e.g. /api/me/*) and swap this module's internals. UI code must not
 // touch localStorage directly for learner data (UI prefs like theme/view/motion
 // may keep using localStorage via useLocal).
 import { keys } from './store';
@@ -19,7 +19,7 @@ function write(key, value) {
     if (value == null) localStorage.removeItem(key);
     else localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    /* storage unavailable — callers treat as ephemeral */
+    /* storage unavailable: callers treat as ephemeral */
   }
 }
 
@@ -52,7 +52,7 @@ export const repo = {
   },
   // Annotations: highlight boxes + margin pins placed over the document frame.
   // Positions are fractions (0-1) of the viewer box, so they survive resize.
-  // They live alongside the document — they are NOT embedded in the file and
+  // They live alongside the document. They are NOT embedded in the file and
   // do not travel with downloads or inside-frame zoom.
   // { [resourceId]: [{ id, kind: 'highlight'|'pin', x, y, w, h, color, text, at }] }
   annotations: {
@@ -112,7 +112,7 @@ export function exportData() {
   };
 }
 
-/** Delete all local learner data (irreversible — callers must confirm first). */
+/** Delete all local learner data (irreversible: callers must confirm first). */
 export function deleteAllData() {
   for (const k of ['sehs-progress', 'sehs-notes', 'sehs-annotations', 'sehs-review', keys.saved, keys.mocks, keys.mistakes, keys.lists, keys.decks, keys.leitner, keys.recent, keys.insights, keys.profile, keys.streak])
     try {

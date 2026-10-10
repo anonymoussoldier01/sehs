@@ -1,4 +1,4 @@
-// Assessment engine — modular, typed-by-convention, tested (scripts/assessment.test.mjs).
+// Assessment engine, modular, typed-by-convention, tested (scripts/assessment.test.mjs).
 // Timer uses absolute timestamps (Date.now, monotonic enough for exam timing) so it
 // survives tab backgrounding and refresh; elapsed time can be re-validated from
 // stored startedAt/endAt. Question selection is deterministic from a seed.
@@ -136,50 +136,50 @@ export function applyAccommodations(settings = {}) {
 // ---- clearly labelled SAMPLE questions for development (draft, not official) ----
 export const SAMPLE_QUESTIONS = [
   {
-    id: 'sample-vr-1', type: 'single', strand: 'verbal', stem: 'SAMPLE — Book is to chapter as song is to…',
+    id: 'sample-vr-1', type: 'single', strand: 'verbal', stem: 'SAMPLE: Book is to chapter as song is to…',
     options: ['verse', 'cover', 'singer', 'stage'], answer: 0,
     explanation: 'A chapter is part of a book; a verse is part of a song.',
     difficulty: 'easy', timeSecs: 60, verification: 'draft', source: 'original sample',
   },
   {
-    id: 'sample-qr-1', type: 'single', strand: 'quant', stem: 'SAMPLE — 3, 6, 11, 18, 27, … What comes next?',
+    id: 'sample-qr-1', type: 'single', strand: 'quant', stem: 'SAMPLE: 3, 6, 11, 18, 27, … What comes next?',
     options: ['36', '38', '34', '39'], answer: 1,
     explanation: 'Differences grow by 2 each step: +3, +5, +7, +9, so +11 gives 38.',
     difficulty: 'medium', timeSecs: 90, verification: 'draft', source: 'original sample',
   },
   {
-    id: 'sample-maths-1', type: 'numeric', strand: 'maths', stem: 'SAMPLE — What is 3/4 of 96?',
+    id: 'sample-maths-1', type: 'numeric', strand: 'maths', stem: 'SAMPLE: What is 3/4 of 96?',
     answer: 72, tolerance: 0,
     explanation: '96 ÷ 4 = 24; 24 × 3 = 72.',
     difficulty: 'easy', timeSecs: 60, verification: 'draft', source: 'original sample',
   },
   {
-    id: 'sample-maths-2', type: 'single', strand: 'maths', stem: 'SAMPLE — If 2x + 5 = 17, x = …',
+    id: 'sample-maths-2', type: 'single', strand: 'maths', stem: 'SAMPLE: If 2x + 5 = 17, x = …',
     options: ['5', '6', '7', '11'], answer: 1,
     explanation: '2x = 12, so x = 6.',
     difficulty: 'easy', timeSecs: 60, verification: 'draft', source: 'original sample',
   },
   {
-    id: 'sample-read-1', type: 'passage', strand: 'reading', stem: 'SAMPLE — The author compares the river to a "patient archivist" mainly to suggest it…',
+    id: 'sample-read-1', type: 'passage', strand: 'reading', stem: 'SAMPLE: The author compares the river to a "patient archivist" mainly to suggest it…',
     options: ['stores history in its layers', 'flows very slowly', 'is open to visitors', 'writes books'],
-    answer: 0, passage: { title: 'SAMPLE — The river keeps receipts', text: 'SAMPLE passage: The river keeps receipts. … (two sentences for development only.)' },
-    explanation: '"Archivist" implies keeping records — the layers store history.',
+    answer: 0, passage: { title: 'SAMPLE: The river keeps receipts', text: 'SAMPLE passage: The river keeps receipts. … (two sentences for development only.)' },
+    explanation: '"Archivist" implies keeping records, as the layers store history.',
     difficulty: 'medium', timeSecs: 90, verification: 'draft', source: 'original sample',
   },
   {
-    id: 'sample-vocab-1', type: 'single', strand: 'vocab', stem: 'SAMPLE — "Meticulous" most nearly means…',
+    id: 'sample-vocab-1', type: 'single', strand: 'vocab', stem: 'SAMPLE: "Meticulous" most nearly means…',
     options: ['careless', 'thorough', 'hasty', 'cheerful'], answer: 1,
     explanation: 'Meticulous means showing great attention to detail.',
     difficulty: 'easy', timeSecs: 45, verification: 'draft', source: 'original sample',
   },
   {
-    id: 'sample-grammar-1', type: 'single', strand: 'grammar', stem: 'SAMPLE — Choose the correctly punctuated sentence.',
+    id: 'sample-grammar-1', type: 'single', strand: 'grammar', stem: 'SAMPLE: Choose the correctly punctuated sentence.',
     options: ["Its a sunny day.", "It's a sunny day.", "Its' a sunny day.", "It,s a sunny day."], answer: 1,
     explanation: '"It\'s" is the contraction of "it is".',
     difficulty: 'easy', timeSecs: 45, verification: 'draft', source: 'original sample',
   },
   {
-    id: 'sample-write-1', type: 'writing', strand: 'writing', stem: 'SAMPLE — "Should school start later in the day?" Plan and write a persuasive response (practice only — not officially marked).',
+    id: 'sample-write-1', type: 'writing', strand: 'writing', stem: 'SAMPLE: "Should school start later in the day?" Plan and write a persuasive response (practice only, not officially marked).',
     explanation: 'Practise stating a position, giving two reasons with evidence, and concluding clearly.',
     difficulty: 'medium', timeSecs: 1200, verification: 'draft', source: 'original sample',
   },

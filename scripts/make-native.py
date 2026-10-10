@@ -76,7 +76,7 @@ vocab = {"deck":"sehs-vocab-foundation","title":"SEHS Vocab Foundation (300)","d
 # triple the list with tiered prompts to reach ~200+ without hand-typing each
 extended = VOCAB + [(w+" (use)",d,a,s) for (w,d,a,s) in VOCAB[:60]] + [(w+" (antonym)",a,d,"Antonym of "+w+". e.g. "+s) for (w,d,a,s) in VOCAB[:60]]
 for w,d,a,s in extended[:200]:
-    vocab["cards"].append({"front": f"{w} — meaning?","back": f"{d}. ANT: {a}. e.g. {s}","tag":"vocab"})
+    vocab["cards"].append({"front": f"{w}: meaning?","back": f"{d}. ANT: {a}. e.g. {s}","tag":"vocab"})
 open(os.path.join(ROOT,'vocab.json'),'w').write(json.dumps(vocab, indent=1))
 
 # ---- verbal: analogies / synonyms / odd-one-out / codes / deductions ----
@@ -90,22 +90,22 @@ AN = [("Chapter : Book :: Scene : ?","Play","part-to-whole: chapter is part of b
 ("Calm : Storm :: Peace : ?","War","analogy of opposites."),
 ("Author : Book :: Composer : ?","Symphony","creator-to-work.")]
 for a,b,why in AN*8:
-    verbal["cards"].append({"front":f"Analogy — {a}","back":f"{b}. {why}","tag":"analogy"})
+    verbal["cards"].append({"front":f"Analogy: {a}","back":f"{b}. {why}","tag":"analogy"})
 SYN = [("Abundant","Plentiful"),("Candid","Honest"),("Frugal","Thrifty"),("Vivid","Graphic"),("Tedious","Boring"),("Lucid","Clear"),("Judicious","Wise"),("Meticulous","Careful"),("Reluctant","Unwilling"),("Coherent","Logical")]
 for w,s in SYN*8:
     verbal["cards"].append({"front":f"Synonym of {w}?","back":s,"tag":"synonym"})
 ODD = [(["Apple","Banana","Carrot","Grape"],"Carrot","only vegetable."),(["Run","Walk","Jump","Think"],"Think","only non-movement."),(["Circle","Square","Triangle","Cube"],"Cube","only 3D."),(["Piano","Guitar","Drum","Novel"],"Novel","only non-instrument.")]
 for words,ans,why in ODD*10:
-    verbal["cards"].append({"front":"Odd one out: "+", ".join(words),"back":f"{ans} — {why}","tag":"odd-one-out"})
+    verbal["cards"].append({"front":"Odd one out: "+", ".join(words),"back":f"{ans} ({why})","tag":"odd-one-out"})
 CODE = [("If CAT=3120 (A=1..), DOG=?","4715","D=4,O=15,G=7 → 4-15-7."),
 ("A→C, B→D, C→E: HELL0 would code?","JGNN","each letter +2."),
 ("STAR=1234, RATS=?","4231","reorder letters: R=4,A=2,T=3,S=1.")]
 for q,a,why in CODE*10:
-    verbal["cards"].append({"front":f"Code — {q}","back":f"{a}. {why}","tag":"code"})
-DED = [("All cats have tails. Felix has a tail. Therefore Felix is a cat?","No — invalid: tail doesn't prove cat.","affirming the consequent."),
+    verbal["cards"].append({"front":f"Code: {q}","back":f"{a}. {why}","tag":"code"})
+DED = [("All cats have tails. Felix has a tail. Therefore Felix is a cat?","No (invalid: tail doesn't prove cat).","affirming the consequent."),
 ("No reptiles are mammals. A snake is a reptile. So?","A snake is not a mammal.","valid syllogism.")]
 for q,a,why in DED*10:
-    verbal["cards"].append({"front":f"Deduction — {q}","back":f"{a} {why}","tag":"deduction"})
+    verbal["cards"].append({"front":f"Deduction: {q}","back":f"{a} {why}","tag":"deduction"})
 open(os.path.join(ROOT,'verbal.json'),'w').write(json.dumps(verbal, indent=1))
 
 # ---- quant ----
@@ -133,6 +133,6 @@ open(os.path.join(ROOT,'maths.json'),'w').write(json.dumps(maths, indent=1))
 grammar = {"deck":"sehs-grammar-skill","title":"Grammar & Sentences","description":"Spelling, punctuation, sentence variety.","cards":[]}
 G = [("Their / There / They're in: ___ going to win.","They're","contraction of they are."),("Its / It's: ___ raining.","It's","it is."),("Affect / Effect (verb)?","Affect","to influence."),("Comma splice? Fix: 'I ran, I fell.'","'I ran. I fell.' or ';'","two sentences."),("Which sentence varies length best?","Mix of short punch + long flow.","short for impact."),("Spelling: neccessary?","necessary (1 c, 2 s)","remember: 1 collar, 2 sleeves.")]
 for q,a,why in G*14:
-    grammar["cards"].append({"front":q,"back":f"{a} — {why}","tag":"grammar"})
+    grammar["cards"].append({"front":q,"back":f"{a} ({why})","tag":"grammar"})
 open(os.path.join(ROOT,'grammar.json'),'w').write(json.dumps(grammar, indent=1))
 print("banks done")
