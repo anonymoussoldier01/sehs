@@ -7,7 +7,7 @@ import { Select } from '../components/ui/select';
 import { api, pretty } from '../lib/api';
 import { bumpInsight } from '../lib/store';
 import { BlurFade, Empty, Skeleton, AnimatedGrid } from '../components/magic';
-import { Pager, ResourceCard, highlight } from '../components/cards';
+import { Pager, ResourceCard, useSaved } from '../components/cards';
 
 const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
 
@@ -98,6 +98,48 @@ export default function Search() {
   const tokens = useMemo(() => tokensOf(q), [q]);
   const total = data?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / 24));
+  const { toggle } = useSaved();
+
+  // Keyboard: ↑/↓ move between results, Enter opens, S saves the focused card.
+  useEffect(() => {
+    const onKey = (e) => {
+      const tag = document.activeElement?.tagName || '';
+      if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
+      const links = [...document.querySelectorAll('[data-result-link]')];
+      if (!links.length) return;
+      const at = links.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const next = e.key === 'ArrowDown' ? links[Math.min(at + 1, links.length - 1)] || links[0] : links[Math.max(at - 1, 0)] || links[0];
+        next?.focus();
+      } else if ((e.key === 's' || e.key === 'S') && at >= 0) {
+        const card = document.activeElement.closest('[data-result-id]');
+        if (card?.dataset.resultId) toggle(card.dataset.resultId);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [toggle, data]);
+
+  const chips = [
+    ...(q ? [{ k: 'q', label: `“${q}”` }] : []),
+    ...cats.map((v) => ({ k: 'cat', v, label: pretty(v) })),
+    ...provs.map((v) => ({ k: 'provider', v, label: pretty(v) })),
+    ...types.map((v) => ({ k: 'type', v, label: TYPE_LABEL[v] || v })),
+    ...(answers ? [{ k: 'answers', label: 'Answers included' }] : []),
+  ];
+  const dropChip = (c) => {
+    const next = new URLSearchParams(sp);
+    if (c.k === 'q') next.delete('q');
+    else if (c.k === 'answers') next.delete('answers');
+    else {
+      const cur = (next.get(c.k) || '').split(',').filter((x) => x && x !== c.v);
+      if (cur.length) next.set(c.k, cur.join(','));
+      else next.delete(c.k);
+    }
+    next.delete('page');
+    setSp(next);
+  };
 
   const toggleMulti = (key, cur, v) => {
     const next = cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v];
@@ -231,6 +273,20 @@ export default function Search() {
             </Select>
           </div>
         </div>
+        {!!chips.length && (
+          <div className="mb-3 flex flex-wrap items-center gap-1.5" aria-live="polite" aria-label="Active filters">
+            {chips.map((c, idx) => (
+              <span key={idx} className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+                {c.label}
+                <button onClick={() => dropChip(c)} aria-label={'Remove filter ' + c.label} className="grid h-6 w-6 place-items-center rounded-full" style={{ color: 'var(--mut)' }}>✕</button>
+              </span>
+            ))}
+            <Link to={q ? `/search?q=${encodeURIComponent(q)}` : '/search'} className="min-h-[36px] px-2 py-2 text-[13px] font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>
+              Reset all
+            </Link>
+          </div>
+        )}
+        <p className="mb-3 text-xs" style={{ color: 'var(--faint)' }}>Tip: ↑ ↓ to move · Enter to open · S to save</p>
 
         {loading ? (
           <div className={`grid gap-3.5 ${view === 'list' ? 'grid-cols-1' : 'sm:grid-cols-2'}`}>

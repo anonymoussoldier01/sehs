@@ -9,6 +9,7 @@ import { Select } from '../components/ui/select';
 import { Textarea } from '../components/ui/textarea';
 import { api, pretty } from '../lib/api';
 import { keys, pushRecent } from '../lib/store';
+import { repo } from '../lib/repo';
 import { useOpener, useToast } from '../providers';
 import { BlurFade, Empty, Skeleton } from '../components/magic';
 import { ResourceCard, highlight } from '../components/cards';
@@ -27,6 +28,12 @@ export default function Resource() {
   const [detail, setDetail] = useState('');
   const [aiHtml, setAiHtml] = useState(null);
   const [aiCards, setAiCards] = useState(null);
+  const [note, setNote] = useState('');
+  const [noteState, setNoteState] = useState('saved'); // saved | saving | saved…
+  const [distractionFree, setDistractionFree] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+  const [openedBefore, setOpenedBefore] = useState(null);
+  const noteTimer = useRef(null);
 
   useEffect(() => {
     let live = true;
@@ -44,6 +51,11 @@ export default function Resource() {
         const r = j.results[0];
         setV(r);
         pushRecent(r.id, r.displayTitle || r.title);
+        const prev = repo.readingProgress.get()[r.id];
+        setOpenedBefore(prev?.at || null);
+        repo.readingProgress.touch(r.id);
+        setNote(repo.notes.get(r.id));
+        setNoteState('saved');
         document.title = `${r.displayTitle || r.title} — SEHS Study`;
         const words = (r.displayTitle || r.title || '').split(/\s+/).slice(0, 3).join(' ');
         api
@@ -109,6 +121,47 @@ export default function Resource() {
     }
   };
 
+  // Autosave notes (debounced) with visible saving/saved status.
+  const onNote = (text) => {
+    setNote(text);
+    setNoteState('saving');
+    clearTimeout(noteTimer.current);
+    noteTimer.current = setTimeout(() => {
+      repo.notes.set(id, text);
+      setNoteState('saved');
+    }, 600);
+  };
+
+  // Warn before leaving with an unsaved note.
+  useEffect(() => {
+    if (noteState !== 'saving') return;
+    const onBefore = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', onBefore);
+    return () => window.removeEventListener('beforeunload', onBefore);
+  }, [noteState]);
+
+  // Viewer shortcuts: o open · s save · f fullscreen preview · ? help.
+  useEffect(() => {
+    const onKey = (e) => {
+      const tag = document.activeElement?.tagName || '';
+      if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
+      if (e.key === '?') setShowHelp(true);
+      else if ((e.key === 's' || e.key === 'S') && v) toggle(v.id);
+      else if ((e.key === 'o' || e.key === 'O') && v) open(v.id);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [v, open, toggle]);
+
+  // Answer-key candidates: same title stem + answer/solution/key words (inferred, never auto-applied).
+  const answerKeys = (related || []).filter((r) => {
+    const t = String(r.displayTitle || r.title || '').toLowerCase();
+    return /answer|solution|marking|key/.test(t) && (r.answersIncluded || /answer|solution/.test(t));
+  }).slice(0, 3);
+
   if (missing)
     return (
       <div className="mx-auto max-w-[900px] px-5 py-10">
@@ -149,8 +202,13 @@ export default function Resource() {
         {v.answersIncluded && <Badge variant="success">Answers included</Badge>}
       </div>
       {v.description && (
-        <p className="max-w-[70ch] text-[15px]" style={{ color: 'var(--mut)' }}>
+        <p className="reading max-w-[70ch] text-[15px]" style={{ color: 'var(--mut)' }}>
           {v.description}
+        </p>
+      )}
+      {openedBefore && (
+        <p className="mt-1 text-[13px]" style={{ color: 'var(--faint)' }}>
+          You opened this before ({new Date(openedBefore).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}) — your note and place are kept below.
         </p>
       )}
       <div className="mb-[18px] mt-1.5 flex flex-wrap gap-1.5">
@@ -165,40 +223,95 @@ export default function Resource() {
           </Link>
         ))}
       </div>
-      <div className="mb-7 flex flex-wrap gap-2.5">
-        <Button variant="default" onClick={() => open(v.id)}>
-          {v.fileType === 'pdf' ? 'Open PDF →' : 'Open resource →'}
-        </Button>
-        {v.fileType === 'pdf' && (
-          <Button variant="secondary" onClick={() => setPreviewOpen((o) => !o)} aria-expanded={String(previewOpen)}>
-            {previewOpen ? 'Hide preview' : 'Preview here'}
+      <div className="mb-7 flex flex-wrap items-center gap-2.5" role="toolbar" aria-label="Resource actions">
+        <span className="flex flex-wrap gap-2.5" role="group" aria-label="Open">
+          <Button variant="default" onClick={() => open(v.id)}>
+            {v.fileType === 'pdf' ? 'Open PDF →' : 'Open resource →'}
           </Button>
-        )}
-        <Button variant="secondary" onClick={() => toggle(v.id)} aria-pressed={String(saved.has(v.id))}>
-          {saved.has(v.id) ? '★ Saved' : '☆ Save'}
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={async () => {
-            try {
-              await navigator.clipboard.writeText(window.location.href);
-            } catch {
-              /* noop */
-            }
-            toast('Link copied');
-          }}
-        >
-          Copy link
-        </Button>
-        <Button variant="secondary" onClick={() => setRepOpen(true)}>
-          Report issue
-        </Button>
+          {v.fileType === 'pdf' && (
+            <Button variant="secondary" onClick={() => setPreviewOpen((o) => !o)} aria-expanded={String(previewOpen)}>
+              {previewOpen ? 'Hide preview' : 'Preview here'}
+            </Button>
+          )}
+        </span>
+        <span className="flex flex-wrap gap-2.5" role="group" aria-label="Organise">
+          <Button variant="secondary" onClick={() => toggle(v.id)} aria-pressed={String(saved.has(v.id))}>
+            {saved.has(v.id) ? '★ Saved' : '☆ Save'}
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(window.location.href);
+              } catch {
+                /* noop */
+              }
+              toast('Link copied');
+            }}
+          >
+            Copy link
+          </Button>
+          <Button variant="secondary" onClick={() => setRepOpen(true)}>
+            Report issue
+          </Button>
+        </span>
+        <span className="flex flex-wrap gap-2.5" role="group" aria-label="View">
+          <Button variant="secondary" onClick={() => setDistractionFree((d) => !d)} aria-pressed={String(distractionFree)}>
+            {distractionFree ? 'Exit focus mode' : 'Focus mode'}
+          </Button>
+          <Button variant="secondary" onClick={() => setShowHelp(true)} aria-label="Keyboard shortcuts">
+            ?
+          </Button>
+        </span>
       </div>
 
       {v.fileType === 'pdf' && previewOpen && (
         <PreviewPanel id={v.id} onOpen={() => open(v.id)} />
       )}
 
+      {!distractionFree && !!answerKeys.length && (
+        <section className="mb-7 rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--ok-paper, #FBFAF6)', borderColor: 'var(--line)' }} aria-label="Possible answer keys">
+          <h3 className="mt-0 font-display text-[15.5px] font-bold">Possible answer key</h3>
+          <p className="mb-2 mt-0 text-[13px]" style={{ color: 'var(--mut)' }}>
+            Inferred from the collection index (title match) — check it covers this paper before trusting it.
+          </p>
+          <ul className="flex flex-col gap-1.5">
+            {answerKeys.map((r) => (
+              <li key={r.id}>
+                <Link to={'/r/' + r.id} className="text-sm font-semibold hover:underline" style={{ color: 'var(--acc)' }}>
+                  {r.displayTitle || r.title}
+                </Link>
+                <span className="ml-2 text-xs" style={{ color: 'var(--faint)' }}>inferred</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div className="mb-7 rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+        <h3 className="mt-0 font-display text-[15.5px] font-bold">
+          My note <span className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}>{noteState === 'saving' ? 'Saving…' : 'Saved in this browser'}</span>
+        </h3>
+        <Textarea value={note} onChange={(e) => onNote(e.target.value)} rows={3} maxLength={8000} placeholder="What should future-you remember about this paper?" aria-label="My note on this resource" />
+      </div>
+
+      {showHelp && (
+        <Dialog open onOpenChange={(isOpen) => { if (!isOpen) setShowHelp(false); }}>
+          <DialogContent aria-label="Viewer keyboard shortcuts">
+            <DialogHeader>
+              <DialogTitle>Viewer shortcuts</DialogTitle>
+              <DialogDescription>Available on this page. Shortcuts rest while typing.</DialogDescription>
+            </DialogHeader>
+            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
+              <dt className="tnum font-bold">O</dt><dd>Open the file</dd>
+              <dt className="tnum font-bold">S</dt><dd>Save to my list</dd>
+              <dt className="tnum font-bold">?</dt><dd>Open this help</dd>
+            </dl>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {!distractionFree && (
       <div className="mb-7 rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         <h3 className="mt-0 font-display text-[15.5px] font-bold">Study this properly</h3>
         <p className="mb-2.5 mt-0 text-[13.5px]" style={{ color: 'var(--mut)' }}>
@@ -268,6 +381,7 @@ export default function Resource() {
           </div>
         )}
       </div>
+      )}
 
       {repOpen && (
         <Dialog open onOpenChange={(isOpen) => { if (!isOpen) setRepOpen(false); }}>

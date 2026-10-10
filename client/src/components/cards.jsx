@@ -55,11 +55,11 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
   const isPdf = v.fileType === 'pdf';
 
   return (
-    <article className="glare flex gap-3.5 rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg" style={{ background: 'var(--card)', borderColor: 'var(--line)' }}>
+    <article data-result-id={v.id} className="glare flex gap-3.5 rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg" style={{ background: 'var(--card)', borderColor: 'var(--line)' }}>
       <FileIcon type={v.fileType} />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <h3 className="text-[15.5px] font-bold leading-snug">
-          <Link to={'/r/' + v.id} className="transition-colors hover:text-[var(--acc)] hover:underline">
+          <Link data-result-link to={'/r/' + v.id} className="transition-colors hover:text-[var(--acc)] hover:underline">
             {highlight(displayTitle, tokens)}
           </Link>
         </h3>
