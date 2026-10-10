@@ -42,15 +42,23 @@ export function landing(ctx) {
   const stat = (label, n) => `<div><dt>${label}</dt><dd data-countup="${n}">${Number(n).toLocaleString()}</dd></div>`;
   const body = `
   <section class="wrap hero" aria-label="Search">
-    <h1>Find exactly what you need to study.</h1>
-    <p class="hero-sub">Search the SEHS resource collection across practice papers, notes, tests and more.</p>
+    <span class="hero-kicker"><span class="dot"></span>${Number(stats.total).toLocaleString()} resources · free · no sign-up</span>
+    <h1>Find the right paper, <span class="scribble">fast.<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 60 2, 140 2, 198 7" stroke="#b45309" stroke-width="4" fill="none" stroke-linecap="round"/></svg></span></h1>
+    <p class="hero-sub">Past papers, topic notes and practice sets for the SEHS selective-entry exam — maths, reasoning, reading and writing. Type a topic, a provider, or just “fractions”.</p>
     <form class="search-wrap" action="/search" method="get" role="search">
       <div class="searchbox">
         <svg class="search-ico" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <input name="q" type="search" placeholder="Search papers, subjects, providers, topics…" autocomplete="off" aria-label="Search study resources">
+        <input name="q" type="search" placeholder="Try “VSSE maths”, “verbal analogy”, “reading answers”…" autocomplete="off" aria-label="Search study resources">
         <kbd title="Press / to focus">/</kbd>
       </div>
     </form>
+    <div class="quick-row"><span class="quick-label">Popular:</span>
+      <a class="quick-chip" href="/search?q=vsse">VSSE</a>
+      <a class="quick-chip" href="/search?q=maths&answers=1">Maths + answers</a>
+      <a class="quick-chip" href="/search?q=numerical%20reasoning">Numerical</a>
+      <a class="quick-chip" href="/search?q=reading%20comprehension">Reading</a>
+      <a class="quick-chip" href="/mocks">Timed mock</a>
+    </div>
     <dl class="stats" aria-label="Collection statistics">
       ${stat('Resources', stats.total)}
       ${stat('Subjects', stats.subjects)}
@@ -61,11 +69,12 @@ export function landing(ctx) {
   </section>
   <div class="wrap layout single" id="discovery">
     <main aria-label="Browse resources">
-      <section class="disc-section"><div class="disc-head"><h2>✦ Today</h2></div>
+      <section class="progress-strip" id="progress-strip" aria-label="Your progress"></section>
+      <section class="disc-section"><div class="disc-head"><h2>Start here</h2></div>
         <div class="disc-grid">
-          <div class="disc-tile"><h3>Start today's session</h3><p id="home-next" style="color:var(--mut)">Picking your next best move…</p><p><a class="btn small" id="home-go" href="/study">Go →</a></p></div>
-          <div class="disc-tile"><h3>Question of the day</h3><p id="home-qotd" style="color:var(--mut)">Loading…</p><p id="home-qotd-a" hidden style="font-size:13.5px"></p><p><button class="btn small secondary" id="home-qotd-reveal" hidden>Reveal</button></p></div>
-        </div></section>      <section class="disc-section"><div class="disc-head"><h2>Native SEHS prep <small>built-in · no Drive needed</small></h2></div>
+          <div class="disc-tile"><h3>Today's next step</h3><p id="home-next">Picking your next best move…</p><p><a class="btn small" id="home-go" href="/study">Continue →</a></p></div>
+          <div class="disc-tile"><h3>Question of the day</h3><p id="home-qotd">Warming up…</p><p id="home-qotd-a" hidden style="font-size:13.5px"></p><p><button class="btn small secondary" id="home-qotd-reveal" hidden>Show answer</button></p></div>
+        </div></section>      <section class="disc-section"><div class="disc-head"><h2>Prep without the Drive hunt <small>built-in · works offline-ish</small></h2></div>
         <div class="disc-grid">
           <div class="disc-tile"><h3>Exam guide</h3><p>ACER 3-block format, pacing, schools, 12-week plan.</p><a class="btn small" href="/exam-guide">Open guide →</a></div>
           <div class="disc-tile"><h3>Timed mocks</h3><p>Diagnostic + 60/55/40 min blocks with scoring.</p><a class="btn small" href="/mocks">Open mocks →</a></div>
@@ -226,7 +235,7 @@ export function searchPage(ctx, sp) {
         </div>
       </div>
       <div id="grid" class="grid${p.view === 'list' ? ' list' : ''}">${cards}</div>
-      ${total === 0 ? '' : `<section class="disc-section"><div class="disc-tile"><button class="btn small secondary" id="explain-results">✦ Explain these results</button> <span style="color:var(--faint);font-size:12px">What the top hits cover + what to search next</span><p id="explain-out" style="white-space:pre-wrap;font-size:13.5px" hidden></p></div></section>`}
+      ${total === 0 ? '' : `<section class="disc-section"><div class="disc-tile"><button class="btn small secondary" id="explain-results">Explain these results</button> <span style="color:var(--faint);font-size:12px">Plain-English summary of the top hits + what to try next</span><p id="explain-out" style="white-space:pre-wrap;font-size:13.5px" hidden></p></div></section>`}
       ${total === 0 ? emptyBlock({
         msg: p.q ? `Nothing matched “${p.q}” with the current filters.` : 'Nothing matched the current filters.',
         corrected: res.mode === 'none' ? res.corrected : null,
@@ -291,8 +300,9 @@ export function resourcePage(ctx, publicId) {
       <button class="btn secondary" data-copylink="/r/${esc(v.id)}">Copy link</button>
       <button class="btn secondary" data-report="${esc(v.id)}">Report issue</button>
     </div>
-    <div class="disc-tile" style="margin-bottom:28px"><h3 style="margin-top:0">✦ Study this with AI</h3>
-      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn small secondary" id="res-cards">Flashcards from this</button><button class="btn small secondary" id="res-quiz">Quiz me on this</button></div>
+    <div class="disc-tile" style="margin-bottom:28px"><h3 style="margin-top:0">Study this properly</h3>
+      <p style="color:var(--mut);font-size:13.5px;margin:0 0 10px">Turn this resource into flashcards or a short quiz. Made on the spot, saved to your browser.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn small secondary" id="res-cards">Make flashcards</button><button class="btn small secondary" id="res-quiz">Quiz me on this</button></div>
       <div id="res-ai-out" hidden style="margin-top:8px"><div id="res-ai-body" style="font-size:14px"></div><p><button class="btn small secondary" id="res-ai-save" hidden>Save as personal deck</button></p></div>
     </div>
     <div class="modal-backdrop" id="report-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="rep-title" style="max-width:480px">
@@ -383,9 +393,9 @@ export function studyHubPage(ctx) {
         <div class="disc-tile"><h3>Writing studio</h3><p>80 prompts + timer + rubric.</p><a class="btn small" href="/writing">Open writing →</a></div>
         <div class="disc-tile"><h3>Maths drills</h3><p>Infinite Year-8 drills.</p><a class="btn small" href="/drills">Open drills →</a></div>
       </div></section>
-    <section class="disc-section"><div class="disc-head"><h2>✦ AI study tools</h2></div>
+    <section class="disc-section"><div class="disc-head"><h2>Study tools that use your work</h2></div>
       <div class="disc-grid">
-        <div class="disc-tile"><h3>Generate deck from topic</h3>
+        <div class="disc-tile"><h3>Flashcards from any topic</h3>
           <div style="display:flex;gap:8px;margin-top:8px"><input id="ai-deck-topic" maxlength="120" placeholder="e.g. analogies, fractions…" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit" aria-label="Deck topic"><button class="btn small" id="ai-deck-go">Make deck</button></div>
           <p id="ai-deck-msg" style="font-size:13px;color:var(--mut)"></p></div>
         <div class="disc-tile"><h3>My study plan</h3>
@@ -523,7 +533,7 @@ export function examGuidePage(ctx) {
     <section class="disc-section"><div class="disc-head"><h2>12-week plan</h2></div>
       <div class="disc-tile"><p style="color:var(--mut)">Wk1-2: vocab foundation + maths facts + 1 diagnostic. Wk3-6: VR/QR one type per day + weekly mini. Wk7-10: full blocks timed + mistake bank. Wk11-12: 2 full mocks + writing 2×/week + taper. Crash (4wk): daily 30 vocab + 20 VR + 20 QR + 1 passage + 1 prompt plan.</p>
       <p><a class="link-btn" href="/study">Open study hub →</a> <a class="link-btn" href="/drills">Maths drills →</a></p></div></section>
-    <section class="disc-section"><div class="disc-head"><h2>✦ Ask the tutor</h2></div>
+    <section class="disc-section"><div class="disc-head"><h2>Ask about the exam</h2></div>
       <div class="disc-tile"><div style="display:flex;gap:8px"><input id="tutor-q" maxlength="800" placeholder="e.g. How do I pace the 55-min block?" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit" aria-label="Ask the tutor"><button class="btn small" id="tutor-go">Ask</button></div>
       <p id="tutor-a" style="white-space:pre-wrap;font-size:14px" hidden></p></div></section>
     <section class="disc-section"><div class="disc-head"><h2>FAQ</h2></div>

@@ -19,22 +19,33 @@
     return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
   // ---- add-to-list menu on cards ----
-  var menu = null;
-  function closeMenu() { if (menu) { menu.remove(); menu = null; } }
+  var menu = null, scrim = null;
+  function closeMenu() {
+    if (menu) { menu.remove(); menu = null; }
+    if (scrim) { scrim.remove(); scrim = null; }
+  }
   document.addEventListener('click', function (e) {
-    if (menu && (!e.target.closest || !e.target.closest('.list-menu'))) closeMenu();
+    if (menu && e.target.closest && !e.target.closest('.list-menu') && !e.target.closest('[data-listadd]')) closeMenu();
     var b = e.target.closest && e.target.closest('[data-listadd]');
     if (!b) return;
     e.preventDefault();
+    e.stopPropagation();
     closeMenu();
     var id = b.getAttribute('data-listadd');
     var lists = load();
+    scrim = document.createElement('div');
+    scrim.className = 'drawer-scrim';
+    scrim.addEventListener('click', closeMenu);
+    document.body.appendChild(scrim);
     menu = document.createElement('div');
     menu.className = 'list-menu disc-tile';
-    menu.style.cssText = 'position:fixed;z-index:50;min-width:220px;padding:10px';
+    menu.setAttribute('role', 'dialog');
+    menu.setAttribute('aria-label', 'Add to list');
+    menu.style.cssText = 'position:fixed;z-index:70;min-width:240px;max-width:min(320px, calc(100vw - 32px));padding:14px';
     var r = b.getBoundingClientRect();
-    menu.style.left = Math.min(window.innerWidth - 240, r.left) + 'px';
-    menu.style.top = (r.bottom + window.scrollY + 6) + 'px';
+    var mw = 300, mh = 320;
+    menu.style.left = Math.max(12, Math.min(window.innerWidth - mw - 12, r.left)) + 'px';
+    menu.style.top = Math.max(12, Math.min(window.innerHeight - mh - 12, r.bottom + 8)) + 'px';
     menu.innerHTML = '<p style="font-size:12px;color:var(--mut);margin:0 0 6px">Add to list</p>' +
       lists.map(function (l, i) {
         return '<button class="btn small secondary" style="width:100%;margin-bottom:6px" data-picklist="' + i + '" data-res="' + esc(id) + '">' +

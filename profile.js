@@ -81,10 +81,12 @@
       location.href = location.pathname + location.search.replace(/&?aff=[^&]*/g, '').replace(/\?$/, '');
     }
   });
-  // Saved items also tune the profile (lightly).
+  // Saved items also tune the profile (lightly) — only when adding, not removing.
+  // ux.js toggles .is-on synchronously and loads before this file, so by the
+  // time this handler runs a fresh save already has .is-on.
   document.addEventListener('click', function (e) {
     var sv = e.target.closest && e.target.closest('[data-save]');
-    if (sv && sv.textContent === '☆') trackOpen(sv.getAttribute('data-save'));
+    if (sv && sv.classList.contains('is-on')) trackOpen(sv.getAttribute('data-save'));
   });
   function paintChip() {
     var host = document.getElementById('active-chips') || document.querySelector('.toolbar');

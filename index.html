@@ -5,23 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SEHS Study Directory — Find exactly what you need to study</title>
 <meta name="description" content="Search the SEHS resource collection across practice papers, notes, tests and more. Maths, reasoning, reading, writing, science.">
-<meta name="theme-color" content="#4f46e5">
+<meta name="theme-color" content="#155e46">
 <link rel="icon" href="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div id="scroll-progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to results</a>
 
 <header class="topbar" role="banner">
   <div class="wrap topbar-inner">
     <a class="brand" href="#" id="brand-home" aria-label="SEHS Study Directory home">
-      <span class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 32 32" width="28" height="28"><rect x="2" y="2" width="28" height="28" rx="8" fill="#4f46e5"/><path d="M10 12.5A6 6 0 0 1 22 12.5c0 4-4.5 4.5-4.5 8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="17.5" cy="23.5" r="1.6" fill="#fff"/></svg>
-      </span>
-      <span class="brand-text"><strong>SEHS Study Directory</strong><small>Practice papers · notes · study resources</small></span>
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <span class="brand-text"><strong>SEHS Study Directory</strong><small>Past papers · notes · mocks</small></span>
     </a>
     <nav class="topnav" aria-label="Sections">
       <a href="#main" data-nav="browse">Browse</a>
@@ -36,7 +35,8 @@
 </header>
 
 <section class="wrap hero" aria-label="Search">
-  <h1>Find exactly what you need to study.</h1>
+  <span class="hero-kicker"><span class="dot"></span>Free · no sign-up · works on phones</span>
+  <h1>Find the right paper, <span class="scribble">fast.<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 60 2, 140 2, 198 7" stroke="#b45309" stroke-width="4" fill="none" stroke-linecap="round"/></svg></span></h1>
   <p class="hero-sub">Search the SEHS resource collection across practice papers, notes, tests and more.</p>
   <div class="search-wrap">
     <div class="searchbox" role="search">
@@ -154,6 +154,7 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
+<script src="insights.js" defer></script>
 <script type="module" src="app.js"></script>
 </body>
 </html>

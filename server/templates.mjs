@@ -18,24 +18,26 @@ export function layout({ title, desc = '', body, active = '', session = null, ex
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(title)} — SEHS Study Directory</title>
 ${desc ? `<meta name="description" content="${esc(desc)}">` : ''}
-<meta name="theme-color" content="#4f46e5">
+<meta name="theme-color" content="#155e46">
 <link rel="icon" href="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon.svg">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
 ${extraHead}
 </head>
 <body>
+<div id="scroll-progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar" role="banner">
   <div class="wrap topbar-inner">
     <a class="brand" href="/" aria-label="SEHS Study Directory home">
-      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="28" height="28"><rect x="2" y="2" width="28" height="28" rx="8" fill="#4f46e5"/><path d="M10 12.5A6 6 0 0 1 22 12.5c0 4-4.5 4.5-4.5 8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="17.5" cy="23.5" r="1.6" fill="#fff"/></svg></span>
-      <span class="brand-text"><strong>SEHS Study Directory</strong><small>Study resources · mocks · AI tutor</small></span>
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <span class="brand-text"><strong>SEHS Study Directory</strong><small>Past papers · notes · mocks · guides</small></span>
     </a>
     <nav class="topnav" aria-label="Sections">
       ${NAV_MAIN.map(([h, l]) => `<a href="${h}"${active === h ? ' aria-current="page" class="on"' : ''}>${l}</a>`).join('')}
@@ -55,9 +57,10 @@ ${extraHead}
 <footer class="wrap foot">
   <div class="about">
     <h2>About this directory</h2>
-    <p>A searchable collection of SEHS selective-entry study resources. Search runs on our index — opening a resource takes you to its hosted file.</p>
+    <p>A searchable collection of SEHS selective-entry study resources, put together for Year 8 students in Victoria. Search the index, open what you need, save your own lists — no account, no tracking.</p>
+    <p class="foot-meta">Privacy-first: your saves, decks and progress never leave this browser. Anonymous open counts auto-delete after 30 days.</p>
   </div>
-  <div class="foot-actions"><a class="link-btn" href="/about">About</a><a class="link-btn" href="/saved">Saved</a><a class="link-btn" href="/unlock">Admin</a></div>
+  <div class="foot-actions"><a class="link-btn" href="/about">About</a><a class="link-btn" href="/saved">Saved</a><a class="link-btn" href="/study">Study hub</a><a class="link-btn" href="/request">Request</a><a class="link-btn" href="/unlock">Admin</a></div>
 </footer>
 <div class="modal-backdrop" id="terms-modal" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="terms-title">
@@ -96,6 +99,7 @@ ${extraHead}
 <script src="/profile.js" defer></script>
 <script src="/palette.js" defer></script>
 <script src="/lists.js" defer></script>
+<script src="/insights.js" defer></script>
 </body>
 </html>`;
 }
