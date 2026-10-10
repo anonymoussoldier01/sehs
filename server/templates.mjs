@@ -30,7 +30,8 @@ const SIDE_MORE = [
 ];
 
 function sideLink(h, l, ico, active) {
-  return `<a class="side-link${active === h ? ' on' : ''}" href="${h}"${active === h ? ' aria-current="page"' : ''}><span class="side-ico" aria-hidden="true">${ico}</span>${l}</a>`;
+  const on = active === h || (h !== '/' && String(active || '').startsWith(h + '/'));
+  return `<a class="side-link${on ? ' on' : ''}" href="${h}"${on ? ' aria-current="page"' : ''}><span class="side-ico" aria-hidden="true">${ico}</span>${l}</a>`;
 }
 
 export function layout({ title, desc = '', body, active = '', session = null, extraHead = '' }) {

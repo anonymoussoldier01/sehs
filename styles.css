@@ -459,7 +459,7 @@ input[type="date"], input[type="text"], input[type="search"], input[type="passwo
   padding: 0 8px 0 16px; min-height: 44px; transition: all .16s var(--ease); }
 .topsearch:focus-within { border-color: var(--acc); background: var(--panel); box-shadow: 0 0 0 3px rgba(47, 73, 229, .15); }
 .topsearch input { flex: 1; border: 0; outline: 0; background: transparent; color: inherit;
-  font-size: 14.5px; padding: 11px 0; min-width: 0; font-family: inherit; }
+  font-size: 16px; padding: 11px 0; min-width: 0; font-family: inherit; }
 .topsearch input::-webkit-search-cancel-button { display: none; }
 .avatar { width: 40px; height: 40px; min-width: 40px; border-radius: 50%; border: 2px solid var(--acc-line);
   background: linear-gradient(135deg, var(--acc), #7c3aed); color: #fff; font-weight: 800; font-size: 16px;
@@ -498,6 +498,8 @@ input[type="date"], input[type="text"], input[type="search"], input[type="passwo
 .opt.sel { border-color: var(--acc); background: var(--acc-soft); box-shadow: 0 0 0 3px rgba(47, 73, 229, .14); }
 .opt.right { border-color: var(--ok); background: var(--ok-bg); }
 .opt.wrong { border-color: var(--bad); background: var(--bad-bg); }
+.opt:disabled { cursor: default; opacity: 1; }
+.opt:disabled:not(.right):not(.wrong):not(.sel) { opacity: .55; }
 .opt-fb { font-size: 13.5px; margin: 4px 0 0; }
 .promo { background: linear-gradient(135deg, #2f49e5, #6d28d9 60%, #0e7490); color: #fff; border-radius: 20px;
   padding: 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: center; overflow: hidden; position: relative; }
@@ -514,6 +516,26 @@ input[type="date"], input[type="text"], input[type="search"], input[type="passwo
   box-shadow: var(--shadow-lg); font-size: 13px; }
 .cookie-bar[hidden] { display: none; }
 .cookie-bar .btn { min-height: 38px; padding: 8px 14px; }
+
+/* ---------- fluid layer: view transitions, page-enter, render perf ---------- */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: vt-out .22s var(--ease) both; }
+::view-transition-new(root) { animation: vt-in .28s var(--ease) both; }
+@keyframes vt-out { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(10px); } }
+#main { animation: pagein .32s var(--ease) both; }
+@keyframes pagein { from { opacity: 0; transform: translateY(10px); } }
+/* long grids: skip off-screen rendering until scrolled to */
+.grid .card, .rail .deck-card { content-visibility: auto; contain-intrinsic-size: auto 230px; }
+::selection { background: var(--acc); color: #fff; }
+/* themed scrollbars */
+* { scrollbar-width: thin; scrollbar-color: var(--line2) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--line2); border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
+*::-webkit-scrollbar-track { background: transparent; }
+/* indeterminate progress while a filter/sort navigation is leaving */
+#scroll-progress.busy { width: 35% !important; transition: width .3s var(--ease); animation: busyslide 1s var(--ease) infinite alternate; }
+@keyframes busyslide { from { transform: translateX(0); } to { transform: translateX(60vw); } }
 
 @media (max-width: 960px) {
   .app { grid-template-columns: 1fr; }

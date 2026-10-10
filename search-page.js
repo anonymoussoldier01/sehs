@@ -2,6 +2,12 @@
 (function () {
   function params() { return new URLSearchParams(location.search); }
   function go(p) {
+    // instant feedback: the new page can take ~1s to render server-side,
+    // so show the progress bar in its travelling state before leaving.
+    var bar = document.getElementById('scroll-progress');
+    if (bar) { bar.classList.add('busy'); bar.style.width = '35%'; }
+    var ae = document.activeElement;
+    if (ae && ae.blur) { try { ae.blur(); } catch (e) {} }
     var s = p.toString();
     location.href = '/search' + (s ? '?' + s : '');
   }

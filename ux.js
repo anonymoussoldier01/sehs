@@ -273,6 +273,20 @@
     });
   })();
 
+  /* offline awareness: the library shell works offline, resources don't */
+  (function offline() {
+    var wasOff = false;
+    function showOff() {
+      wasOff = true;
+      toast('You are offline — saved pages still work, new searches need connection');
+    }
+    window.addEventListener('offline', showOff);
+    window.addEventListener('online', function () {
+      if (wasOff) { wasOff = false; toast('Back online'); }
+    });
+    try { if (navigator.onLine === false) showOff(); } catch (e) {}
+  })();
+
   /* cookie notice: one tap, remembered in this browser */
   (function cookies() {
     var ok = null;
