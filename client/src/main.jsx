@@ -1,6 +1,6 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { RouterProvider, createBrowserRouter, useRouteError, Link } from 'react-router-dom';
 import Lenis from 'lenis';
 import './index.css';
 import Layout, { Providers } from './Layout';
@@ -27,9 +27,33 @@ import Design from './pages/Design';
 import NotFound from './pages/NotFound';
 import { initMotion } from './lib/motion';
 
+// Route error boundary: a designed recovery card instead of a blank crash.
+function RouteError() {
+  const err = useRouteError();
+  return (
+    <div className="mx-auto max-w-[640px] px-5 py-14 text-center">
+      <p className="text-xs font-extrabold uppercase tracking-[0.2em]" style={{ color: 'var(--warn)' }}>Something broke on our side</p>
+      <h1 className="mt-2 font-display text-3xl font-bold">This page hit a snag</h1>
+      <p className="mx-auto mt-2 max-w-[52ch] text-sm" style={{ color: 'var(--mut)' }}>
+        Nothing of yours is lost. Your library, notes and progress stay in this browser.
+        {err && err.message ? ` (Detail: ${String(err.message).slice(0, 140)})` : ''}
+      </p>
+      <p className="mt-5 flex flex-wrap justify-center gap-2.5">
+        <Link to="/" className="inline-flex min-h-[44px] items-center rounded-xl px-5 py-2.5 text-sm font-bold" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>
+          Back home
+        </Link>
+        <button onClick={() => window.location.reload()} className="inline-flex min-h-[44px] items-center rounded-xl border px-5 py-2.5 text-sm font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+          Reload this page
+        </button>
+      </p>
+    </div>
+  );
+}
+
 const router = createBrowserRouter([
   {
     element: <Layout />,
+    errorElement: <RouteError />,
     children: [
       { index: true, element: <Home /> },
       { path: 'search', element: <Search /> },

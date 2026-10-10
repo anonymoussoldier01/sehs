@@ -26,7 +26,7 @@ function useApi(fn, deps) {  const [data, setData] = useState(null);
   return [data, err];
 }
 
-function Hero() {
+function Hero({ stats }) {
   const navigate = useNavigate();
   return (
     <section className="mhero relative overflow-hidden" aria-label="Search" style={{ padding: '56px 24px 10px', maxWidth: 1060 }}>
@@ -232,7 +232,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-[1060px] px-4 pb-12 sm:px-6">
-      <Hero />
+      <Hero stats={stats} />
 
       <BlurFade className="mt-6">
         <Marquee>
