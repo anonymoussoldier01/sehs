@@ -92,6 +92,13 @@ npm start      # builds the React client + serves http://localhost:8080
 Open `http://localhost:8080`, search, open `/unlock` for admin. Re-running
 `migrate.mjs` without `--reset` keeps the admin password.
 
+Terms & Conditions are versioned in the `terms` table. After migrating a fresh
+database, publish the current version:
+
+```powershell
+node scripts/terms-v2.mjs   # additive; revert by setting terms_version back to '1'
+```
+
 ## Routes
 
 - `/`, `/search?q=&cat=&provider=&type=&year=&sort=&page=&per=&view=&aff=`,
