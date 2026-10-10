@@ -17,18 +17,25 @@
     return null;
   }
   async function openResource(id, btn) {
-    if (btn) btn.disabled = true;
+    var label = btn ? btn.textContent : null;
+    if (btn) { btn.disabled = true; btn.textContent = 'Opening…'; }
     // Open the tab SYNCHRONOUSLY in the click gesture: browsers block
     // window.open() calls made after awaits (Terms fetch + grant POST).
     // We navigate the placeholder once the grant URL is ready.
     var w = null;
     try { w = window.open('about:blank', '_blank'); } catch (e) { w = null; }
     if (!w) toast('Popup blocked — allow popups for this site, then try again');
+    else {
+      // so the new tab never looks dead while the grant is minted
+      try {
+        w.document.write('<!DOCTYPE html><title>Opening…</title><body style="font-family:sans-serif;background:#0b0b28;color:#f2f2fb;display:grid;place-items:center;height:100vh;margin:0"><p>Opening your file…</p></body>');
+        w.document.close();
+      } catch (e) { /* cross-browser quirks: skip */ }
+    }
     try {
       if (window.__sehsTerms) {
         var ok = await window.__sehsTerms.ensure();
         if (!ok) { if (w) w.close(); return; } // declined: do not open
-        toast('Terms accepted — opening…');
       }
       var url = await grant(id);
       if (url && w) w.location.replace(url);
@@ -38,7 +45,7 @@
       if (w) w.close();
       toast('Could not open resource');
     } finally {
-      if (btn) btn.disabled = false;
+      if (btn) { btn.disabled = false; if (label !== null) btn.textContent = label; }
     }
   }
   document.addEventListener('click', function (e) {

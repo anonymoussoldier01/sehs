@@ -111,7 +111,8 @@
     var s = new Set(saved());
     document.querySelectorAll('[data-save]').forEach(function (b) {
       var on = s.has(b.getAttribute('data-save'));
-      b.textContent = on ? '★ Saved' : '☆ Save';
+      var mini = b.classList.contains('icon-only');
+      b.textContent = on ? (mini ? '★' : '★ Saved') : (mini ? '☆' : '☆ Save');
       b.classList.toggle('is-on', on);
       b.setAttribute('aria-pressed', String(on));
     });

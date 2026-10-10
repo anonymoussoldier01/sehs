@@ -409,16 +409,87 @@ function nativeJson(name) {
     return j;
   } catch { return null; }
 }
+function shuffled(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+// Short answer for MCQ options: first clause of a flashcard back
+// ("2/3. ÷6" → "2/3", "Play. part-to-whole" → "Play").
+function shortAns(back) {
+  const t = String(back || '').trim();
+  const head = t.split(/(?<=[.!?])\s+/)[0] || t;
+  return head.slice(0, 90).trim();
+}
+function buildBankMcqs(cards, n, strand) {
+  const pool = shuffled([...(cards || [])]);
+  const out = [];
+  for (const c of pool) {
+    if (out.length >= n) break;
+    if (!c || !c.front || !c.back) continue;
+    const correct = shortAns(c.back);
+    if (!correct) continue;
+    const distract = [];
+    for (const d of shuffled([...pool])) {
+      if (d === c || !d.back) continue;
+      const s = shortAns(d.back);
+      if (s && s.toLowerCase() !== correct.toLowerCase() &&
+        !distract.some(x => x.toLowerCase() === s.toLowerCase())) distract.push(s);
+      if (distract.length >= 3) break;
+    }
+    if (distract.length < 3) continue;
+    const options = shuffled([correct, ...distract]);
+    out.push({
+      strand,
+      stem: String(c.front).slice(0, 300),
+      options, answer: options.indexOf(correct),
+      explain: String(c.back).slice(0, 300),
+    });
+  }
+  return out;
+}
+// Assemble a full-length mock from the flashcard + passage banks.
+// Static `questions` stay as a fallback; every attempt gets a fresh set,
+// which also makes retakes meaningful.
+function assembleMock(mock) {
+  if (!mock.plan) return mock;
+  const qs = [];
+  for (const p of mock.plan) {
+    if (p.bank === 'reading') {
+      const rj = nativeJson('reading.json');
+      for (const ps of shuffled([...(rj?.passages || [])]).slice(0, p.n)) {
+        for (const q of (ps.questions || [])) {
+          if (!q || !Array.isArray(q.options) || q.options.length !== 4) continue;
+          qs.push({
+            strand: 'reading', stem: q.stem, options: q.options,
+            answer: q.answer, explain: q.explain,
+            passage: { title: ps.title, text: ps.text },
+          });
+        }
+      }
+      continue;
+    }
+    const bj = nativeJson(p.bank + '.json');
+    qs.push(...buildBankMcqs(bj?.cards, p.n, p.bank));
+  }
+  return { ...mock, questions: shuffled(qs) };
+}
+function planTotal(m) {
+  if (!m.plan) return (m.questions || []).length;
+  return m.plan.reduce((a, p) => a + (p.bank === 'reading' ? p.n * 4 : p.n), 0);
+}
 function apiMocks(_req, res) {
   const j = nativeJson('mocks.json');
   if (!j) return sendJson(res, 500, { ok: false, error: 'unavailable' });
-  return sendJson(res, 200, { ok: true, mocks: j.mocks.map(m => ({ id: m.id, title: m.title, minutes: m.minutes, strands: m.strands, count: m.questions.length })) });
+  return sendJson(res, 200, { ok: true, mocks: j.mocks.map(m => ({ id: m.id, title: m.title, minutes: m.minutes, strands: m.strands, count: planTotal(m) })) });
 }
 function apiMockById(_req, res, id) {
   const j = nativeJson('mocks.json');
   const m = j?.mocks.find(x => x.id === String(id).slice(0, 40));
   if (!m) return sendJson(res, 404, { ok: false, error: 'Not found.' });
-  return sendJson(res, 200, { ok: true, mock: m });
+  return sendJson(res, 200, { ok: true, mock: assembleMock(m) });
 }
 function apiWriting(_req, res) {
   const j = nativeJson('writing.json');

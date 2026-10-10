@@ -101,7 +101,7 @@ export function normalizeQuery(q) {
 }
 
 // ---- display titles -------------------------------------------------------
-export function cleanDisplayName(driveName, title) {
+export function cleanDisplayName(driveName, title, desc = '') {
   let t = String(title || driveName || '').trim();
   t = t.replace(/~\$[^\s]*/g, ' ');
   t = t.replace(/^copy of\s+/i, '');
@@ -110,7 +110,16 @@ export function cleanDisplayName(driveName, title) {
   t = t.replace(/\.(pdf|docx?|pptx?|xlsx?|png|jpe?g|gif|zip|htm|html|js|css)$/i, '');
   t = t.replace(/[-_]+/g, ' ').replace(/\s+/g, ' ').trim();
   t = t.replace(/\s*-?\s*0+\d*\s*$/g, '').trim();
-  return t.slice(0, 200) || String(title || driveName || '');
+  let out = t.slice(0, 200);
+  if (!/[A-Za-z]/.test(out)) {
+    // bare section numbers like "1.1": borrow real words from the description
+    // ("1.1. Practice material." → "Practice material 1.1")
+    const words = String(desc || '').split(/[\s\-–—_]+/)
+      .filter(w => /[A-Za-z]{2,}/.test(w)).slice(0, 5).join(' ')
+      .replace(/\s*[.!?;,]+$/g, '').trim().slice(0, 160);
+    if (words) out = `${words} ${out}`.trim().slice(0, 200);
+  }
+  return out || String(title || driveName || 'Untitled resource');
 }
 
 export function fallbackType(driveName) {
@@ -152,7 +161,7 @@ export function buildIndex(links) {
     }
     return {
       rec, type,
-      displayTitle: cleanDisplayName(rec.driveName, rec.title),
+      displayTitle: cleanDisplayName(rec.driveName, rec.title, rec.description || rec.summary),
       titleToks, titleCounts, titlePos, titleLen: Math.max(1, titleToks.length),
       titlePhrase: titleToks.join(' '),
       tagMap,

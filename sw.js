@@ -1,6 +1,8 @@
-// Offline shell: app pages + saved data endpoints. Hosted files stay online-only.
-const CACHE = 'sehs-v1';
-const SHELL = ['/', '/styles.css', '/theme.js', '/ux.js', '/suggest.js', '/profile.js', '/palette.js', '/lists.js', '/study.js', '/gate.js', '/open.js', '/record.js', '/manifest.json', '/icon.svg'];
+// Offline shell: static assets cached, pages network-first so new deploys show
+// up immediately. Hosted files stay online-only.
+// NOTE: bump CACHE whenever the shell UI changes, or visitors keep the old UI.
+const CACHE = 'sehs-v2';
+const SHELL = ['/styles.css', '/theme.js', '/ux.js', '/suggest.js', '/profile.js', '/palette.js', '/lists.js', '/study.js', '/gate.js', '/open.js', '/record.js', '/request.js', '/search-page.js', '/insights.js', '/confetti.js', '/feed-learn.js', '/home.js', '/mocks.js', '/writing.js', '/drills.js', '/reading.js', '/manifest.json', '/icon.svg'];
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()).catch(() => {}));
 });
@@ -19,10 +21,23 @@ self.addEventListener('fetch', (e) => {
     }).catch(() => caches.match(e.request).then((m) => m || Response.json({ ok: false, error: 'offline' }, { status: 503 }))));
     return;
   }
-  // pages + assets: cache-first, then network
-  e.respondWith(caches.match(e.request).then((m) => m || fetch(e.request).then((r) => {
+  const isAsset = /\.(css|js|svg|png|ico|json|xml)$/.test(u.pathname);
+  if (isAsset) {
+    // assets: stale-while-revalidate — instant + always refreshes behind
+    e.respondWith(caches.match(e.request).then((m) => {
+      const net = fetch(e.request).then((r) => {
+        const copy = r.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
+        return r;
+      }).catch(() => m);
+      return m || net;
+    }));
+    return;
+  }
+  // pages: network-first so UI updates deploy instantly, offline falls back
+  e.respondWith(fetch(e.request).then((r) => {
     const copy = r.clone();
     caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
     return r;
-  }).catch(() => caches.match('/'))));
+  }).catch(() => caches.match(e.request).then((m) => m || caches.match('/'))));
 });

@@ -310,7 +310,7 @@ export function resourcePage(ctx, publicId) {
     <dl class="kv">${facts}</dl>
     <div class="meta-row" style="margin:6px 0 18px">${(v.tags || []).slice(0, 10).map(t => `<a class="tag" href="/search?q=${encodeURIComponent(t)}">${esc(pretty(t))}</a>`).join('')}</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px">
-      <button class="btn" data-open="${esc(v.id)}">Open resource →</button>
+      <button class="btn" data-open="${esc(v.id)}">${v.fileType === 'pdf' ? 'Open PDF →' : 'Open resource →'}</button>
       <button class="btn secondary" data-save="${esc(v.id)}" aria-label="Save this resource">☆ Save</button>
       <button class="btn secondary" data-copylink="/r/${esc(v.id)}">Copy link</button>
       <button class="btn secondary" data-report="${esc(v.id)}">Report issue</button>

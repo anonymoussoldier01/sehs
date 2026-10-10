@@ -1,208 +1,277 @@
 {
- "mocks": [
-  {
-   "id": "diagnostic-50",
-   "title": "Free Diagnostic (50Q)",
-   "minutes": 40,
-   "strands": [
-    "maths",
-    "quant",
-    "reading",
-    "verbal"
-   ],
-   "questions": [
+  "mocks": [
     {
-     "strand": "maths",
-     "stem": "Simplify 12/18",
-     "options": [
-      "1/2",
-      "2/3",
-      "3/4",
-      "4/6"
-     ],
-     "answer": 1,
-     "explain": "Divide by 6."
+      "id": "diagnostic-50",
+      "title": "Free Diagnostic (50Q)",
+      "minutes": 40,
+      "strands": [
+        "maths",
+        "quant",
+        "reading",
+        "verbal"
+      ],
+      "questions": [
+        {
+          "strand": "maths",
+          "stem": "Simplify 12/18",
+          "options": [
+            "1/2",
+            "2/3",
+            "3/4",
+            "4/6"
+          ],
+          "answer": 1,
+          "explain": "Divide by 6."
+        },
+        {
+          "strand": "quant",
+          "stem": "Next: 2, 4, 8, 16, ?",
+          "options": [
+            "20",
+            "24",
+            "30",
+            "32"
+          ],
+          "answer": 3,
+          "explain": "×2."
+        },
+        {
+          "strand": "verbal",
+          "stem": "Chapter : Book :: Scene : ?",
+          "options": [
+            "Play",
+            "Actor",
+            "Stage",
+            "Song"
+          ],
+          "answer": 0,
+          "explain": "Part-to-whole."
+        },
+        {
+          "strand": "reading",
+          "stem": "'knew every gull by its cry' suggests the keeper is?",
+          "options": [
+            "New",
+            "Observant",
+            "Deaf",
+            "Afraid"
+          ],
+          "answer": 1,
+          "explain": "Long attention to detail."
+        }
+      ],
+      "plan": [
+        {
+          "bank": "maths",
+          "n": 12
+        },
+        {
+          "bank": "quant",
+          "n": 12
+        },
+        {
+          "bank": "verbal",
+          "n": 14
+        },
+        {
+          "bank": "vocab",
+          "n": 6
+        },
+        {
+          "bank": "grammar",
+          "n": 6
+        }
+      ]
     },
     {
-     "strand": "quant",
-     "stem": "Next: 2, 4, 8, 16, ?",
-     "options": [
-      "20",
-      "24",
-      "30",
-      "32"
-     ],
-     "answer": 3,
-     "explain": "\u00d72."
+      "id": "maths-qr-60",
+      "title": "Maths + QR Block (60 min)",
+      "minutes": 60,
+      "strands": [
+        "maths",
+        "quant"
+      ],
+      "questions": [
+        {
+          "strand": "maths",
+          "stem": "25% of 80?",
+          "options": [
+            "15",
+            "20",
+            "25",
+            "30"
+          ],
+          "answer": 1,
+          "explain": "Quarter."
+        },
+        {
+          "strand": "maths",
+          "stem": "Solve 2x+5=17",
+          "options": [
+            "5",
+            "6",
+            "7",
+            "8"
+          ],
+          "answer": 1,
+          "explain": "−5, ÷2."
+        },
+        {
+          "strand": "quant",
+          "stem": "Next: 3, 6, 11, 18, ?",
+          "options": [
+            "23",
+            "25",
+            "27",
+            "29"
+          ],
+          "answer": 2,
+          "explain": "+3,+5,+7,+9."
+        },
+        {
+          "strand": "quant",
+          "stem": "Venn: 30 students, 18 maths, 15 science, 8 both. Neither?",
+          "options": [
+            "3",
+            "5",
+            "7",
+            "9"
+          ],
+          "answer": 1,
+          "explain": "30−(18+15−8)."
+        }
+      ],
+      "plan": [
+        {
+          "bank": "maths",
+          "n": 20
+        },
+        {
+          "bank": "quant",
+          "n": 20
+        }
+      ]
     },
     {
-     "strand": "verbal",
-     "stem": "Chapter : Book :: Scene : ?",
-     "options": [
-      "Play",
-      "Actor",
-      "Stage",
-      "Song"
-     ],
-     "answer": 0,
-     "explain": "Part-to-whole."
+      "id": "reading-vr-55",
+      "title": "Reading + VR Block (55 min)",
+      "minutes": 55,
+      "strands": [
+        "reading",
+        "verbal"
+      ],
+      "questions": [
+        {
+          "strand": "verbal",
+          "stem": "Synonym of Candid?",
+          "options": [
+            "Honest",
+            "Rude",
+            "Shy",
+            "Cold"
+          ],
+          "answer": 0,
+          "explain": "Frank."
+        },
+        {
+          "strand": "verbal",
+          "stem": "Odd one out: Apple, Banana, Carrot, Grape",
+          "options": [
+            "Apple",
+            "Banana",
+            "Carrot",
+            "Grape"
+          ],
+          "answer": 2,
+          "explain": "Only vegetable."
+        },
+        {
+          "strand": "reading",
+          "stem": "Author favouring managed phone use would support?",
+          "options": [
+            "Total ban",
+            "Pouches in class",
+            "No rules",
+            "Ban teachers"
+          ],
+          "answer": 1,
+          "explain": "Compromise position."
+        }
+      ],
+      "plan": [
+        {
+          "bank": "reading",
+          "n": 3,
+          "unit": "passage"
+        },
+        {
+          "bank": "verbal",
+          "n": 20
+        },
+        {
+          "bank": "vocab",
+          "n": 8
+        }
+      ]
     },
     {
-     "strand": "reading",
-     "stem": "'knew every gull by its cry' suggests the keeper is?",
-     "options": [
-      "New",
-      "Observant",
-      "Deaf",
-      "Afraid"
-     ],
-     "answer": 1,
-     "explain": "Long attention to detail."
+      "id": "mixed-mini-20",
+      "title": "Mixed Mini (20Q / 25 min)",
+      "minutes": 25,
+      "strands": [
+        "maths",
+        "verbal",
+        "quant",
+        "reading"
+      ],
+      "questions": [
+        {
+          "strand": "maths",
+          "stem": "BODMAS: 6+3×4?",
+          "options": [
+            "36",
+            "18",
+            "24",
+            "12"
+          ],
+          "answer": 1,
+          "explain": "× first."
+        },
+        {
+          "strand": "verbal",
+          "stem": "Hot : Cold :: Day : ?",
+          "options": [
+            "Night",
+            "Sun",
+            "Light",
+            "Heat"
+          ],
+          "answer": 0,
+          "explain": "Antonyms."
+        }
+      ],
+      "plan": [
+        {
+          "bank": "maths",
+          "n": 5
+        },
+        {
+          "bank": "quant",
+          "n": 5
+        },
+        {
+          "bank": "verbal",
+          "n": 5
+        },
+        {
+          "bank": "vocab",
+          "n": 3
+        },
+        {
+          "bank": "grammar",
+          "n": 2
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "maths-qr-60",
-   "title": "Maths + QR Block (60 min)",
-   "minutes": 60,
-   "strands": [
-    "maths",
-    "quant"
-   ],
-   "questions": [
-    {
-     "strand": "maths",
-     "stem": "25% of 80?",
-     "options": [
-      "15",
-      "20",
-      "25",
-      "30"
-     ],
-     "answer": 1,
-     "explain": "Quarter."
-    },
-    {
-     "strand": "maths",
-     "stem": "Solve 2x+5=17",
-     "options": [
-      "5",
-      "6",
-      "7",
-      "8"
-     ],
-     "answer": 1,
-     "explain": "\u22125, \u00f72."
-    },
-    {
-     "strand": "quant",
-     "stem": "Next: 3, 6, 11, 18, ?",
-     "options": [
-      "23",
-      "25",
-      "27",
-      "29"
-     ],
-     "answer": 2,
-     "explain": "+3,+5,+7,+9."
-    },
-    {
-     "strand": "quant",
-     "stem": "Venn: 30 students, 18 maths, 15 science, 8 both. Neither?",
-     "options": [
-      "3",
-      "5",
-      "7",
-      "9"
-     ],
-     "answer": 1,
-     "explain": "30\u2212(18+15\u22128)."
-    }
-   ]
-  },
-  {
-   "id": "reading-vr-55",
-   "title": "Reading + VR Block (55 min)",
-   "minutes": 55,
-   "strands": [
-    "reading",
-    "verbal"
-   ],
-   "questions": [
-    {
-     "strand": "verbal",
-     "stem": "Synonym of Candid?",
-     "options": [
-      "Honest",
-      "Rude",
-      "Shy",
-      "Cold"
-     ],
-     "answer": 0,
-     "explain": "Frank."
-    },
-    {
-     "strand": "verbal",
-     "stem": "Odd one out: Apple, Banana, Carrot, Grape",
-     "options": [
-      "Apple",
-      "Banana",
-      "Carrot",
-      "Grape"
-     ],
-     "answer": 2,
-     "explain": "Only vegetable."
-    },
-    {
-     "strand": "reading",
-     "stem": "Author favouring managed phone use would support?",
-     "options": [
-      "Total ban",
-      "Pouches in class",
-      "No rules",
-      "Ban teachers"
-     ],
-     "answer": 1,
-     "explain": "Compromise position."
-    }
-   ]
-  },
-  {
-   "id": "mixed-mini-20",
-   "title": "Mixed Mini (20Q / 25 min)",
-   "minutes": 25,
-   "strands": [
-    "maths",
-    "verbal",
-    "quant",
-    "reading"
-   ],
-   "questions": [
-    {
-     "strand": "maths",
-     "stem": "BODMAS: 6+3\u00d74?",
-     "options": [
-      "36",
-      "18",
-      "24",
-      "12"
-     ],
-     "answer": 1,
-     "explain": "\u00d7 first."
-    },
-    {
-     "strand": "verbal",
-     "stem": "Hot : Cold :: Day : ?",
-     "options": [
-      "Night",
-      "Sun",
-      "Light",
-      "Heat"
-     ],
-     "answer": 0,
-     "explain": "Antonyms."
-    }
-   ]
-  }
- ]
+  ]
 }

@@ -5,13 +5,11 @@ export function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-const NAV_MAIN = [['/', 'Home'], ['/study', 'Study'], ['/mocks', 'Mocks'], ['/exam-guide', 'Guide']];
-const NAV_MORE = [['/search', 'Browse'], ['/writing', 'Writing'], ['/drills', 'Drills'], ['/reading', 'Reading'], ['/subjects', 'Subjects'], ['/providers', 'Providers'], ['/saved', 'Saved'], ['/about', 'About']];
-
 const SIDE_MAIN = [
   ['/', 'Home', '⌂'],
   ['/saved', 'Your library', '▤'],
   ['/search', 'Browse', '⚲'],
+  ['/search?type=pdf', 'PDF papers', '❏'],
   ['/study', 'Study hub', '✎'],
 ];
 const SIDE_START = [
@@ -153,7 +151,8 @@ ${extraHead}
 }
 
 export function pretty(s) {
-  return String(s || '').split(/[-_\s]/).filter(Boolean).map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
+  const ACR = { vsse: 'VSSE', acer: 'ACER', vcaa: 'VCAA', naplan: 'NAPLAN' };
+  return String(s || '').split(/[-_\s]/).filter(Boolean).map(w => ACR[w.toLowerCase()] || w[0].toUpperCase() + w.slice(1)).join(' ');
 }
 
 const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
@@ -175,30 +174,32 @@ export function highlight(text, tokens) {
 
 export function resultRow(v, displayTitle, tokens = [], showDesc = true) {
   const subj = v.subject ? pretty(v.subject) : pretty(v.category);
-  const size = v.sizeBytes ? ` · ${fmtBytes(v.sizeBytes)}` : '';
-  const year = v.year ? ` · ${esc(v.year)}` : '';
   const tags = (v.tags || []).slice(0, 4).map(t => `<span class="tagstatic">${esc(pretty(t))}</span>`).join('');
+  // skip descriptions that only echo the title ("1.1. Practice material.")
+  const norm = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const tn = norm(displayTitle), dn = norm(v.description);
+  const filler = /^(practice material|practice materials|worksheet|worksheets|homework|test|tests|notes?|study material|revision)$/;
+  const echoDesc = dn === tn || (tn.length >= 2 && dn.startsWith(tn) && filler.test(dn.slice(tn.length).trim()));
   return `<article class="card" data-id="${esc(v.id)}">
     ${typeTile(v.fileType)}
     <div class="card-body">
       <h3><a href="/r/${esc(v.id)}">${highlight(displayTitle, tokens)}</a></h3>
       <div class="meta-row"><span class="crumb">${esc(subj)}${v.provider ? ` › ${esc(pretty(v.provider))}` : ''}</span></div>
-      ${showDesc && v.description ? `<p class="desc">${highlight(v.description, tokens)}</p>` : ''}
+      ${showDesc && v.description && !echoDesc ? `<p class="desc">${highlight(v.description, tokens)}</p>` : ''}
       <div class="meta-row">
         <span class="badge">${esc(TYPE_LABEL[v.fileType] || v.fileType)}</span>
         ${v.answersIncluded ? `<span class="badge ans">Answers included</span>` : ''}
         ${v.status && v.status !== 'available' ? `<span class="badge st-${esc(v.status === 'needs_verification' ? 'unknown' : v.status)}">● ${esc(pretty(v.status))}</span>` : ''}
-        <span class="filemeta">${esc(TYPE_LABEL[v.fileType] || '')}${size}${year}</span>
       </div>
       ${tags ? `<div class="meta-row">${tags}</div>` : ''}
       <div class="card-foot">
-        <span class="date">${v.year ? esc(v.year) : ''}${v.sizeBytes ? ` · ${fmtBytes(v.sizeBytes)}` : ''}</span>
-        <span><button class="btn small secondary" data-save="${esc(v.id)}" aria-label="Save ${esc(displayTitle)}" title="Save">☆</button>
-        <button class="btn small secondary" data-listadd="${esc(v.id)}" aria-label="Add to list" title="Add to list">List +</button>
-        <button class="btn small secondary" data-copylink="/r/${esc(v.id)}" aria-label="Copy link">⧉</button>
-        <a class="btn small secondary" href="/r/${esc(v.id)}">Details</a>
-        <button class="btn small" data-open="${esc(v.id)}">Open resource →</button></span>
+        <span class="date">${v.year ? esc(v.year) : ''}${v.year && v.sizeBytes ? ' · ' : ''}${v.sizeBytes ? fmtBytes(v.sizeBytes) : ''}</span>
+        <span class="card-btns"><button class="btn small secondary icon-only" data-save="${esc(v.id)}" aria-label="Save ${esc(displayTitle)}" title="Save">☆</button>
+        <button class="btn small secondary icon-only" data-listadd="${esc(v.id)}" aria-label="Add to list" title="Add to list">+</button>
+        <button class="btn small secondary icon-only" data-copylink="/r/${esc(v.id)}" aria-label="Copy link" title="Copy link">⧉</button>
+        <a class="btn small secondary" href="/r/${esc(v.id)}">Details</a></span>
       </div>
+      <button class="btn small open-full" data-open="${esc(v.id)}">${v.fileType === 'pdf' ? 'Open PDF →' : 'Open resource →'}</button>
     </div>
   </article>`;
 }
