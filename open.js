@@ -19,15 +19,24 @@
   }
   async function openResource(id, btn) {
     if (btn) btn.disabled = true;
+    // Open the tab SYNCHRONOUSLY in the click gesture: browsers block
+    // window.open() calls made after awaits (Terms fetch + grant POST).
+    // We navigate the placeholder once the grant URL is ready.
+    var w = null;
+    try { w = window.open('about:blank', '_blank'); } catch (e) { w = null; }
+    if (!w) toast('Popup blocked — allow popups for this site, then try again');
     try {
       if (window.__sehsTerms) {
         var ok = await window.__sehsTerms.ensure();
-        if (!ok) return; // declined: do not open
+        if (!ok) { if (w) w.close(); return; } // declined: do not open
         toast('Terms accepted — opening…');
       }
       var url = await grant(id);
-      if (url) window.open(url, '_blank', 'noopener');
+      if (url && w) w.location.replace(url);
+      else if (url && !w) location.href = url; // last resort: same tab
+      else if (w) w.close();
     } catch (e) {
+      if (w) w.close();
       toast('Could not open resource');
     } finally {
       if (btn) btn.disabled = false;
