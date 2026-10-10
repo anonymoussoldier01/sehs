@@ -1,9 +1,9 @@
 # SEHS Study Directory — secure study-resource platform
 
 Searchable collection of selective-entry study resources with a smart local
-search engine, study tools, and an admin console. Zero dependencies (plain
-Node 22+ with `node:sqlite`), no build step, no accounts required — open to
-anyone studying.
+search engine, study tools, and an admin console. Server is dependency-light
+(plain Node 22+ with `node:sqlite`); the React client builds with Vite +
+Tailwind. No accounts required — open to anyone studying.
 
 Live dataset: 1,641 resources served from SQLite — clients never receive raw
 storage URLs or folder IDs.
@@ -29,10 +29,31 @@ storage URLs or folder IDs.
   remember the visitor's theme, library, decks and progress. Raw analytics
   auto-purge after 30 days (configurable). Admin auth is a per-tab bearer token.
 
+## Frontend (React + Vite + Tailwind)
+
+```
+client/                     # Vite + React 19 + Tailwind v4 + framer-motion
+client/src/pages/           # routed pages (Home, Search, Resource, Study…)
+client/src/components/      # shell (sidebar/topbar/palette) + magic effects
+client/src/lib/             # API client + browser-storage state
+client/dist/                # production build (gitignored, built by npm start)
+```
+
+```powershell
+npm run build:client   # install + production build into client/dist
+npm run client:dev     # Vite dev server (:5173, proxies /api + /open to :8080)
+npm start              # build client + migrate + seed + serve (http://localhost:8080)
+```
+
+`server.mjs` serves `client/dist` for all app routes (with SPA fallback) once
+built; `/api/*`, `/open/*` and `/admin*` always stay on the server. If `dist`
+is missing, the server falls back to the legacy server-rendered pages.
+
 ## Project structure
 
 ```
-server.mjs                  # platform server: pages + JSON API + access gateway
+server.mjs                  # platform server: API + access gateway + static/SPA host
+client/                     # React + Vite + Tailwind frontend (see Frontend above)
 server/db.mjs               # SQLite schema (auto-migrates on boot)
 server/crypto.mjs           # scrypt passwords, tokens, rate limits, lockouts
 server/content.mjs          # search index + strict public serializers
@@ -58,14 +79,14 @@ state/id-map.json           # old→new ID map (gitignored, server-only)
 
 ```powershell
 cd C:\sehs
-npm install   # no deps; Node >= 22 required (node:sqlite)
+npm install   # server deps; Node >= 22 required (node:sqlite)
 
 # First run only: build the database (generates the admin password once,
 # or set SEHS_ADMIN_PASSWORD beforehand)
 $env:SEHS_ADMIN_PASSWORD="..."
 node scripts/migrate.mjs [--reset]
 
-npm run server   # http://localhost:8080
+npm start      # builds the React client + serves http://localhost:8080
 ```
 
 Open `http://localhost:8080`, search, open `/unlock` for admin. Re-running

@@ -9,7 +9,9 @@ data/app.db*
 
 # deps / build
 node_modules/
+client/node_modules/
 dist/
+client/dist/
 .tmp/
 
 # ingestion runtime (regenerable checkpoints/caches — keep local only)

@@ -24,9 +24,35 @@ import {
 
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir);
+const DIST = path.join(ROOT, 'client', 'dist');
+const DIST_INDEX = path.join(DIST, 'index.html');
+const distOn = () => {
+  try {
+    return fs.statSync(DIST_INDEX).isFile();
+  } catch {
+    return false;
+  }
+};
+// React SPA routes (served from client/dist when built, legacy MPA otherwise).
+// /admin*, /open/*, /feed.xml and /api/* always stay on the server.
+const SPA_RE = /^\/(search|subjects|providers|about|saved|request|study|exam-guide|mocks|writing|reading|drills|unlock|list|r)(\/|$)/;
+function distFile(p) {
+  try {
+    const f = path.join(DIST, decodeURIComponent(p));
+    if (!f.startsWith(DIST)) return null;
+    return fs.statSync(f).isFile() ? f : null;
+  } catch {
+    return null;
+  }
+}
 const PORT = Number(process.env.PORT || 8080);
 const SECURE = process.env.APP_SECURE === '1' || Boolean(process.env.VERCEL);
-const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.woff': 'font/woff', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.map': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json', '.webp': 'image/webp', '.avif': 'image/avif' };
+function sendFile(res, f) {
+  secureHeaders(res);
+  res.writeHead(200, { 'Content-Type': MIME[path.extname(f)] || 'application/octet-stream' });
+  fs.createReadStream(f).pipe(res);
+}
 
 // Lazy async boot shared by long-lived and serverless runtimes.
 let db = null;
@@ -1307,6 +1333,20 @@ const server = http.createServer(async (req, res) => {
     // single-use grant redemption (no session needed — the token IS the capability)
     const g = url.pathname.match(/^\/open\/([A-Za-z0-9_-]{16,64})$/);
     if (g && req.method === 'GET') return openGrant(req, res, g[1]);
+
+    // React SPA (client/dist) owns these routes once built; otherwise the
+    // legacy server-rendered pages below handle them. /admin* stays legacy.
+    if (req.method === 'GET' && distOn()) {
+      const p = url.pathname;
+      if (p === '/' || SPA_RE.test(p)) {
+        const f = p === '/' ? DIST_INDEX : distFile(p);
+        return sendFile(res, f || DIST_INDEX);
+      }
+      if (p.startsWith('/assets/')) {
+        const f = distFile(p);
+        if (f) return sendFile(res, f);
+      }
+    }
 
     if (req.method !== 'GET') { secureHeaders(res); res.writeHead(405); res.end('method not allowed'); return; }
     // Pages are public; the header shows an Admin link only with a valid bearer session.

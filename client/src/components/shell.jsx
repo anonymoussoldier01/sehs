@@ -1,0 +1,431 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Form, Link, NavLink, useNavigate } from 'react-router-dom';
+import { Command } from 'cmdk';
+import { useOpener, useTheme, useToast } from '../providers';
+import { api, pretty } from '../lib/api';
+import { keys, useLocal } from '../lib/store';
+import { cn } from './cn';
+
+const MAIN = [
+  ['/', 'Home', '⌂'],
+  ['/saved', 'Your library', '▤'],
+  ['/search', 'Browse', '⚲'],
+  ['/search?type=pdf', 'PDF papers', '❏'],
+  ['/study', 'Study hub', '✎'],
+];
+const START = [
+  ['/study', 'Flashcards', '▢'],
+  ['/mocks', 'Timed mocks', '◷'],
+  ['/exam-guide', 'Study guides', '≡'],
+  ['/drills', 'Games & drills', '▦'],
+  ['/writing', 'Writing studio', '✒'],
+  ['/reading', 'Reading room', '☰'],
+];
+const MORE = [
+  ['/subjects', 'Subjects', '○'],
+  ['/providers', 'Providers', '○'],
+  ['/request', 'Request', '＋'],
+  ['/about', 'About', 'ⓘ'],
+];
+
+function SideLink({ to, icon, label, onNav }) {
+  return (
+    <NavLink
+      to={to}
+      end={to === '/'}
+      onClick={onNav}
+      className={({ isActive }) =>
+        cn(
+          'flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all',
+          isActive ? '' : 'hover:translate-x-[1px]'
+        )
+      }
+      style={({ isActive }) => ({
+        background: isActive ? 'var(--acc-soft)' : undefined,
+        color: isActive ? 'var(--acc)' : 'var(--mut)',
+      })}
+    >
+      <span
+        className="grid h-[26px] w-[26px] flex-none place-items-center rounded-lg border text-[15px]"
+        style={{ background: 'var(--bg2)', borderColor: 'var(--line)' }}
+      >
+        {icon}
+      </span>
+      <span className="truncate">{label}</span>
+    </NavLink>
+  );
+}
+
+export function Sidebar({ open, onClose, folders }) {
+  return (
+    <>
+      <div
+        className={cn('fixed inset-0 z-[48] bg-black/45 lg:hidden', open ? '' : 'hidden')}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <aside
+        className={cn(
+          'fixed inset-y-0 left-0 z-50 flex w-[min(300px,84vw)] flex-col gap-1.5 overflow-y-auto border-r p-3 transition-transform lg:sticky lg:top-0 lg:h-screen lg:w-[248px] lg:translate-x-0 lg:rounded-none lg:shadow-none',
+          open ? 'translate-x-0' : '-translate-x-[105%]'
+        )}
+        style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}
+        aria-label="Primary"
+      >
+        <Link to="/" onClick={onClose} className="mb-2 flex items-center gap-2.5 rounded-xl p-2">
+          <span className="grid h-9 w-9 flex-none -rotate-2 place-items-center rounded-[11px] font-display text-xl font-black text-white shadow">
+            Q
+          </span>
+          <span className="leading-tight">
+            <strong className="block font-display text-[17px]">SEHS Study</strong>
+            <small className="block text-xs" style={{ color: 'var(--mut)' }}>
+              Flashcards · mocks · papers
+            </small>
+          </span>
+        </Link>
+        <nav className="flex flex-col gap-[1px]" aria-label="Sections">
+          {MAIN.map(([to, l, i]) => (
+            <SideLink key={to + l} to={to} icon={i} label={l} onNav={onClose} />
+          ))}
+          <p className="mx-3 mb-1.5 mt-4 text-[11px] font-extrabold uppercase tracking-[.08em]" style={{ color: 'var(--faint)' }}>
+            Start here
+          </p>
+          {START.map(([to, l, i]) => (
+            <SideLink key={to + l} to={to} icon={i} label={l} onNav={onClose} />
+          ))}
+          <p className="mx-3 mb-1.5 mt-4 text-[11px] font-extrabold uppercase tracking-[.08em]" style={{ color: 'var(--faint)' }}>
+            More
+          </p>
+          {MORE.map(([to, l, i]) => (
+            <SideLink key={to + l} to={to} icon={i} label={l} onNav={onClose} />
+          ))}
+        </nav>
+        <div className="mt-auto border-t border-dashed px-2 pb-1 pt-3" style={{ borderColor: 'var(--line2)' }}>
+          <Link to="/saved#list-new" onClick={onClose} className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 text-[13.5px] font-bold">
+            ＋ New folder
+          </Link>
+          {!!folders?.length && (
+            <div className="mt-1.5 flex flex-col gap-[1px]">
+              {folders.slice(0, 6).map((f) => (
+                <Link
+                  key={f.code}
+                  to={'/list/' + f.code}
+                  onClick={onClose}
+                  className="flex min-h-[40px] items-center gap-3 rounded-xl px-3 text-sm font-semibold"
+                  style={{ color: 'var(--mut)' }}
+                >
+                  <span
+                    className="grid h-[26px] w-[26px] flex-none place-items-center rounded-lg border text-[15px]"
+                    style={{ background: 'var(--bg2)', borderColor: 'var(--line)' }}
+                  >
+                    ▤
+                  </span>
+                  <span className="truncate">{f.name}</span>
+                  <span
+                    className="ml-auto rounded-full border px-2 py-[1px] text-[11px] tabular-nums"
+                    style={{ borderColor: 'var(--line)', color: 'var(--faint)' }}
+                  >
+                    {f.count}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+          <p className="mx-3 mt-1.5 text-[11.5px]" style={{ color: 'var(--faint)' }}>
+            Progress saves in this browser.
+          </p>
+        </div>
+      </aside>
+    </>
+  );
+}
+
+function useSuggest(value) {
+  const [items, setItems] = useState([]);
+  useEffect(() => {
+    const last = value.split(/\s+/).pop() || '';
+    if (last.length < 2) {
+      setItems([]);
+      return;
+    }
+    let live = true;
+    const t = setTimeout(() => {
+      api
+        .suggest(last.slice(0, 40))
+        .then((j) => live && setItems((j.suggestions || []).slice(0, 7)))
+        .catch(() => {});
+    }, 110);
+    return () => {
+      live = false;
+      clearTimeout(t);
+    };
+  }, [value]);
+  return items;
+}
+
+export function Topbar({ onMenu }) {
+  const { dark, toggle } = useTheme();
+  const toast = useToast();
+  const navigate = useNavigate();
+  const [q, setQ] = useState('');
+  const [focus, setFocus] = useState(false);
+  const [name, setName] = useLocal(keys.name, '');
+  const sugg = useSuggest(q);
+  const boxRef = useRef(null);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        window.dispatchEvent(new CustomEvent('sehs:palette'));
+      }
+      if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '')) {
+        const input = boxRef.current?.querySelector('input');
+        if (input) {
+          e.preventDefault();
+          input.focus();
+        }
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!q.trim()) return;
+    try {
+      const list = JSON.parse(localStorage.getItem(keys.recentSearches) || '[]');
+      localStorage.setItem(keys.recentSearches, JSON.stringify([q.trim(), ...list.filter((x) => x !== q.trim())].slice(0, 8)));
+    } catch {
+      /* noop */
+    }
+    setFocus(false);
+    navigate('/search?q=' + encodeURIComponent(q.trim()));
+  };
+
+  return (
+    <header
+      className="sticky top-0 z-40 border-b backdrop-blur-xl"
+      style={{ background: 'color-mix(in srgb, var(--panel) 90%, transparent)', borderColor: 'var(--line)' }}
+    >
+      <div className="mx-auto flex min-h-[62px] max-w-[1240px] items-center gap-2.5 px-4 sm:px-6">
+        <button
+          onClick={onMenu}
+          className="grid h-10 min-w-10 place-items-center rounded-[11px] border text-[15px] shadow-sm lg:hidden"
+          style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
+          aria-label="Open menu"
+        >
+          ☰
+        </button>
+        <div className="relative mx-auto w-full max-w-[560px]" ref={boxRef}>
+          <Form
+            onSubmit={submit}
+            className="flex min-h-[44px] items-center gap-2.5 rounded-full border py-0 pl-4 pr-2 transition-all focus-within:-translate-y-px"
+            style={{ background: 'var(--bg2)', borderColor: focus ? 'var(--acc)' : 'var(--line)' }}
+            role="search"
+          >
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" style={{ color: 'var(--faint)', flex: 'none' }}>
+              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" fill="none" />
+              <path d="M16.5 16.5 21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+            <input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onFocus={() => setFocus(true)}
+              onBlur={() => setTimeout(() => setFocus(false), 120)}
+              type="search"
+              placeholder="Search papers, decks, topics…"
+              aria-label="Search study resources"
+              className="min-w-0 flex-1 bg-transparent py-2.5 text-base outline-none"
+            />
+          </Form>
+          {focus && !!sugg.length && (
+            <div
+              className="absolute inset-x-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-2xl border p-1.5 shadow-2xl"
+              style={{ background: 'var(--panel)', borderColor: 'var(--line2)' }}
+              role="listbox"
+            >
+              {sugg.map((s, i) => (
+                <button
+                  key={i}
+                  role="option"
+                  aria-selected="false"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    navigate('/search?q=' + encodeURIComponent(s.label));
+                    setFocus(false);
+                  }}
+                  className="flex w-full items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-left text-sm transition-colors hover:bg-[var(--acc-soft)]"
+                >
+                  <span
+                    className="flex-none rounded-md border px-1.5 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wider"
+                    style={{ color: 'var(--acc)', borderColor: 'var(--acc-line)' }}
+                  >
+                    {s.kind}
+                  </span>
+                  <span className="truncate">{s.label}</span>
+                  {!!s.count && <span className="ml-auto text-xs tabular-nums" style={{ color: 'var(--faint)' }}>{s.count}</span>}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => window.dispatchEvent(new CustomEvent('sehs:palette'))}
+            className="grid h-10 min-w-10 place-items-center rounded-[11px] border px-2.5 text-[15px] font-bold shadow-sm transition-all hover:-translate-y-px"
+            style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
+            title="Quick search (Ctrl+K)"
+            aria-label="Quick search"
+          >
+            ⌘K
+          </button>
+          <button
+            onClick={() => {
+              const next = prompt('Display name (stored only in this browser):', name || '');
+              if (next === null) return;
+              const v = String(next).trim().slice(0, 24);
+              setName(v);
+              toast(v ? `Hi, ${v}` : 'Profile cleared');
+            }}
+            className="grid h-10 w-10 place-items-center rounded-full border-2 text-base font-extrabold text-white transition-transform hover:scale-105"
+            style={{ borderColor: 'var(--acc-line)', background: 'linear-gradient(135deg,#2f49e5,#7c3aed)' }}
+            title="Your profile"
+            aria-label="Your profile"
+          >
+            {(name?.trim()?.[0] || 'G').toUpperCase()}
+          </button>
+          <button
+            onClick={toggle}
+            className="grid h-10 min-w-10 place-items-center rounded-[11px] border text-[15px] shadow-sm transition-all hover:-translate-y-px"
+            style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
+            title="Toggle light / dark"
+            aria-label="Toggle light and dark mode"
+            aria-pressed={String(dark)}
+          >
+            ◐
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export function Palette() {
+  const [open, setOpen] = useState(false);
+  const [q, setQ] = useState('');
+  const [results, setResults] = useState([]);
+  const navigate = useNavigate();
+  const toast = useToast();
+
+  useEffect(() => {
+    const on = () => {
+      setQ('');
+      setResults([]);
+      setOpen((o) => !o);
+    };
+    window.addEventListener('sehs:palette', on);
+    return () => window.removeEventListener('sehs:palette', on);
+  }, []);
+
+  useEffect(() => {
+    if (!open || q.trim().length < 2) {
+      setResults([]);
+      return;
+    }
+    let live = true;
+    const t = setTimeout(() => {
+      api
+        .search({ q: q.trim(), per: 5 })
+        .then((j) => live && setResults((j.results || []).slice(0, 6)))
+        .catch(() => {});
+    }, 130);
+    return () => {
+      live = false;
+      clearTimeout(t);
+    };
+  }, [open, q]);
+
+  const go = (href) => {
+    setOpen(false);
+    navigate(href);
+  };
+
+  return (
+    <Command.Dialog open={open} onOpenChange={setOpen} label="Quick search">
+      <div className="fixed inset-0 z-[70] grid place-items-start justify-center overflow-y-auto bg-black/55 p-4 pt-[12vh] backdrop-blur-sm" onClick={() => setOpen(false)}>
+        <div
+          className="w-full max-w-[600px] rounded-[18px] border p-3.5 shadow-2xl"
+          style={{ background: 'var(--panel)', borderColor: 'var(--line2)' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Command.Input
+            value={q}
+            onValueChange={setQ}
+            placeholder="Search resources, subjects, actions…"
+            className="min-h-[52px] w-full rounded-xl border bg-transparent px-4 text-base outline-none"
+            style={{ borderColor: 'var(--line2)', background: 'var(--bg)' }}
+          />
+          <Command.List className="mt-2.5 max-h-[50vh] overflow-auto">
+            <Command.Empty className="px-3.5 py-2.5 text-sm" style={{ color: 'var(--mut)' }}>
+              No matches — press Enter to search.
+            </Command.Empty>
+            {q.trim() && (
+              <Command.Item
+                onSelect={() => go('/search?q=' + encodeURIComponent(q.trim()))}
+                className="flex cursor-pointer items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-sm aria-selected:bg-[var(--acc-soft)]"
+              >
+                <span className="rounded-md border px-1.5 py-0.5 text-[10.5px] font-extrabold uppercase" style={{ color: 'var(--acc)', borderColor: 'var(--acc-line)' }}>
+                  search
+                </span>
+                Search for “{q.trim()}”
+              </Command.Item>
+            )}
+            {results.map((v) => (
+              <Command.Item
+                key={v.id}
+                value={v.displayTitle || v.title}
+                onSelect={() => go('/r/' + v.id)}
+                className="flex cursor-pointer items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-sm aria-selected:bg-[var(--acc-soft)]"
+              >
+                <span className="rounded-md border px-1.5 py-0.5 text-[10.5px] font-extrabold uppercase" style={{ color: 'var(--acc)', borderColor: 'var(--acc-line)' }}>
+                  {v.fileType}
+                </span>
+                <span className="truncate">{v.displayTitle || v.title}</span>
+              </Command.Item>
+            ))}
+            {[
+              ['Browse subjects', '/subjects'],
+              ['Timed mocks', '/mocks'],
+              ['Your library', '/saved'],
+            ].map(([label, href]) => (
+              <Command.Item
+                key={href}
+                value={label}
+                onSelect={() => go(href)}
+                className="flex cursor-pointer items-center gap-2.5 rounded-[10px] px-3 py-2.5 text-sm aria-selected:bg-[var(--acc-soft)]"
+              >
+                <span className="rounded-md border px-1.5 py-0.5 text-[10.5px] font-extrabold uppercase" style={{ color: 'var(--acc)', borderColor: 'var(--acc-line)' }}>
+                  go
+                </span>
+                {label}
+              </Command.Item>
+            ))}
+          </Command.List>
+          <p className="mb-0 mt-2.5 text-xs" style={{ color: 'var(--faint)' }}>
+            ↑↓ navigate · Enter open · Esc close
+          </p>
+        </div>
+      </div>
+    </Command.Dialog>
+  );
+}
+
+export function useFolders() {
+  const [lists] = useLocal(keys.lists, []);
+  return useMemo(() => {
+    const encode = (ids) => btoa(JSON.stringify(ids.slice(0, 100))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return (lists || []).map((l) => ({ name: l.name, count: (l.items || []).length, code: encode(l.items || []) }));
+  }, [lists]);
+}

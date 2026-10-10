@@ -21,8 +21,11 @@
     "migrate": "node scripts/migrate.mjs",
     "seed:native": "node scripts/seed-native.mjs",
     "make:native": "python3 scripts/make-native.py && python3 scripts/make-native2.py",
-    "start": "node scripts/migrate.mjs && node scripts/seed-native.mjs && node server.mjs",
+    "start": "npm run build:client && node scripts/migrate.mjs && node scripts/seed-native.mjs && node server.mjs",
     "server": "node server.mjs",
+    "client:dev": "npm --prefix client run dev",
+    "client:install": "npm --prefix client install",
+    "build:client": "npm --prefix client install && npm --prefix client run build",
     "serve": "node scripts/serve.mjs",
     "deploy": "echo \"Push main branch; enable GitHub Pages on /(root) or use gh-pages branch\""
   },
