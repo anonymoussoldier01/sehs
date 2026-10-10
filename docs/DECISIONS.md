@@ -38,5 +38,12 @@ Log the smallest sensible change whenever a requirement conflicts with the archi
 ## D9 — Real 404 status with the SPA page
 - `server.mjs`: unknown extensionless non-reserved paths serve `client/dist/index.html` with HTTP 404 (no soft-404s). API/admin/grants/feeds/static untouched (verified live).
 
+## D10 — Thorough first-visit T&C, Drive links removed, overlay annotations
+- Terms v2 seeded additively (`scripts/terms-v2.mjs`; v1 row untouched, revert = set `terms_version` back to 1; DB snapshotted to `state/backups/phase-terms-v2/`). Copy covers independence, minors, acceptable use, copyright + takedown procedure, privacy summary, AI limits, as-is availability, Australian Consumer Law savings, VIC governing law. No compliance claims — qualified legal review still required (final report).
+- First-visit gate (`FirstVisitTerms`): full scrollable v2 on first site open; Accept records version locally; Decline dismisses and re-asks next visit; per-tab resource gate unchanged. Single-source for Terms page (`/api/terms`); `/privacy` static plain-English page.
+- All Google Drive redirect buttons removed (cards ↗, viewer toolbar + fallbacks, O shortcut, card open). Non-previewable types (docx/other/archive/webpage, ~200 records) now show an honest details-only notice + report path — a deliberate, user-directed regression logged here; follow-up is server-side conversion/proxy or per-type original links.
+- True in-file highlighting is impossible inside the Drive embed, so annotations are positioned overlays (drag = highlight box in 4 colours, tap = numbered pin, optional note, list with show/delete, persisted per resource, exported/deleted with user data). UI states plainly that marks live with the page, not in the file.
+- Cloudflare: the provided token is R2-storage-scoped and cannot deploy this Node+SQLite app; no deployment attempted, token never stored. See final report for hosting options.
+
 ## D7 — Streaks kept neutral; no streak-shaming, urgency, locks, or peer comparison
 - The existing day-streak counter stays as a neutral fact ("3 days active") with no guilt copy, no artificial locks, no leaderboards.

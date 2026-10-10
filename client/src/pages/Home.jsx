@@ -3,9 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api, pretty } from '../lib/api';
 import { keys } from '../lib/store';
 import { Button } from '../components/ui/button';
-import { AuroraText, BlurFade, DeckCard, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText, DotPattern, Magnet, ClickSpark, StarBorder, TextGenerate, BlurText } from '../components/magic';
+import { AuroraText, BlurFade, DeckCard, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText, DotPattern, Magnet, ClickSpark, StarBorder, TextGenerate, BlurText, SpotlightCard } from '../components/magic';
 import { ResourceCard } from '../components/cards';
-import { BoxReveal, SpinningText, VanishInput, Typewriter, ScrollVelocity, Ripple, InteractiveHover } from '../components/bits';
+import { BoxReveal, SpinningText, VanishInput, Typewriter, ScrollVelocity, Ripple, InteractiveHover, OrbitingCircles } from '../components/bits';
 import { BentoGrid, BentoCard, MiniTimer, MiniViewer, MiniDeck, MiniPen, MiniBars, MiniLines, ContainerScroll, AuroraBg, SnapCarousel, Evervault } from '../components/ace';
 
 function useApi(fn, deps) {
@@ -35,7 +35,7 @@ function Hero() {
         <BlurFade>
           <span className="flex flex-wrap items-center gap-3">
             <ShinyBadge>
-              <SparklesText count={5}>✦ Built for the selective entry test · free forever</SparklesText>
+              <SparklesText count={5}>✦ Victorian selective entry · Year 8 → Year 9 · ACER format</SparklesText>
             </ShinyBadge>
             <SpinningText text="FREE FOREVER • NO ACCOUNT • " size={92}>
               ✦
@@ -54,7 +54,7 @@ function Hero() {
         </BlurFade>
         <BlurFade delay={0.16}>
           <p className="lede" style={{ color: 'var(--mut)', fontSize: 17, maxWidth: '62ch', margin: '0 0 22px' }}>
-            Past papers, flashcards and timed ACER-style mocks for selective entry exams — maths, verbal and quantitative reasoning, reading and writing. No account, just study.
+            Past papers, flashcards and timed mocks for Victoria&apos;s selective entry exam — the ACER test Year 8 students sit for Year 9 entry into Melbourne High, Mac.Rob, Nossal and Suzanne Cory. No account, just study.
           </p>
         </BlurFade>
         <BlurFade delay={0.22}>
@@ -258,6 +258,48 @@ export default function Home() {
           </span>
         </Link>
       </BlurFade>
+
+      <section aria-label="Where you could be in Year 9" className="mt-10">
+        <div className="grid items-center gap-6 md:grid-cols-[minmax(0,1fr)_auto]">
+          <div>
+            <p className="text-xs font-extrabold uppercase tracking-[0.2em]" style={{ color: 'var(--acc)' }}>
+              Victorian selective entry · Year 9 intake
+            </p>
+            <h2 className="mt-1 font-display text-[26px] font-bold">
+              <TextGenerate words="Four schools. One exam. Walk in ready." />
+            </h2>
+            <p className="mt-2 max-w-[58ch] text-[15px]" style={{ color: 'var(--mut)' }}>
+              Around 1,000 Year 9 places across Melbourne High, Mac.Robertson Girls&apos;, Nossal and Suzanne Cory.
+              Offers come from the official selection process — this site exists so you meet exam day prepared, not surprised.
+            </p>
+          </div>
+          <OrbitingCircles core="✦" items={['MHS', 'MRG', 'NHS', 'SCS']} radius={72} duration={20} />
+        </div>
+        <div className="mt-4 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            ['Melbourne High', 'MHS', 'Boys · South Yarra', 'The academic powerhouse on the hill — generations of high achievers.'],
+            ['Mac.Robertson Girls’', 'MRG', 'Girls · Melbourne', 'A storied inner-city school for high-achieving girls.'],
+            ['Nossal', 'NHS', 'Co-ed · Berwick', 'Modern co-ed excellence in the south-east.'],
+            ['Suzanne Cory', 'SCS', 'Co-ed · Werribee', 'Purpose-built selective schooling in the west.'],
+          ].map(([name, short, facts, line], k) => (
+            <BlurFade key={name} delay={k * 0.06}>
+              <SpotlightCard className="h-full rounded-2xl border shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+                <div className="flex h-full flex-col p-[18px]">
+                  <span className="tnum grid h-11 w-11 place-items-center rounded-xl border text-sm font-extrabold" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)', color: 'var(--acc)' }}>
+                    {short}
+                  </span>
+                  <h3 className="mt-2.5 font-display text-[16px] font-bold">{name}</h3>
+                  <p className="text-xs font-semibold" style={{ color: 'var(--faint)' }}>{facts}</p>
+                  <p className="mb-3 mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>{line}</p>
+                  <Link to="/exam-guide" className="mt-auto inline-flex items-center gap-1.5 text-[13px] font-bold" style={{ color: 'var(--acc)' }}>
+                    How to prepare <span aria-hidden="true">→</span>
+                  </Link>
+                </div>
+              </SpotlightCard>
+            </BlurFade>
+          ))}
+        </div>
+      </section>
 
       <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Recents</h2>
       {recents.length ? (

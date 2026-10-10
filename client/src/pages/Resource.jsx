@@ -10,14 +10,13 @@ import { Textarea } from '../components/ui/textarea';
 import { api, pretty } from '../lib/api';
 import { keys, pushRecent } from '../lib/store';
 import { repo } from '../lib/repo';
-import { useOpener, useTerms, useToast } from '../providers';
+import { useTerms, useToast } from '../providers';
 import { BlurFade, Empty, Skeleton, AnimatedTooltip, SpotlightCard } from '../components/magic';
 import { ResourceCard, highlight } from '../components/cards';
 import { useSaved } from '../components/cards';
 
 export default function Resource() {
   const { id } = useParams();
-  const open = useOpener();
   const toast = useToast();
   const { saved, toggle } = useSaved();
   const [v, setV] = useState(null);
@@ -144,19 +143,18 @@ export default function Resource() {
     return () => window.removeEventListener('beforeunload', onBefore);
   }, [noteState]);
 
-  // Viewer shortcuts: o open · s save · f focus mode · ? help.
+  // Viewer shortcuts: s save · f focus mode · ? help.
   useEffect(() => {
     const onKey = (e) => {
       const tag = document.activeElement?.tagName || '';
       if (/INPUT|TEXTAREA|SELECT/.test(tag)) return;
       if (e.key === '?') setShowHelp(true);
       else if ((e.key === 's' || e.key === 'S') && v) toggle(v.id);
-      else if ((e.key === 'o' || e.key === 'O') && v) open(v.id);
       else if ((e.key === 'f' || e.key === 'F') && canPreview) setDistractionFree((d) => !d);
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [v, open, toggle, canPreview]);
+  }, [v, toggle, canPreview]);
 
   // Answer-key candidates: same title stem + answer/solution/key words (inferred, never auto-applied).
   const answerKeys = (related || []).filter((r) => {
@@ -226,22 +224,13 @@ export default function Resource() {
         ))}
       </div>
       <div className="mb-7 flex flex-wrap items-center gap-2.5" role="toolbar" aria-label="Resource actions">
-        <span className="flex flex-wrap gap-2.5" role="group" aria-label="Open">
-          {canPreview ? (
-            <>
-              <Button variant="default" onClick={scrollToViewer}>
-                Read here ↓
-              </Button>
-              <Button variant="secondary" onClick={() => open(v.id)}>
-                Open original ↗
-              </Button>
-            </>
-          ) : (
-            <Button variant="default" onClick={() => open(v.id)}>
-              Open resource →
+        {canPreview && (
+          <span className="flex flex-wrap gap-2.5" role="group" aria-label="Read">
+            <Button variant="default" onClick={scrollToViewer}>
+              Read here ↓
             </Button>
-          )}
-        </span>
+          </span>
+        )}
         <span className="flex flex-wrap gap-2.5" role="group" aria-label="Organise">
           <Button variant="secondary" onClick={() => toggle(v.id)} aria-pressed={String(saved.has(v.id))}>
             {saved.has(v.id) ? '★ Saved' : '☆ Save'}
@@ -259,7 +248,7 @@ export default function Resource() {
           >
             Copy link
           </Button>
-          <Button variant="secondary" onClick={() => setRepOpen(true)}>
+          <Button variant="secondary" id="report-anchor" onClick={() => setRepOpen(true)}>
             Report issue
           </Button>
         </span>
@@ -274,7 +263,20 @@ export default function Resource() {
       </div>
 
       {canPreview && (
-        <PreviewPanel id={v.id} kind={v.fileType} title={title} onOpen={() => open(v.id)} />
+        <PreviewPanel id={v.id} kind={v.fileType} title={title} />
+      )}
+      {!canPreview && (
+        <div className="mb-7 rounded-2xl border border-dashed p-[18px]" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+          <h2 className="font-display text-[15.5px] font-bold">Can&apos;t read this file type here yet</h2>
+          <p className="mt-1 max-w-[62ch] text-sm" style={{ color: 'var(--mut)' }}>
+            The built-in viewer reads PDFs and images. {v.fileType === 'docx' ? 'Word documents' : 'This file'} can&apos;t be displayed inside the site yet — we removed external file links, so for now this listing is details only. If this file matters to you, report it and we&apos;ll prioritise support.
+          </p>
+          <p className="mt-2.5">
+            <Button size="sm" variant="secondary" onClick={() => setRepOpen(true)}>
+              Report this file
+            </Button>
+          </p>
+        </div>
       )}
 
       {!distractionFree && !!answerKeys.length && (
@@ -313,7 +315,6 @@ export default function Resource() {
               <DialogDescription>Available on this page. Shortcuts rest while typing.</DialogDescription>
             </DialogHeader>
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
-              <dt className="tnum font-bold">O</dt><dd>Open the file in its original location</dd>
               <dt className="tnum font-bold">S</dt><dd>Save to my list</dd>
               <dt className="tnum font-bold">F</dt><dd>Toggle focus mode</dd>
               <dt className="tnum font-bold">?</dt><dd>Open this help</dd>
@@ -434,14 +435,28 @@ export default function Resource() {
   );
 }
 
-function PreviewPanel({ id, kind, title, onOpen }) {
+const ANN_COLOURS = [
+  { id: 'yellow', css: 'rgba(253,230,138,0.55)', solid: '#FDE68A', label: 'Yellow' },
+  { id: 'pink', css: 'rgba(249,168,212,0.5)', solid: '#F9A8D4', label: 'Pink' },
+  { id: 'blue', css: 'rgba(147,197,253,0.5)', solid: '#93C5FD', label: 'Blue' },
+  { id: 'green', css: 'rgba(110,231,183,0.5)', solid: '#6EE7B7', label: 'Green' },
+];
+
+function PreviewPanel({ id, kind, title }) {
   const { ensure } = useTerms();
+  const toast = useToast();
   const [src, setSrc] = useState(null);
   const [err, setErr] = useState(null);
   const [loaded, setLoaded] = useState(false);
   const [needsTerms, setNeedsTerms] = useState(false);
-  const [blockedUrl, setBlockedUrl] = useState(null);
+  const [annotating, setAnnotating] = useState(false);
+  const [anns, setAnns] = useState(() => repo.annotations.get(id));
+  const [colour, setColour] = useState(ANN_COLOURS[0]);
+  const [draft, setDraft] = useState(null); // { x, y, w, h } fractions, or null
+  const [draftText, setDraftText] = useState('');
+  const [flash, setFlash] = useState(null);
   const wrapRef = useRef(null);
+  const dragRef = useRef(null);
 
   const load = useCallback(async () => {
     setErr(null);
@@ -467,15 +482,12 @@ function PreviewPanel({ id, kind, title, onOpen }) {
   useEffect(() => {
     setSrc(null);
     setLoaded(false);
-    setBlockedUrl(null);
+    setAnnotating(false);
+    setDraft(null);
+    setAnns(repo.annotations.get(id));
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
-
-  const openOriginal = async () => {
-    const res = await onOpen();
-    if (res?.blocked) setBlockedUrl(res.url);
-  };
 
   const fullscreen = () => {
     const el = wrapRef.current;
@@ -483,6 +495,65 @@ function PreviewPanel({ id, kind, title, onOpen }) {
     if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
     else el.requestFullscreen?.().catch(() => {});
   };
+
+  const frac = (clientX, clientY) => {
+    const r = wrapRef.current?.getBoundingClientRect();
+    if (!r) return { x: 0, y: 0 };
+    return {
+      x: Math.min(0.98, Math.max(0, (clientX - r.left) / r.width)),
+      y: Math.min(0.98, Math.max(0, (clientY - r.top) / r.height)),
+    };
+  };
+  const onDown = (e) => {
+    if (!annotating) return;
+    const p = frac(e.clientX, e.clientY);
+    dragRef.current = { ...p, moved: false };
+  };
+  const onMove = (e) => {
+    const d = dragRef.current;
+    if (!annotating || !d) return;
+    const p = frac(e.clientX, e.clientY);
+    if (Math.abs(p.x - d.x) > 0.008 || Math.abs(p.y - d.y) > 0.008) d.moved = true;
+    d.px = p.x;
+    d.py = p.y;
+  };
+  const onUp = (e) => {
+    const d = dragRef.current;
+    dragRef.current = null;
+    if (!annotating || !d) return;
+    const p = frac(e.clientX, e.clientY);
+    if (d.moved) {
+      const x = Math.min(d.x, p.x);
+      const y = Math.min(d.y, p.y);
+      const w = Math.max(0.02, Math.abs(p.x - d.x));
+      const h = Math.max(0.015, Math.abs(p.y - d.y));
+      setDraft({ x, y, w, h });
+    } else {
+      setDraft({ x: Math.max(0, p.x - 0.012), y: Math.max(0, p.y - 0.02), w: 0.024, h: 0.04, pin: true });
+    }
+    setDraftText('');
+  };
+  const saveDraft = () => {
+    if (!draft) return;
+    setAnns(repo.annotations.add(id, {
+      kind: draft.pin ? 'pin' : 'highlight',
+      x: draft.x, y: draft.y, w: draft.w, h: draft.h,
+      color: colour.id, text: draftText.trim().slice(0, 500),
+    }));
+    setDraft(null);
+    setDraftText('');
+    toast('Annotation saved');
+  };
+  const removeAnn = (annId) => {
+    setAnns(repo.annotations.remove(id, annId));
+    toast('Annotation removed');
+  };
+  const jumpAnn = (a) => {
+    setFlash(a.id);
+    setTimeout(() => setFlash(null), 1400);
+    wrapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+  const colourCss = (c) => (ANN_COLOURS.find((x) => x.id === c) || ANN_COLOURS[0]).css;
 
   return (
     <div id="viewer" className="mb-7 scroll-mt-24 overflow-hidden rounded-2xl border shadow-md" style={{ background: 'var(--panel)', borderColor: 'var(--line2)' }}>
@@ -492,19 +563,19 @@ function PreviewPanel({ id, kind, title, onOpen }) {
         </h2>
         <span className="max-w-[40ch] truncate text-xs" style={{ color: 'var(--faint)' }}>{title}</span>
         <span className="ml-auto flex flex-wrap gap-2">
+          <AnimatedTooltip tip="Highlight and pin notes onto the page">
+            <Button size="sm" variant={annotating ? 'default' : 'secondary'} onClick={() => { setAnnotating((a) => !a); setDraft(null); }} aria-pressed={String(annotating)}>
+              {annotating ? 'Done annotating' : '✎ Annotate'}
+            </Button>
+          </AnimatedTooltip>
           <AnimatedTooltip tip="Fill the screen">
             <Button size="sm" variant="secondary" onClick={fullscreen}>
               ⛶ Fullscreen
             </Button>
           </AnimatedTooltip>
-          <AnimatedTooltip tip="Open the original file" shortcut="O">
-            <Button size="sm" variant="secondary" onClick={openOriginal}>
-              Open original ↗
-            </Button>
-          </AnimatedTooltip>
         </span>
       </div>
-      <div ref={wrapRef} className="relative" style={{ height: 'min(80vh, 720px)', background: 'var(--ok-paper, #FBFAF6)' }}>
+      <div ref={wrapRef} className="relative" style={{ height: 'min(80vh, 720px)', background: 'var(--ok-paper, #FBFAF6)', touchAction: annotating ? 'none' : undefined }}>
         {!loaded && !err && !needsTerms && (
           <div className="absolute inset-0" aria-label="Loading document">
             <div className="mx-auto mt-10 h-6 w-2/3 animate-pulse rounded" style={{ background: 'var(--line)' }} />
@@ -534,15 +605,15 @@ function PreviewPanel({ id, kind, title, onOpen }) {
           <div className="grid h-full place-items-center p-6 text-center">
             <div>
               <p className="text-sm font-bold">Preview didn&apos;t load</p>
-              <p className="mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
-                {err} — the file still opens fine in its original location.
+              <p className="mt-1 max-w-[52ch] text-[13px]" style={{ color: 'var(--mut)' }}>
+                {err} — this file refuses embedding. Try your saved note and related resources below, or report it so we can fix the listing.
               </p>
               <p className="mt-3 flex justify-center gap-2">
                 <Button size="sm" variant="secondary" onClick={load}>
                   Retry
                 </Button>
-                <Button size="sm" variant="default" onClick={openOriginal}>
-                  Open original ↗
+                <Button size="sm" variant="secondary" onClick={() => document.getElementById('report-anchor')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}>
+                  Report this file
                 </Button>
               </p>
             </div>
@@ -559,19 +630,118 @@ function PreviewPanel({ id, kind, title, onOpen }) {
             />
           )
         )}
+        {/* Saved annotations render above the frame; the annotate overlay captures gestures. */}
+        {loaded && !err && anns.map((a, k) => (
+          <span
+            key={a.id}
+            aria-hidden="true"
+            className={flash === a.id ? 'ann-flash' : undefined}
+            style={{
+              position: 'absolute',
+              left: `${a.x * 100}%`, top: `${a.y * 100}%`,
+              width: a.kind === 'pin' ? 22 : `${a.w * 100}%`,
+              height: a.kind === 'pin' ? 22 : `${a.h * 100}%`,
+              background: a.kind === 'pin' ? (ANN_COLOURS.find((x) => x.id === a.color) || ANN_COLOURS[0]).solid : colourCss(a.color),
+              borderRadius: a.kind === 'pin' ? '50%' : 3,
+              border: a.kind === 'pin' ? '2px solid var(--panel)' : '1px solid rgba(15,23,42,0.18)',
+              boxShadow: '0 1px 4px rgba(15,23,42,0.25)',
+              color: '#0F172A', fontSize: 11, fontWeight: 800,
+              display: 'grid', placeItems: 'center',
+              pointerEvents: 'none',
+              transform: a.kind === 'pin' ? 'translate(-50%,-50%)' : undefined,
+            }}
+          >
+            {a.kind === 'pin' ? k + 1 : ''}
+          </span>
+        ))}
+        {loaded && !err && draft && (
+          <span
+            aria-hidden="true"
+            style={{
+              position: 'absolute',
+              left: `${draft.x * 100}%`, top: `${draft.y * 100}%`,
+              width: draft.pin ? 22 : `${draft.w * 100}%`,
+              height: draft.pin ? 22 : `${draft.h * 100}%`,
+              background: colour.css, borderRadius: draft.pin ? '50%' : 3,
+              border: '2px dashed var(--primary)', pointerEvents: 'none',
+              transform: draft.pin ? 'translate(-50%,-50%)' : undefined,
+            }}
+          />
+        )}
+        {annotating && loaded && !err && (
+          <div
+            className="absolute inset-0"
+            style={{ cursor: 'crosshair', touchAction: 'none' }}
+            onMouseDown={onDown}
+            onMouseMove={onMove}
+            onMouseUp={onUp}
+            onTouchStart={(e) => onDown(e.touches[0])}
+            onTouchMove={(e) => onMove(e.touches[0])}
+            onTouchEnd={(e) => onUp(e.changedTouches[0])}
+            aria-label="Annotation layer — drag to highlight, tap to pin a note"
+          />
+        )}
       </div>
-      {blockedUrl ? (
-        <p className="border-t px-4 py-2.5 text-[13px]" style={{ borderColor: 'var(--line)', background: 'var(--warn-bg)' }}>
-          <strong>Popup blocked — your file is ready:</strong>{' '}
-          <a href={blockedUrl} target="_blank" rel="noopener" className="font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>
-            Click to open the file
-          </a>
-        </p>
-      ) : (
-        <p className="border-t px-4 py-2 text-xs" style={{ borderColor: 'var(--line)', color: 'var(--faint)' }}>
-          Reading here keeps your place and notes together. Some files block embedding — use Open original instead. Press ? for shortcuts.
-        </p>
+      {annotating && (
+        <div className="border-t px-4 py-2.5" style={{ borderColor: 'var(--line)', background: 'var(--acc-soft)' }}>
+          <p className="text-[13px] font-semibold">Annotate mode: drag across text to highlight, or tap to drop a numbered pin.</p>
+          <p className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            {ANN_COLOURS.map((c) => (
+              <button
+                key={c.id}
+                onClick={() => setColour(c)}
+                aria-label={`${c.label} highlighter`}
+                aria-pressed={String(colour.id === c.id)}
+                className="h-9 w-9 rounded-full border-2"
+                style={{ background: c.solid, borderColor: colour.id === c.id ? 'var(--primary)' : 'transparent' }}
+              />
+            ))}
+            <span className="ml-1 text-xs" style={{ color: 'var(--mut)' }}>{draft ? 'Now add an optional note, then Save.' : 'Pick a colour, then mark the page.'}</span>
+          </p>
+          {draft && (
+            <p className="mt-2 flex flex-wrap items-center gap-2">
+              <input
+                value={draftText}
+                onChange={(e) => setDraftText(e.target.value.slice(0, 500))}
+                onKeyDown={(e) => e.key === 'Enter' && saveDraft()}
+                placeholder={draft.pin ? 'Pin note (optional)…' : 'Why did you mark this? (optional)…'}
+                aria-label="Annotation note"
+                className="min-h-[42px] min-w-[200px] flex-1 rounded-[10px] border px-3 py-2 text-sm"
+                style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
+              />
+              <Button size="sm" variant="default" onClick={saveDraft}>Save mark</Button>
+              <Button size="sm" variant="secondary" onClick={() => setDraft(null)}>Cancel</Button>
+            </p>
+          )}
+        </div>
       )}
+      {!!anns.length && (
+        <div className="border-t px-4 py-2.5" style={{ borderColor: 'var(--line)' }}>
+          <p className="text-xs font-extrabold uppercase tracking-widest" style={{ color: 'var(--faint)' }}>
+            {anns.length} mark{anns.length === 1 ? '' : 's'} on this file
+          </p>
+          <ul className="mt-1.5 flex flex-col gap-1.5">
+            {anns.map((a, k) => (
+              <li key={a.id} className="flex items-center gap-2.5 text-sm">
+                <span aria-hidden="true" className="h-4 w-4 flex-none rounded-full border" style={{ background: (ANN_COLOURS.find((x) => x.id === a.color) || ANN_COLOURS[0]).solid, borderColor: 'var(--line2)' }} />
+                <span className="min-w-0 flex-1 truncate">
+                  <strong>{a.kind === 'pin' ? `Pin ${k + 1}` : 'Highlight'}</strong>
+                  {a.text ? <span style={{ color: 'var(--mut)' }}> — {a.text}</span> : <span style={{ color: 'var(--faint)' }}> — no note</span>}
+                </span>
+                <button onClick={() => jumpAnn(a)} className="min-h-[36px] rounded-lg px-2 text-[13px] font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>
+                  Show
+                </button>
+                <button onClick={() => removeAnn(a.id)} aria-label="Delete this mark" className="grid h-9 w-9 place-items-center rounded-lg text-sm" style={{ color: 'var(--mut)' }}>
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <p className="border-t px-4 py-2 text-xs" style={{ borderColor: 'var(--line)', color: 'var(--faint)' }}>
+        Marks sit on top of the page and stay in this browser — they aren&apos;t written into the file and won&apos;t follow downloads. Press ? for shortcuts.
+      </p>
     </div>
   );
 }

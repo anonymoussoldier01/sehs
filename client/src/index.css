@@ -539,6 +539,20 @@ kbd.kbd {
   }
 }
 
+.ann-flash {
+  animation: ann-flash 1.4s var(--ease-standard);
+}
+@keyframes ann-flash {
+  0%, 100% {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+  25%, 65% {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+  }
+}
+
 /* Print styles for study guides and results review. */@media print {
   nav, aside, footer, .no-print {
     display: none !important;

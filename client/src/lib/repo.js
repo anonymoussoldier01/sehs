@@ -50,6 +50,28 @@ export const repo = {
       write('sehs-notes', all);
     },
   },
+  // Annotations: highlight boxes + margin pins placed over the document frame.
+  // Positions are fractions (0-1) of the viewer box, so they survive resize.
+  // They live alongside the document — they are NOT embedded in the file and
+  // do not travel with downloads or inside-frame zoom.
+  // { [resourceId]: [{ id, kind: 'highlight'|'pin', x, y, w, h, color, text, at }] }
+  annotations: {
+    get: (id) => read('sehs-annotations', {})[id] || [],
+    add: (id, ann) => {
+      const all = read('sehs-annotations', {});
+      const list = [...(all[id] || []), { ...ann, id: `${Date.now().toString(36)}-${Math.floor(Math.random() * 1e4)}`, at: new Date().toISOString() }].slice(-120);
+      all[id] = list;
+      write('sehs-annotations', all);
+      return list;
+    },
+    remove: (id, annId) => {
+      const all = read('sehs-annotations', {});
+      all[id] = (all[id] || []).filter((a) => a.id !== annId);
+      if (!all[id].length) delete all[id];
+      write('sehs-annotations', all);
+      return all[id] || [];
+    },
+  },
   // Attempts: { [mockId]: { score, total, at, seed } }
   attempts: {
     get: () => read(keys.mocks, {}),
@@ -81,6 +103,7 @@ export function exportData() {
     saved: repo.bookmarks.get(),
     progress: repo.readingProgress.get(),
     notes: repo.notes.getAll(),
+    annotations: read('sehs-annotations', {}),
     attempts: repo.attempts.get(),
     review: repo.reviewQueue.get(),
     mistakes: read(keys.mistakes, []),
@@ -91,7 +114,7 @@ export function exportData() {
 
 /** Delete all local learner data (irreversible — callers must confirm first). */
 export function deleteAllData() {
-  for (const k of ['sehs-progress', 'sehs-notes', 'sehs-review', keys.saved, keys.mocks, keys.mistakes, keys.lists, keys.decks, keys.leitner, keys.recent, keys.insights, keys.profile, keys.streak])
+  for (const k of ['sehs-progress', 'sehs-notes', 'sehs-annotations', 'sehs-review', keys.saved, keys.mocks, keys.mistakes, keys.lists, keys.decks, keys.leitner, keys.recent, keys.insights, keys.profile, keys.streak])
     try {
       localStorage.removeItem(k);
     } catch {

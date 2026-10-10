@@ -35,7 +35,7 @@ const distOn = () => {
 };
 // React SPA routes (served from client/dist when built, legacy MPA otherwise).
 // /admin*, /open/*, /feed.xml and /api/* always stay on the server.
-const SPA_RE = /^\/(search|subjects|providers|about|saved|request|study|exam-guide|mocks|writing|reading|drills|unlock|list|design|r)(\/|$)/;
+const SPA_RE = /^\/(search|subjects|providers|about|terms|privacy|saved|request|study|exam-guide|mocks|writing|reading|drills|unlock|list|design|r)(\/|$)/;
 function distFile(p) {
   try {
     const f = path.join(DIST, decodeURIComponent(p));

@@ -18,6 +18,8 @@ import Saved from './pages/Saved';
 import SharedList from './pages/SharedList';
 import Subjects from './pages/Subjects';
 import About from './pages/About';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import Request from './pages/Request';
 import Unlock from './pages/Unlock';
 import Guide from './pages/Guide';
@@ -44,6 +46,8 @@ const router = createBrowserRouter([
       { path: 'subjects', element: <Subjects subject /> },
       { path: 'providers', element: <Subjects /> },
       { path: 'about', element: <About /> },
+      { path: 'terms', element: <Terms /> },
+      { path: 'privacy', element: <Privacy /> },
       { path: 'request', element: <Request /> },
       { path: 'unlock', element: <Unlock /> },
       { path: 'exam-guide', element: <Guide /> },

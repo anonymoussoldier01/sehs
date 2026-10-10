@@ -3,7 +3,7 @@ import { Star } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { useOpener, useToast } from '../providers';
+import { useToast } from '../providers';
 import { pretty } from '../lib/api';
 import { keys, useSyncedLocal } from '../lib/store';
 import { LinkPreview } from './ace';
@@ -48,7 +48,6 @@ export function highlight(text, tokens) {
 }
 
 export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
-  const open = useOpener();
   const navigate = useNavigate();
   const { saved, toggle } = useSaved();
   const displayTitle = title || v.displayTitle || v.title;
@@ -105,22 +104,8 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
               <TooltipContent>{saved.has(v.id) ? 'Saved' : 'Save'}</TooltipContent>
             </Tooltip>
             <Button size="sm" variant="secondary" onClick={() => navigate('/r/' + v.id)}>
-              Details
+              {readable ? 'Read' : 'Details'}
             </Button>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => open(v.id)}
-                  aria-label="Open original in a new tab"
-                  className="h-9 w-9 p-0"
-                >
-                  <span aria-hidden="true">↗</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Open original</TooltipContent>
-            </Tooltip>
           </span>
         </div>
         <Button variant="default" size="sm" onClick={() => navigate('/r/' + v.id)} className="w-full">

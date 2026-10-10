@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, ScrollRestoration } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Palette, Sidebar, Topbar, useFolders } from './components/shell';
 import { StickyBanner } from './components/ace';
 import { Dock } from './components/magic';
@@ -88,10 +89,106 @@ function Announcement() {
   );
 }
 
+// First-visit gate: the full Terms & Conditions on first site open.
+// Accepting records the version locally; declining dismisses (browsing stays
+// open, but study features re-ask per tab). Shown once per terms version.
+function FirstVisitTerms() {
+  const [terms, setTerms] = useState(null);
+  const [agreed, setAgreed] = useState(false);
+  useEffect(() => {
+    let live = true;
+    api
+      .terms()
+      .then((t) => {
+        if (!live || !t?.version) return;
+        let accepted = 0;
+        try {
+          accepted = Number(localStorage.getItem('sehs-terms-accepted') || 0);
+        } catch {
+          /* noop */
+        }
+        if (accepted < t.version) setTerms(t);
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, []);
+  if (!terms) return null;
+  const decide = (val) => {
+    if (val) {
+      try {
+        localStorage.setItem('sehs-terms-accepted', String(terms.version));
+      } catch {
+        /* noop */
+      }
+    }
+    setTerms(null);
+    setAgreed(false);
+  };
+  const paras = String(terms.body || '').split(/\n{2,}/);
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-[80] grid place-items-center overflow-auto bg-black/60 p-4 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Terms and Conditions — please read"
+    >
+      <motion.div
+        initial={{ scale: 0.97, y: 12 }}
+        animate={{ scale: 1, y: 0 }}
+        className="my-auto w-full max-w-2xl rounded-2xl border p-6 shadow-2xl"
+        style={{ background: 'var(--panel)', borderColor: 'var(--line2)' }}
+      >
+        <p className="text-xs font-extrabold uppercase tracking-[0.18em]" style={{ color: 'var(--acc)' }}>
+          Before you start studying
+        </p>
+        <h2 className="mt-1 font-display text-2xl font-bold">Terms &amp; Conditions <span className="text-sm font-normal" style={{ color: 'var(--faint)' }}>v{terms.version}</span></h2>
+        <p className="mt-1 text-sm font-semibold" style={{ color: 'var(--mut)' }}>{terms.summary}</p>
+        <div className="mt-3 max-h-[46vh] overflow-auto rounded-xl border p-4 text-sm" style={{ borderColor: 'var(--line)', color: 'var(--mut)' }} tabIndex={0} aria-label="Full terms and conditions">
+          {paras.map((para, i) =>
+            /^## /.test(para) ? (
+              <h3 key={i} className="mb-1 mt-4 font-display text-[15px] font-bold first:mt-0" style={{ color: 'var(--txt)' }}>
+                {para.replace(/^## /, '')}
+              </h3>
+            ) : (
+              <p key={i} className="mb-2 whitespace-pre-wrap">{para.replace(/^# /, '')}</p>
+            )
+          )}
+        </div>
+        <label className="mt-3 flex min-h-[44px] cursor-pointer items-center gap-2 text-sm">
+          <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="h-5 w-5 accent-[var(--primary)]" />
+          I have read these Terms &amp; Conditions{terms.body && terms.body.includes('under 18') ? ' (and, if I’m under 18, my parent or guardian has read them too)' : ''}
+        </label>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            className="min-h-[44px] rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-bold text-[var(--primary-foreground)] hover:brightness-110 disabled:opacity-50"
+            disabled={!agreed}
+            onClick={() => decide(true)}
+          >
+            Accept &amp; start studying
+          </button>
+          <button
+            className="min-h-[44px] rounded-xl border px-5 py-2.5 text-sm font-bold"
+            style={{ borderColor: 'var(--line2)' }}
+            onClick={() => decide(false)}
+          >
+            Not now
+          </button>
+          <span className="ml-auto self-center text-xs" style={{ color: 'var(--faint)' }}>
+            <Link to="/terms" className="underline underline-offset-2" style={{ color: 'var(--acc)' }} onClick={() => setTerms(null)}>Read later</Link>
+          </span>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function Layout() {
   const [sideOpen, setSideOpen] = useState(false);
-  const folders = useFolders();
-  useEffect(() => {
+  const folders = useFolders();  useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') setSideOpen(false);
     };
@@ -126,6 +223,8 @@ function Layout() {
           <div className="flex flex-wrap items-center gap-0.5">
             {[
               ['/about', 'About'],
+              ['/terms', 'Terms'],
+              ['/privacy', 'Privacy'],
               ['/saved', 'Library'],
               ['/study', 'Study hub'],
               ['/request', 'Request'],
@@ -141,6 +240,7 @@ function Layout() {
       <Palette />
       <Dock />
       <CookieBar />
+      <FirstVisitTerms />
       <ScrollRestoration />
     </div>
   );
