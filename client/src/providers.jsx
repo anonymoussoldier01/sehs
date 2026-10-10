@@ -1,18 +1,18 @@
 ﻿import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { Toast } from '@heroui/react/toast';
 import { api } from './lib/api';
 import { keys } from './lib/store';
 
-// ---------- theme ----------
-const ThemeCtx = createContext({ dark: true, toggle: () => {} });
+// ---------- theme (HeroUI default theme; .dark class drives dark mode) ----------
+const ThemeCtx = createContext({ dark: false, toggle: () => {} });
 export const useTheme = () => useContext(ThemeCtx);
 
 export function ThemeProvider({ children }) {
   const [dark, setDark] = useState(() => {
     try {
-      return localStorage.getItem(keys.theme) !== 'light';
+      return localStorage.getItem(keys.theme) === 'dark';
     } catch {
-      return true;
+      return false;
     }
   });
   useEffect(() => {
@@ -42,35 +42,18 @@ export function ThemeProvider({ children }) {
   return <ThemeCtx.Provider value={{ dark, toggle }}>{children}</ThemeCtx.Provider>;
 }
 
-// ---------- toast ----------
+// ---------- toast (HeroUI Toast; same useToast() signature for callers) ----------
 const ToastCtx = createContext((msg) => {});
 export const useToast = () => useContext(ToastCtx);
 
 export function ToastProvider({ children }) {
-  const [msg, setMsg] = useState(null);
-  const timer = useRef(null);
   const toast = useCallback((m) => {
-    setMsg(m);
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => setMsg(null), 2400);
+    Toast.toast(String(m ?? ''));
   }, []);
   return (
     <ToastCtx.Provider value={toast}>
       {children}
-      <AnimatePresence>
-        {msg && (
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            className="fixed bottom-6 left-1/2 z-[80] -translate-x-1/2 rounded-2xl px-5 py-3 text-sm font-semibold shadow-2xl"
-            style={{ background: 'var(--toast-bg, #f2f2fb)', color: 'var(--toast-fg, #14132e)' }}
-            role="status"
-          >
-            {msg}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      <Toast.Provider />
     </ToastCtx.Provider>
   );
 }

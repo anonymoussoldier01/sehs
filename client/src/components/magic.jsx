@@ -218,12 +218,111 @@ export function Meteors({ count = 5 }) {
   );
 }
 
-// ---------- DeckCard ----------
+// ---------- AnimatedList (items slide in one after another) ----------
+export function AnimatedList({ items, className, renderItem, step = 0.09 }) {
+  return (
+    <div className={className}>
+      {(items || []).map((item, i) => (
+        <motion.div
+          key={item.key || i}
+          initial={{ opacity: 0, y: 18, filter: 'blur(6px)' }}
+          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          viewport={{ once: true, margin: '-30px' }}
+          transition={{ duration: 0.45, delay: Math.min(i, 8) * step, ease: [0.2, 0.7, 0.25, 1] }}
+        >
+          {renderItem ? renderItem(item, i) : item}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+// ---------- SparklesText (twinkling stars around text) ----------
+export function SparklesText({ children, className, count = 6 }) {
+  const [seeds, setSeeds] = useState([]);
+  useEffect(() => {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    setSeeds(Array.from({ length: count }, () => ({ left: Math.random() * 100, delay: Math.random() * 2.4, size: 8 + Math.random() * 8 })));
+  }, [count]);
+  return (
+    <span className={cn('relative inline-block', className)}>
+      {children}
+      {seeds.map((s, i) => (
+        <span
+          key={i}
+          aria-hidden="true"
+          className="sparkle-star"
+          style={{ left: `${s.left}%`, animationDelay: `${s.delay}s`, fontSize: s.size }}
+        >
+          ✦
+        </span>
+      ))}
+    </span>
+  );
+}
+
+// ---------- TypingAnimation (stream-in text, click to complete) ----------
+export function TypingText({ text, speed = 14, className }) {
+  const [n, setN] = useState(0);
+  const full = String(text || '');
+  useEffect(() => {
+    setN(0);
+    if (!full) return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      setN(full.length);
+      return;
+    }
+    const t = setInterval(() => {
+      setN((v) => {
+        if (v >= full.length) {
+          clearInterval(t);
+          return v;
+        }
+        return v + 1;
+      });
+    }, speed);
+    return () => clearInterval(t);
+  }, [full, speed]);
+  return (
+    <span className={className} onClick={() => setN(full.length)} title="Click to show all">
+      {full.slice(0, n)}
+      {n < full.length && <span className="typing-caret" aria-hidden="true" />}
+    </span>
+  );
+}
+
+// ---------- Dock (mobile shortcut bar) ----------
+export function Dock() {
+  return (
+    <nav
+      aria-label="Quick sections"
+      className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-4 gap-1 rounded-2xl border p-1.5 shadow-2xl backdrop-blur-xl lg:hidden"
+      style={{ background: 'color-mix(in srgb, var(--panel) 92%, transparent)', borderColor: 'var(--line2)', paddingBottom: 'max(6px, env(safe-area-inset-bottom))' }}
+    >
+      {[
+        ['/', '⌂', 'Home'],
+        ['/search', '⚲', 'Search'],
+        ['/study', '✎', 'Study'],
+        ['/mocks', '◷', 'Mocks'],
+      ].map(([to, ico, label]) => (
+        <Link
+          key={to}
+          to={to}
+          className="flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-bold transition-colors"
+          style={{ color: 'var(--mut)' }}
+        >
+          <span className="text-lg leading-none">{ico}</span>
+          {label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
 export function DeckCard({ to, icon, title, sub, badge }) {
   return (
     <Link
       to={to}
-      className="group flex min-h-[190px] flex-col gap-2 rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg"
+      className="glare group flex min-h-[190px] flex-col gap-2 rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg"
       style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}
     >
       <span className="flex items-start justify-between gap-2">

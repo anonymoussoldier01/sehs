@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '@heroui/react/button';
+import { Input } from '@heroui/react/input';
+import { TextArea } from '@heroui/react/textarea';
 import { api } from '../lib/api';
 import { useToast } from '../providers';
 
@@ -37,12 +40,12 @@ export default function Request() {
         Tip: <Link to="/search" className="font-bold underline" style={{ color: 'var(--acc)' }}>search the collection first</Link> — your resource may already be here under a different title.
       </p>
       <form onSubmit={send} className="mt-3 grid gap-2.5">
-        <input value={title} onChange={(e) => setTitle(e.target.value)} required minLength={4} maxLength={200} placeholder="What are you looking for? (e.g. 2023 ACER verbal reasoning)" className={cls} style={st} />
-        <textarea value={detail} onChange={(e) => setDetail(e.target.value)} rows={4} maxLength={1000} placeholder="Extra detail (optional)" className={cls} style={st} />
+        <Input value={title} onChange={(e) => setTitle(e.target.value)} required minLength={4} maxLength={200} placeholder="What are you looking for? (e.g. 2023 ACER verbal reasoning)" aria-label="Request title" />
+        <TextArea value={detail} onChange={(e) => setDetail(e.target.value)} rows={4} maxLength={1000} placeholder="Extra detail (optional)" aria-label="Extra detail" />
         <div>
-          <button type="submit" className="inline-flex min-h-[42px] items-center rounded-[11px] bg-[#2f49e5] px-[18px] py-2.5 text-sm font-bold text-white">
+          <Button type="submit" variant="primary">
             Send request
-          </button>{' '}
+          </Button>{' '}
           <span className="text-[13px]">{msg}</span>
         </div>
       </form>

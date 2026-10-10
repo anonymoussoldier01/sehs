@@ -1,427 +1,607 @@
 {
- "deck": "sehs-grammar-skill",
- "title": "Grammar & Sentences",
- "description": "Spelling, punctuation, sentence variety.",
- "cards": [
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Their / There / They're in: ___ going to win.",
-   "back": "They're \u2014 contraction of they are.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Its / It's: ___ raining.",
-   "back": "It's \u2014 it is.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Affect / Effect (verb)?",
-   "back": "Affect \u2014 to influence.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Comma splice? Fix: 'I ran, I fell.'",
-   "back": "'I ran. I fell.' or ';' \u2014 two sentences.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Which sentence varies length best?",
-   "back": "Mix of short punch + long flow. \u2014 short for impact.",
-   "tag": "grammar"
-  },
-  {
-   "front": "Spelling: neccessary?",
-   "back": "necessary (1 c, 2 s) \u2014 remember: 1 collar, 2 sleeves.",
-   "tag": "grammar"
-  }
- ]
+  "deck": "sehs-grammar-skill",
+  "title": "Grammar & Sentences",
+  "description": "Spelling, punctuation, sentence variety.",
+  "cards": [
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Their / There / They're in: ___ going to win.",
+      "back": "They're — contraction of they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Its / It's: ___ raining.",
+      "back": "It's — it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Affect / Effect (verb)?",
+      "back": "Affect — to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Comma splice? Fix: 'I ran, I fell.'",
+      "back": "'I ran. I fell.' or ';' — two sentences.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Which sentence varies length best?",
+      "back": "Mix of short punch + long flow. — short for impact.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Spelling: neccessary?",
+      "back": "necessary (1 c, 2 s) — remember: 1 collar, 2 sleeves.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: ___ dog was barking. (Its / It's)",
+      "back": "Its — possessive, no apostrophe.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: ___ raining again. (Its / It's)",
+      "back": "It's — contraction of it is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: The books are ___ . (there / theirs)",
+      "back": "theirs — possessive pronoun, no apostrophe.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: Put it over ___. (there / their / they're)",
+      "back": "there — place.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: ___ team won. (There / Their / They're)",
+      "back": "Their — belonging to them.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: ___ leaving now. (There / Their / They're)",
+      "back": "They're — they are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: ___ your sister? (Who's / Whose)",
+      "back": "Who's — who is.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: ___ bag is this? (Who's / Whose)",
+      "back": "Whose — belonging to whom.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: I ___ my keys. (lose / loose)",
+      "back": "lose — opposite of win.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: The knot is ___. (lose / loose)",
+      "back": "loose — not tight.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: ___ too late. (Its / It's)",
+      "back": "It's — it is too late.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose the correct sentence: (a) Lets eat. (b) Let's eat.",
+      "back": "b — let's = let us.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Where does the apostrophe go: the dogs bone?",
+      "back": "the dog's bone — one dog owns the bone.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Where does the apostrophe go: the girls bags (many girls)?",
+      "back": "the girls' bags — plural owners.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Fix: Sarahs pencil is missing.",
+      "back": "Sarah's pencil is missing.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Fix: The childrens playground is closed.",
+      "back": "The children's playground — irregular plural.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Fix: she went to melbourne on tuesday.",
+      "back": "She went to Melbourne on Tuesday.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Fix: the murray river flows south.",
+      "back": "The Murray River flows south.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: ___ going to the game? (Your / You're)",
+      "back": "You're — you are.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: Is that ___ pen? (your / you're)",
+      "back": "your — belonging to you.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: The decision will ___ us all. (affect / effect)",
+      "back": "affect — verb, to influence.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: The ___ was immediate. (affect / effect)",
+      "back": "effect — noun, the result.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: ___ going to the shops later? (Can I have / May I have)",
+      "back": "May I have — asking permission.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Fix: Me and Jack went fishing.",
+      "back": "Jack and I went fishing.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Fix: Her gave me the book.",
+      "back": "She gave me the book.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: The team ___ won. (was / were)",
+      "back": "was — team is singular here.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: Neither answer ___ correct. (was / were)",
+      "back": "was — neither is singular.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: Each student ___ a laptop. (has / have)",
+      "back": "has — each is singular.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Fix: I done my homework.",
+      "back": "I did / have done my homework.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Fix: She don't like apples.",
+      "back": "She doesn't like apples.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: ___ many people came. (A lot of / Alot of)",
+      "back": "A lot of — two words.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: ___ separate the egg whites. (First / At first)",
+      "back": "First — sequencing an instruction.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Fix: Its a beautiful day isn't it.",
+      "back": "It's a beautiful day, isn't it?",
+      "tag": "grammar"
+    },
+    {
+      "front": "Fix: the teacher said sit down please",
+      "back": "The teacher said, \"Sit down, please.\"",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: He ran ___. (quick / quickly)",
+      "back": "quickly — adverb describes ran.",
+      "tag": "grammar"
+    },
+    {
+      "front": "Choose: She is a ___ runner. (quick / quickly)",
+      "back": "quick — adjective describes runner.",
+      "tag": "grammar"
+    }
+  ]
 }

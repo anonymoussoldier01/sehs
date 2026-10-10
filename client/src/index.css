@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@heroui/styles";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -8,47 +9,33 @@
   --ease-out: cubic-bezier(0.2, 0.7, 0.25, 1);
 }
 
+/* App chrome follows the HeroUI default theme via its tokens, so the whole
+   site (custom shell + HeroUI components) shares one personality in both
+   light and dark mode. */
 :root {
-  --bg: #faf7f1;
-  --bg2: #f1ebe0;
-  --panel: #fffdf8;
-  --card: #fffdf8;
-  --line: #e7ddcc;
-  --line2: #d6c9b2;
-  --txt: #211d16;
-  --mut: #6d6455;
-  --faint: #8d8471;
-  --acc: #2f49e5;
-  --acc-soft: #e5e9fd;
-  --acc-line: #b9c2f8;
-  --ok: #166534;
-  --ok-bg: #ddf2e3;
-  --bad: #b42318;
-  --bad-bg: #fbe7e3;
-  --toast-bg: #211d16;
-  --toast-fg: #fdfaf3;
+  --bg: var(--background);
+  --bg2: var(--default);
+  --panel: color-mix(in srgb, var(--foreground) 3%, var(--background));
+  --card: color-mix(in srgb, var(--foreground) 4%, var(--background));
+  --line: var(--border, color-mix(in srgb, var(--foreground) 12%, transparent));
+  --line2: color-mix(in srgb, var(--foreground) 22%, transparent);
+  --txt: var(--foreground);
+  --mut: var(--muted);
+  --faint: color-mix(in srgb, var(--muted) 68%, var(--background));
+  --acc: var(--accent);
+  --acc-soft: color-mix(in srgb, var(--accent) 12%, var(--background));
+  --acc-line: color-mix(in srgb, var(--accent) 38%, transparent);
+  --ok: var(--success);
+  --ok-bg: color-mix(in srgb, var(--success) 13%, var(--background));
+  --bad: var(--danger);
+  --bad-bg: color-mix(in srgb, var(--danger) 12%, var(--background));
+  --mark-bg: #fde68a;
   color-scheme: light;
 }
 
 .dark {
-  --bg: #0b0b28;
-  --bg2: #17173a;
-  --panel: #1f1f46;
-  --card: #23234e;
-  --line: #2f2f5c;
-  --line2: #3f3f75;
-  --txt: #f2f2fb;
-  --mut: #b6b6dd;
-  --faint: #8585b3;
-  --acc: #5b6cff;
-  --acc-soft: #26265c;
-  --acc-line: #4a54b8;
-  --ok: #4ade80;
-  --ok-bg: #123a22;
-  --bad: #ff8a8a;
-  --bad-bg: #431414;
-  --toast-bg: #f2f2fb;
-  --toast-fg: #14132e;
+  --mark-bg: #6b5d0a;
+  --mark-fg: #fff7d6;
   color-scheme: dark;
 }
 
@@ -217,6 +204,57 @@ body {
 .btn-pulse {
   box-shadow: 0 0 0 0 rgba(91, 108, 255, 0.5);
   animation: pulse-halo 2.6s ease-out infinite;
+}
+
+/* ---------- magic: sparkles + typing caret + glare ---------- */
+.sparkle-star {
+  position: absolute;
+  top: -0.4em;
+  color: #a855f7;
+  pointer-events: none;
+  animation: sparkle-tw 2.4s ease-in-out infinite;
+}
+@keyframes sparkle-tw {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.5) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15) rotate(25deg);
+  }
+}
+.typing-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.15em;
+  background: currentColor;
+  animation: caret-blink 0.9s steps(2) infinite;
+}
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+/* glare sweep on cards */
+.glare {
+  position: relative;
+  overflow: hidden;
+}
+.glare::before {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.14) 50%, transparent 58%);
+  transform: translateX(-70%);
+  transition: transform 0.9s var(--ease-out, ease);
+  pointer-events: none;
+}
+.glare:hover::before {
+  transform: translateX(70%);
 }
 
 /* ---------- view transitions ---------- */

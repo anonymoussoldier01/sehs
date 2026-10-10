@@ -1,8 +1,10 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@heroui/react/button';
+import { Chip } from '@heroui/react/chip';
+import { Tooltip } from '@heroui/react/tooltip';
 import { useOpener, useToast } from '../providers';
 import { pretty } from '../lib/api';
 import { keys, useSyncedLocal } from '../lib/store';
-import { cn } from './cn';
 
 const TYPE_ABBR = { pdf: 'PDF', docx: 'DOC', image: 'IMG', archive: 'ZIP', webpage: 'WEB', code: 'CODE', other: 'FILE' };
 const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
@@ -45,6 +47,7 @@ export function highlight(text, tokens) {
 
 export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
   const open = useOpener();
+  const navigate = useNavigate();
   const { saved, toggle } = useSaved();
   const toast = useToast();
   const displayTitle = title || v.displayTitle || v.title;
@@ -62,7 +65,7 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
   };
 
   return (
-    <article className="flex gap-3.5 rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg" style={{ background: 'var(--card)', borderColor: 'var(--line)' }}>
+    <article className="glare flex gap-3.5 rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg" style={{ background: 'var(--card)', borderColor: 'var(--line)' }}>
       <FileIcon type={v.fileType} />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <h3 className="text-[15.5px] font-bold leading-snug">
@@ -80,50 +83,38 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
           </p>
         ) : null}
         <div className="flex flex-wrap items-center gap-1.5 text-xs">
-          <span className="rounded-md border px-2 py-[3px] text-[11px] font-bold" style={{ background: 'var(--bg2)', borderColor: 'var(--line)' }}>
+          <Chip size="sm" variant="secondary">
             {TYPE_LABEL[v.fileType] || v.fileType}
-          </span>
-          {v.answersIncluded && (
-            <span className="rounded-md px-2 py-[3px] text-[11px] font-bold" style={{ background: 'var(--ok-bg)', color: 'var(--ok)' }}>
-              ✓ Answers included
-            </span>
-          )}
+          </Chip>
+          {v.answersIncluded && <Chip size="sm" color="success">✓ Answers included</Chip>}
         </div>
         <div className="mt-auto flex items-center justify-between gap-2.5 border-t border-dashed pt-2" style={{ borderColor: 'var(--line)' }}>
           <span className="text-[11.5px] tabular-nums" style={{ color: 'var(--faint)' }}>
             {[v.year, v.sizeBytes ? fmtBytes(v.sizeBytes) : null].filter(Boolean).join(' · ')}
           </span>
           <span className="flex items-center gap-[7px]">
-            <button
-              onClick={() => toggle(v.id)}
-              aria-pressed={String(saved.has(v.id))}
-              title="Save"
-              className={cn(
-                'grid h-[38px] min-w-[38px] place-items-center rounded-[10px] border px-0 text-[13px] font-bold shadow-sm transition-all hover:-translate-y-px'
-              )}
-              style={{
-                borderColor: saved.has(v.id) ? 'var(--amber, #b45309)' : 'var(--line2)',
-                background: saved.has(v.id) ? 'var(--amber-bg, #fdf0d8)' : 'var(--panel)',
-                color: saved.has(v.id) ? 'var(--amber, #b45309)' : undefined,
-              }}
-            >
-              {saved.has(v.id) ? '★' : '☆'}
-            </button>
-            <Link
-              to={'/r/' + v.id}
-              className="grid h-[38px] place-items-center rounded-[10px] border px-3 text-[13px] font-bold shadow-sm transition-all hover:-translate-y-px"
-              style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
-            >
+            <Tooltip>
+              <Tooltip.Trigger aria-label={saved.has(v.id) ? 'Remove from saved' : 'Save this resource'}>
+                <Button
+                  size="sm"
+                  isIconOnly
+                  variant={saved.has(v.id) ? 'primary' : 'secondary'}
+                  onPress={() => toggle(v.id)}
+                  aria-pressed={String(saved.has(v.id))}
+                >
+                  {saved.has(v.id) ? '★' : '☆'}
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Content>{saved.has(v.id) ? 'Saved' : 'Save'}</Tooltip.Content>
+            </Tooltip>
+            <Button size="sm" variant="secondary" onPress={() => navigate('/r/' + v.id)}>
               Details
-            </Link>
+            </Button>
           </span>
         </div>
-        <button
-          onClick={() => open(v.id)}
-          className="mt-1 inline-flex min-h-[38px] w-full items-center justify-center gap-1.5 rounded-[10px] bg-[#2f49e5] px-3 py-2 text-[13px] font-bold text-white transition-all hover:-translate-y-px hover:bg-[#2235b8] active:scale-[.98]"
-        >
+        <Button variant="primary" size="sm" fullWidth onPress={() => open(v.id)}>
           {isPdf ? 'Open PDF →' : 'Open resource →'}
-        </button>
+        </Button>
       </div>
     </article>
   );

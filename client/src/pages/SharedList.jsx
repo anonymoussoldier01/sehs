@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { Button } from '@heroui/react/button';
 import { api, pretty } from '../lib/api';
 import { Skeleton } from '../components/magic';
 import { ResourceCard } from '../components/cards';
@@ -36,9 +37,9 @@ export default function SharedList() {
       </p>
       <h1 className="mt-1 font-display text-3xl font-bold">Shared folder{items ? ` (${items.length} resources)` : ''}</h1>
       <div className="my-3 flex gap-2">
-        <button onClick={() => window.print()} className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+        <Button size="sm" variant="secondary" onPress={() => window.print()}>
           Print pack
-        </button>
+        </Button>
       </div>
       {!items ? (
         <div className="grid gap-3.5 sm:grid-cols-2">

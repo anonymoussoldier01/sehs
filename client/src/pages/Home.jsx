@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api, pretty } from '../lib/api';
 import { keys, pushRecent } from '../lib/store';
 import { useToast } from '../providers';
-import { AuroraText, BlurFade, DeckCard, Empty, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid } from '../components/magic';
+import { Button } from '@heroui/react/button';
+import { AuroraText, BlurFade, DeckCard, Empty, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText } from '../components/magic';
 import { ResourceCard, highlight } from '../components/cards';
 
 function useApi(fn, deps) {
@@ -32,7 +33,7 @@ function Hero({ total }) {
       <div className="mhero-inner relative">
         <BlurFade>
           <ShinyBadge>
-            ✦ {Number(total || 0).toLocaleString()} resources · flashcards · mocks · free forever
+            <SparklesText count={5}>✦ Built for the selective entry test · free forever</SparklesText>
           </ShinyBadge>
         </BlurFade>
         <BlurFade delay={0.08}>
@@ -43,7 +44,7 @@ function Hero({ total }) {
         </BlurFade>
         <BlurFade delay={0.16}>
           <p className="lede" style={{ color: 'var(--mut)', fontSize: 17, maxWidth: '62ch', margin: '0 0 22px' }}>
-            Past papers, flashcards and timed mocks for selective-entry exams — plus infinite drills and an AI tutor. No account, just study.
+            Past papers, flashcards and timed ACER-style mocks for selective entry exams — maths, verbal and quantitative reasoning, reading and writing. No account, just study.
           </p>
         </BlurFade>
         <BlurFade delay={0.22}>
@@ -91,6 +92,7 @@ function Hero({ total }) {
 }
 
 function LearnPreview() {
+  const navigate = useNavigate();
   const [q, setQ] = useState(null);
   const [picked, setPicked] = useState(null);
   useEffect(() => {
@@ -146,12 +148,12 @@ function LearnPreview() {
         </>
       )}
       <p className="mt-3.5 flex flex-wrap gap-2">
-        <Link to="/study" className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+        <Button size="sm" variant="primary" onPress={() => navigate('/study')}>
           Open flashcards
-        </Link>
-        <Link to="/mocks" className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+        </Button>
+        <Button size="sm" variant="secondary" onPress={() => navigate('/mocks')}>
           Take a timed mock
-        </Link>
+        </Button>
       </p>
     </section>
   );
@@ -160,6 +162,13 @@ function LearnPreview() {
 export default function Home() {
   const toast = useToast();
   const [stats] = useApi(() => api.stats(), []);
+  const [deckCount, setDeckCount] = useState(null);
+  useEffect(() => {
+    api
+      .decks()
+      .then((j) => setDeckCount((j.decks || []).length))
+      .catch(() => {});
+  }, []);
   const [fresh] = useApi(() => api.fresh().catch(() => ({ results: [] })), []);
   const [trending] = useApi(() => api.trending().catch(() => ({ results: [] })), []);
   const [search] = useApi(() => api.search({ q: '', per: 24 }).catch(() => null), []);
@@ -201,6 +210,7 @@ export default function Home() {
 
   const practice = (search?.results || []).filter((r) => r.category === 'practice-test').slice(0, 6);
   const answers = (search?.results || []).filter((r) => r.answersIncluded).slice(0, 6);
+  const pdfs = (search?.results || []).filter((r) => r.fileType === 'pdf').slice(0, 6);
 
   return (
     <div className="mx-auto max-w-[1060px] px-4 pb-12 sm:px-6">
@@ -225,7 +235,7 @@ export default function Home() {
         {[
           ['Resources', stats?.publicResources || 0],
           ['Timed mocks', 4],
-          ['Flashcard decks', 8],
+          ['Flashcard decks', deckCount ?? 13],
           ['Writing prompts', 80],
         ].map(([l, n]) => (
           <div key={l} className="flex min-w-[118px] flex-col rounded-xl border px-4 py-2.5 shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
@@ -238,6 +248,24 @@ export default function Home() {
           </div>
         ))}
       </dl>
+
+      <BlurFade className="mt-4">
+        <Link
+          to="/exam-guide"
+          className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl border px-4 py-3 text-[13.5px] shadow-sm transition-all hover:-translate-y-px"
+          style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}
+        >
+          <strong>The selective entry test:</strong>
+          <span style={{ color: 'var(--mut)' }}>Maths + Quant 60 min</span>
+          <span style={{ color: 'var(--faint)' }}>·</span>
+          <span style={{ color: 'var(--mut)' }}>Reading + Verbal 55 min</span>
+          <span style={{ color: 'var(--faint)' }}>·</span>
+          <span style={{ color: 'var(--mut)' }}>Writing 40 min</span>
+          <span className="ml-auto font-bold" style={{ color: 'var(--acc)' }}>
+            Exam guide →
+          </span>
+        </Link>
+      </BlurFade>
 
       <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Recents</h2>
       {recents.length ? (
@@ -264,6 +292,31 @@ export default function Home() {
             <Qotd />
           </div>
         </div>
+      )}
+
+      {recents.length > 0 && (
+        <>
+          <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Your activity</h2>
+          <AnimatedList
+            className="flex flex-col gap-2"
+            items={recents.slice(0, 5).map((v) => ({ key: v.id, v }))}
+            renderItem={({ v }) => (
+              <Link
+                to={'/r/' + v.id}
+                className="flex items-center gap-3 rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-all hover:-translate-y-px"
+                style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}
+              >
+                <span className="grid h-8 w-8 flex-none place-items-center rounded-lg border text-sm" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }}>
+                  ▢
+                </span>
+                <span className="truncate font-semibold">{v.displayTitle || v.title}</span>
+                <span className="ml-auto flex-none text-xs" style={{ color: 'var(--faint)' }}>
+                  Recently opened →
+                </span>
+              </Link>
+            )}
+          />
+        </>
       )}
 
       <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Study modes</h2>
@@ -363,9 +416,16 @@ export default function Home() {
         </div>
       )}
 
-      <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Resources with answers</h2>
+      <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Resources with answers <small className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}><Link to="/search?answers=1" style={{ color: 'var(--acc)' }}>View all</Link></small></h2>
       <div className="grid gap-3.5 sm:grid-cols-2">
         {answers.map((v) => (
+          <ResourceCard key={v.id} v={v} />
+        ))}
+      </div>
+
+      <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">PDF papers <small className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}><Link to="/search?type=pdf" style={{ color: 'var(--acc)' }}>View all</Link></small></h2>
+      <div className="grid gap-3.5 sm:grid-cols-2">
+        {pdfs.map((v) => (
           <ResourceCard key={v.id} v={v} />
         ))}
       </div>
@@ -395,13 +455,9 @@ function Qotd() {
         </p>
       )}
       {!show && (
-        <button
-          onClick={() => setShow(true)}
-          className="mt-2 inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold"
-          style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
-        >
+        <Button size="sm" variant="secondary" onPress={() => setShow(true)} className="mt-2">
           Show answer
-        </button>
+        </Button>
       )}
     </div>
   );

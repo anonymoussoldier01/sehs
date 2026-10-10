@@ -37,6 +37,7 @@ export const api = {
   announcement: () => get('/api/announcement').catch(() => ({ body: null })),
   terms: () => get('/api/terms'),
   access: (id) => post('/api/access/' + encodeURIComponent(id), {}),
+  preview: (id) => post('/api/preview/' + encodeURIComponent(id), {}),
   report: (resourceId, reason, detail) => post('/api/reports', { resourceId, reason, detail }),
   request: (title, detail) => post('/api/requests', { title, detail }),
   unlock: (password) => post('/api/unlock', { password }),

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@heroui/react/button';
+import { Input } from '@heroui/react/input';
 import { api } from '../lib/api';
 
 export default function Unlock() {
@@ -44,11 +46,15 @@ export default function Unlock() {
           </span>
         </p>
         <div className="mt-2 flex gap-2">
-          <Link to="/admin" className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
-            Open dashboard →
+          <Link to="/admin">
+            <Button size="sm" variant="primary">
+              Open dashboard →
+            </Button>
           </Link>
-          <button
-            onClick={() => {
+          <Button
+            size="sm"
+            variant="secondary"
+            onPress={() => {
               try {
                 sessionStorage.removeItem('sehs-admin-token');
               } catch {
@@ -57,11 +63,9 @@ export default function Unlock() {
               window.__sehsAdmin = null;
               setUnlocked(false);
             }}
-            className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold"
-            style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
           >
             Lock this tab
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -75,21 +79,20 @@ export default function Unlock() {
       <form onSubmit={submit} className="mt-3">
         <label className="mb-2.5 block text-sm font-semibold" style={{ color: 'var(--mut)' }}>
           Admin password
-          <input
+          <Input
             value={pw}
             onChange={(e) => setPw(e.target.value)}
             type="password"
             autoComplete="current-password"
             required
             minLength={8}
-            className="mt-1.5 block w-full rounded-[10px] border px-3 py-2.5 text-[15px]"
-            style={{ borderColor: 'var(--line2)', background: 'var(--panel)', color: 'inherit' }}
+            className="mt-1.5 block w-full"
           />
         </label>
         {!!err && <p className="mb-2 text-[13px] font-semibold" style={{ color: 'var(--bad)' }}>{err}</p>}
-        <button type="submit" className="inline-flex min-h-[42px] w-full items-center justify-center rounded-[11px] bg-[#2f49e5] px-[18px] py-2.5 text-sm font-bold text-white">
+        <Button type="submit" variant="primary" fullWidth>
           Unlock admin
-        </button>
+        </Button>
       </form>
     </div>
   );

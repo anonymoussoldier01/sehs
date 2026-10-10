@@ -1,9 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@heroui/react/button';
+import { Input } from '@heroui/react/input';
+import { ListBox } from '@heroui/react/list-box';
+import { ListBoxItem } from '@heroui/react/list-box-item';
+import { Select } from '@heroui/react/select';
 import { api } from '../lib/api';
 import { keys, touchStreak, useLocal, useSyncedLocal } from '../lib/store';
 import { useToast } from '../providers';
-import { BlurFade, ShinyBadge, Skeleton, AnimatedGrid } from '../components/magic';
+import { BlurFade, ShinyBadge, Skeleton, AnimatedGrid, TypingText } from '../components/magic';
 
 function useExam() {
   const [date, setDate] = useLocal(keys.examDate, null);
@@ -18,6 +23,7 @@ function useExam() {
 
 export default function StudyHub() {
   const toast = useToast();
+  const navigate = useNavigate();
   const { date, setDate, streak, diff } = useExam();
   const [decks, setDecks] = useState(null);
   const [localDecks, setLocalDecks] = useSyncedLocal(keys.decks, []);
@@ -147,20 +153,19 @@ export default function StudyHub() {
           className="mt-3 flex flex-wrap gap-2"
         >
           <input name="date" type="date" aria-label="Exam date" defaultValue={date || ''} className={inputCls} style={inputStyle} />
-          <button type="submit" className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+          <Button type="submit" size="sm" variant="primary">
             Set exam date
-          </button>
-          <button
-            type="button"
-            onClick={() => {
+          </Button>
+          <Button
+            size="sm"
+            variant="secondary"
+            onPress={() => {
               setDate(null);
               toast('Exam date cleared');
             }}
-            className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold"
-            style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
           >
             Clear
-          </button>
+          </Button>
         </form>
       </div>
 
@@ -189,10 +194,10 @@ export default function StudyHub() {
         <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
           <h3 className="font-display text-[15.5px] font-bold">Flashcards from any topic</h3>
           <div className="mt-2 flex gap-2">
-            <input value={aiTopic} onChange={(e) => setAiTopic(e.target.value)} maxLength={120} placeholder="e.g. analogies, fractions…" aria-label="Deck topic" className={`${inputCls} min-w-0 flex-1`} style={inputStyle} />
-            <button onClick={makeAiDeck} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+            <Input value={aiTopic} onChange={(e) => setAiTopic(e.target.value)} maxLength={120} placeholder="e.g. analogies, fractions…" aria-label="Deck topic" className="min-w-0 flex-1" />
+            <Button size="sm" variant="primary" onPress={makeAiDeck}>
               Make deck
-            </button>
+            </Button>
           </div>
           {!!aiMsg && (
             <p className="mt-1.5 text-[13px]" style={{ color: 'var(--mut)' }}>
@@ -203,14 +208,24 @@ export default function StudyHub() {
         <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
           <h3 className="font-display text-[15.5px] font-bold">My study plan</h3>
           <div className="mt-2 flex flex-wrap gap-2">
-            <select value={planWeeks} onChange={(e) => setPlanWeeks(e.target.value)} aria-label="Weeks" className={inputCls} style={inputStyle}>
-              <option value="4">4 weeks</option>
-              <option value="8">8 weeks</option>
-              <option value="12">12 weeks</option>
-            </select>
-            <button onClick={buildPlan} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+            <Select aria-label="Weeks" selectedKey={planWeeks} onSelectionChange={(k) => setPlanWeeks(String(k))} className="w-[130px]">
+              <Select.Trigger>
+                <Select.Value />
+                <Select.Indicator />
+              </Select.Trigger>
+              <Select.Popover>
+                <ListBox aria-label="Plan length">
+                  {[['4', '4 weeks'], ['8', '8 weeks'], ['12', '12 weeks']].map(([v, l]) => (
+                    <ListBoxItem key={v} id={v} textValue={l}>
+                      {l}
+                    </ListBoxItem>
+                  ))}
+                </ListBox>
+              </Select.Popover>
+            </Select>
+            <Button size="sm" variant="primary" onPress={buildPlan}>
               Build my plan
-            </button>
+            </Button>
           </div>
           {!!planMsg && (
             <p className="mt-1.5 text-[13px]" style={{ color: 'var(--mut)' }}>
@@ -221,9 +236,13 @@ export default function StudyHub() {
       </div>
       {!!aiOut && (
         <div className="mt-3 rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-          <div className="whitespace-pre-wrap text-sm">{aiOut}</div>
+          <div className="whitespace-pre-wrap text-sm">
+            <TypingText text={aiOut} speed={8} />
+          </div>
         </div>
       )}
+
+      <Weaknesses />
 
       <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">Flashcard decks</h2>
       {!decks ? (
@@ -309,16 +328,16 @@ export default function StudyHub() {
                 {d.cards.length} cards · yours
               </p>
               <span className="flex gap-2">
-                <Link to={'/study/local-' + i} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+                <Button size="sm" variant="primary" onPress={() => navigate('/study/local-' + i)}>
                   Study →
-                </Link>
-                <button
-                  onClick={() => setLocalDecks((x) => x.filter((_, k) => k !== i))}
-                  className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold"
-                  style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => setLocalDecks((x) => x.filter((_, k) => k !== i))}
                 >
                   Delete
-                </button>
+                </Button>
               </span>
             </div>
           ))
@@ -331,25 +350,33 @@ export default function StudyHub() {
       <div className="mt-3 rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         <h3 className="font-display text-[15.5px] font-bold">New deck</h3>
         <form onSubmit={createDeck} className="mt-2 flex flex-wrap gap-2">
-          <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} required maxLength={80} placeholder="Deck title" className={`${inputCls} min-w-[200px] flex-1`} style={inputStyle} />
-          <button type="submit" className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+          <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} required maxLength={80} placeholder="Deck title" aria-label="Deck title" className="min-w-[200px] flex-1" />
+          <Button type="submit" size="sm" variant="primary">
             Create
-          </button>
+          </Button>
         </form>
         {!!localDecks.length && (
           <form onSubmit={addCard} className="mt-2 flex flex-wrap gap-2">
-            <select value={cardDeck} onChange={(e) => setCardDeck(e.target.value)} aria-label="Deck" className={inputCls} style={inputStyle}>
-              {localDecks.map((d, i) => (
-                <option key={i} value={i}>
-                  {d.title}
-                </option>
-              ))}
-            </select>
-            <input value={front} onChange={(e) => setFront(e.target.value)} required maxLength={500} placeholder="Front" className={`${inputCls} min-w-[140px] flex-1`} style={inputStyle} />
-            <input value={back} onChange={(e) => setBack(e.target.value)} required maxLength={2000} placeholder="Back" className={`${inputCls} min-w-[140px] flex-1`} style={inputStyle} />
-            <button type="submit" className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+            <Select aria-label="Deck" selectedKey={cardDeck} onSelectionChange={(k) => setCardDeck(String(k))} className="w-[180px]">
+              <Select.Trigger>
+                <Select.Value />
+                <Select.Indicator />
+              </Select.Trigger>
+              <Select.Popover>
+                <ListBox aria-label="Decks">
+                  {localDecks.map((d, i) => (
+                    <ListBoxItem key={i} id={String(i)} textValue={d.title}>
+                      {d.title}
+                    </ListBoxItem>
+                  ))}
+                </ListBox>
+              </Select.Popover>
+            </Select>
+            <Input value={front} onChange={(e) => setFront(e.target.value)} required maxLength={500} placeholder="Front" aria-label="Card front" className="min-w-[140px] flex-1" />
+            <Input value={back} onChange={(e) => setBack(e.target.value)} required maxLength={2000} placeholder="Back" aria-label="Card back" className="min-w-[140px] flex-1" />
+            <Button type="submit" size="sm" variant="primary">
               Add card
-            </button>
+            </Button>
           </form>
         )}
       </div>
@@ -358,5 +385,169 @@ export default function StudyHub() {
         <ShinyBadge>Streaks, Leitner boxes and plans — all on-device</ShinyBadge>
       </div>
     </div>
+  );
+}
+
+// ---------- My weaknesses: mistakes + mock bests → targeted action ----------
+function Weaknesses() {
+  const toast = useToast();
+  const navigate = useNavigate();
+  const [misses, setMisses] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(keys.mistakes) || '[]');
+    } catch {
+      return [];
+    }
+  });
+  const [bests, setBests] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(keys.mocks) || '{}');
+    } catch {
+      return {};
+    }
+  });
+  const [vq, setVq] = useState(null);
+  const [vqPick, setVqPick] = useState({});
+  const [busy, setBusy] = useState(false);
+
+  const refresh = () => {
+    try {
+      setMisses(JSON.parse(localStorage.getItem(keys.mistakes) || '[]'));
+      setBests(JSON.parse(localStorage.getItem(keys.mocks) || '{}'));
+    } catch {
+      /* noop */
+    }
+  };
+
+  const byStrand = {};
+  misses.forEach((m) => {
+    byStrand[m.strand] = byStrand[m.strand] || [];
+    byStrand[m.strand].push(m);
+  });
+  const strands = Object.keys(byStrand).sort((a, b) => byStrand[b].length - byStrand[a].length);
+  const bestEntries = Object.entries(bests);
+  if (!strands.length && !bestEntries.length) return null;
+
+  const dismissStrand = (s) => {
+    try {
+      const rest = JSON.parse(localStorage.getItem(keys.mistakes) || '[]').filter((m) => m.strand !== s);
+      localStorage.setItem(keys.mistakes, JSON.stringify(rest));
+      refresh();
+      toast(`Cleared ${s} misses`);
+    } catch {
+      /* noop */
+    }
+  };
+
+  const variantQuiz = async (s) => {
+    setBusy(s);
+    setVq(null);
+    setVqPick({});
+    try {
+      const j = await api.aiVariants(byStrand[s].slice(0, 5));
+      setVq({ strand: s, questions: j.questions });
+    } catch (e) {
+      toast('AI unavailable: ' + e.message);
+    }
+    setBusy(false);
+  };
+
+  return (
+    <>
+      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">My weaknesses</h2>
+      <div className="grid gap-3.5 sm:grid-cols-2">
+        {!!strands.length && (
+          <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+            <h3 className="font-display text-[15.5px] font-bold">Most-missed strands</h3>
+            <div className="mt-2 flex flex-col gap-2.5">
+              {strands.slice(0, 4).map((s) => (
+                <div key={s} className="rounded-xl border p-3" style={{ borderColor: 'var(--line)' }}>
+                  <p className="text-sm font-bold">
+                    {s} <span style={{ color: 'var(--faint)' }}>· {byStrand[s].length} miss{byStrand[s].length === 1 ? '' : 'es'}</span>
+                  </p>
+                  <p className="mt-0.5 truncate text-[12.5px]" style={{ color: 'var(--mut)' }}>
+                    e.g. {byStrand[s][0].stem.slice(0, 70)}
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    <Button size="sm" variant="primary" isDisabled={busy === s} onPress={() => variantQuiz(s)}>
+                      {busy === s ? 'Writing…' : 'Variant quiz'}
+                    </Button>
+                    {['maths', 'quant'].includes(s) && (
+                      <Button size="sm" variant="secondary" onPress={() => navigate('/drills')}>
+                        Drill it
+                      </Button>
+                    )}
+                    <Button size="sm" variant="secondary" onPress={() => dismissStrand(s)}>
+                      Dismiss
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {!!vq && (
+              <div className="mt-3">
+                <h4 className="text-sm font-bold">Fresh {vq.strand} variants — same skills, new questions</h4>
+                {vq.questions.map((qq, i) => (
+                  <div key={i} className="mt-2 rounded-xl border p-3" style={{ borderColor: 'var(--line)' }}>
+                    <p className="text-[13.5px]">
+                      <strong>Q{i + 1}</strong> {qq.stem}
+                    </p>
+                    <div className="mt-1.5 grid gap-1.5">
+                      {qq.options.map((o, k) => {
+                        const sel = vqPick[i] === k;
+                        const done = vqPick[i] !== undefined;
+                        return (
+                          <button
+                            key={k}
+                            disabled={done}
+                            onClick={() => setVqPick((p) => ({ ...p, [i]: k }))}
+                            className="rounded-lg border px-3 py-2 text-left text-[13px] font-semibold disabled:cursor-default"
+                            style={{
+                              borderColor: done && k === qq.answer ? 'var(--ok)' : sel ? 'var(--bad)' : 'var(--line2)',
+                              background: done && k === qq.answer ? 'var(--ok-bg)' : sel ? 'var(--bad-bg)' : 'var(--panel)',
+                            }}
+                          >
+                            {o}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {vqPick[i] !== undefined && (
+                      <p className="mt-1 text-[13px]" style={{ color: vqPick[i] === qq.answer ? 'var(--ok)' : 'var(--bad)' }}>
+                        {vqPick[i] === qq.answer ? '✓ Correct. ' : `✗ Correct: ${qq.options[qq.answer]}. `}
+                        {qq.explain}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        {!!bestEntries.length && (
+          <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+            <h3 className="font-display text-[15.5px] font-bold">Mock mastery</h3>
+            <div className="mt-2 flex flex-col gap-2">
+              {bestEntries.map(([id, b]) => (
+                <div key={id}>
+                  <p className="flex justify-between text-[13px] font-semibold">
+                    <span className="truncate">{id.replace(/-/g, ' ')}</span>
+                    <span className="tabular-nums">{b.score}/{b.total}</span>
+                  </p>
+                  <div className="mt-0.5 h-2 overflow-hidden rounded-full" style={{ background: 'var(--bg2)' }}>
+                    <div className="h-full rounded-full transition-all" style={{ width: `${Math.round((b.score / Math.max(1, b.total)) * 100)}%`, background: 'linear-gradient(90deg,#2f49e5,#7c3aed)' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2">
+              <Button size="sm" variant="secondary" onPress={() => navigate('/mocks')}>
+                Take another mock
+              </Button>
+            </p>
+          </div>
+        )}
+      </div>
+    </>
   );
 }

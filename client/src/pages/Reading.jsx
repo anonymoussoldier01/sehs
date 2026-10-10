@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '@heroui/react/button';
+import { ListBox } from '@heroui/react/list-box';
+import { ListBoxItem } from '@heroui/react/list-box-item';
+import { Select } from '@heroui/react/select';
 import { api } from '../lib/api';
 import { recordMistake } from '../lib/store';
 import { useToast } from '../providers';
@@ -69,33 +73,36 @@ export default function Reading() {
       ) : (
         <div className="my-3 flex flex-wrap gap-2">
           {list.map((p) => (
-            <button
+            <Button
               key={p.id}
-              onClick={() => open(p)}
-              className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold"
-              style={
-                cur?.id === p.id
-                  ? { background: '#2f49e5', borderColor: '#2f49e5', color: '#fff' }
-                  : { borderColor: 'var(--line2)', background: 'var(--panel)' }
-              }
+              size="sm"
+              variant={cur?.id === p.id ? 'primary' : 'secondary'}
+              onPress={() => open(p)}
             >
               {p.title}
-            </button>
+            </Button>
           ))}
         </div>
       )}
       <div className="my-3 flex flex-wrap items-center gap-2">
-        <select value={genre} onChange={(e) => setGenre(e.target.value)} aria-label="Genre" className="min-h-[40px] rounded-lg border px-2.5 py-2 text-sm font-semibold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)', color: 'var(--txt)' }}>
-          <option value="">Any genre (rotates)</option>
-          {['fiction', 'nonfiction', 'opinion', 'poetry', 'informational'].map((g) => (
-            <option key={g} value={g}>
-              {g[0].toUpperCase() + g.slice(1)}
-            </option>
-          ))}
-        </select>
-        <button onClick={aiPassage} disabled={busy} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white disabled:opacity-60">
+        <Select aria-label="Genre" selectedKey={genre || 'any'} onSelectionChange={(k) => setGenre(k === 'any' ? '' : String(k))} className="w-[210px]">
+          <Select.Trigger>
+            <Select.Value />
+            <Select.Indicator />
+          </Select.Trigger>
+          <Select.Popover>
+            <ListBox aria-label="Genres">
+              {['any', 'fiction', 'nonfiction', 'opinion', 'poetry', 'informational'].map((g) => (
+                <ListBoxItem key={g} id={g} textValue={g}>
+                  {g === 'any' ? 'Any genre (rotates)' : g[0].toUpperCase() + g.slice(1)}
+                </ListBoxItem>
+              ))}
+            </ListBox>
+          </Select.Popover>
+        </Select>
+        <Button variant="primary" size="sm" isDisabled={busy} onPress={aiPassage}>
           {busy ? 'Writing…' : '✦ New AI passage'}
-        </button>
+        </Button>
       </div>
       {cur && (
         <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>

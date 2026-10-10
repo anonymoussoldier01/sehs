@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { Button } from '@heroui/react/button';
+import { Checkbox } from '@heroui/react/checkbox';
+import { ListBox } from '@heroui/react/list-box';
+import { ListBoxItem } from '@heroui/react/list-box-item';
+import { Select } from '@heroui/react/select';
 import { api, pretty } from '../lib/api';
 import { bumpInsight } from '../lib/store';
 import { BlurFade, Empty, Skeleton, AnimatedGrid } from '../components/magic';
@@ -101,13 +106,18 @@ export default function Search() {
   };
 
   const check = (label, count, checked, onChange) => (
-    <label className="flex min-h-[40px] cursor-pointer items-center gap-2.5 rounded-[10px] px-2 py-2 text-[13.5px] transition-colors hover:bg-[var(--bg2)]" key={label}>
-      <input type="checkbox" checked={checked} onChange={onChange} className="h-[17px] w-[17px] flex-none cursor-pointer accent-[#5b6cff]" />
+    <Checkbox key={label} isSelected={checked} onChange={onChange} className="min-h-[40px] px-2 py-2 text-[13.5px]">
+      <Checkbox.Control>
+        <Checkbox.Indicator />
+      </Checkbox.Control>
       <span className="truncate">{label}</span>
-      <span className="ml-auto flex-none rounded-full border px-2 py-0.5 text-[11px] tabular-nums" style={{ background: 'var(--bg2)', borderColor: 'var(--line)', color: 'var(--faint)' }}>
+      <span
+        className="ml-auto flex-none rounded-full border px-2 py-0.5 text-[11px] tabular-nums"
+        style={{ background: 'var(--bg2)', borderColor: 'var(--line)', color: 'var(--faint)' }}
+      >
         {Number(count || 0).toLocaleString()}
       </span>
-    </label>
+    </Checkbox>
   );
 
   return (
@@ -141,10 +151,12 @@ export default function Search() {
         </details>
         <details className="border-t border-dashed py-3" style={{ borderColor: 'var(--line2)' }}>
           <summary className="flex min-h-[36px] cursor-pointer items-center justify-between rounded-lg px-0.5 text-[13.5px] font-bold">More options</summary>
-          <label className="flex min-h-[40px] cursor-pointer items-center gap-2.5 rounded-[10px] px-2 py-2 text-[13.5px]">
-            <input type="checkbox" checked={answers} onChange={(e) => set({ answers: e.target.checked ? '1' : '' })} className="h-[17px] w-[17px] accent-[#5b6cff]" />
+          <Checkbox isSelected={answers} onChange={(v) => set({ answers: v ? '1' : '' })} className="min-h-[40px] px-2 py-2 text-[13.5px]">
+            <Checkbox.Control>
+              <Checkbox.Indicator />
+            </Checkbox.Control>
             Answers included
-          </label>
+          </Checkbox>
         </details>
       </aside>
 
@@ -161,8 +173,10 @@ export default function Search() {
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2.5">
-            <button
-              onClick={() => {
+            <Button
+              size="sm"
+              variant="secondary"
+              onPress={() => {
                 setCompact((c) => {
                   try {
                     localStorage.setItem('sehs-density', !c ? 'compact' : 'comfortable');
@@ -172,11 +186,17 @@ export default function Search() {
                   return !c;
                 });
               }}
-              className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3 py-2 text-[13px] font-bold shadow-sm"
-              style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
             >
               {compact ? 'Comfortable' : 'Compact'}
-            </button>
+            </Button>
+            <Button
+              size="sm"
+              variant={answers ? 'primary' : 'secondary'}
+              onPress={() => set({ answers: answers ? '' : '1' })}
+              aria-pressed={String(answers)}
+            >
+              {answers ? '✓ Answers' : 'Answers'}
+            </Button>
             <div className="flex gap-0.5 rounded-[11px] border p-[3px] shadow-sm" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }} role="group" aria-label="View">
               {[
                 ['grid', '▦', 'Grid view'],
@@ -201,29 +221,33 @@ export default function Search() {
                 </button>
               ))}
             </div>
-            <label className="flex items-center gap-2 text-[13px] font-semibold" style={{ color: 'var(--mut)' }}>
-              Sort
-              <select
-                value={sort}
-                onChange={(e) => set({ sort: e.target.value === 'relevance' ? '' : e.target.value })}
-                aria-label="Sort results"
-                className="min-h-[40px] cursor-pointer rounded-[10px] border px-2.5 py-2 text-[13.5px] font-semibold"
-                style={{ borderColor: 'var(--line2)', background: 'var(--panel)', color: 'var(--txt)' }}
-              >
-                {[
-                  ['relevance', 'Best match'],
-                  ['title-az', 'A–Z'],
-                  ['title-za', 'Z–A'],
-                  ['newest', 'Newest'],
-                  ['type', 'File type'],
-                  ['answers', 'Answers first'],
-                ].map(([v, l]) => (
-                  <option key={v} value={v}>
-                    {l}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <Select
+              aria-label="Sort results"
+              selectedKey={sort}
+              onSelectionChange={(k) => set({ sort: k === 'relevance' ? '' : String(k) })}
+              className="w-[150px]"
+            >
+              <Select.Trigger>
+                <Select.Value />
+                <Select.Indicator />
+              </Select.Trigger>
+              <Select.Popover>
+                <ListBox aria-label="Sort options">
+                  {[
+                    ['relevance', 'Best match'],
+                    ['title-az', 'A–Z'],
+                    ['title-za', 'Z–A'],
+                    ['newest', 'Newest'],
+                    ['type', 'File type'],
+                    ['answers', 'Answers first'],
+                  ].map(([v, l]) => (
+                    <ListBoxItem key={v} id={v} textValue={l}>
+                      {l}
+                    </ListBoxItem>
+                  ))}
+                </ListBox>
+              </Select.Popover>
+            </Select>
           </div>
         </div>
 

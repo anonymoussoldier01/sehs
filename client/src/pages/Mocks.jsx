@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@heroui/react/button';
 import { api } from '../lib/api';
 import { keys } from '../lib/store';
 import { BlurFade, Skeleton } from '../components/magic';
 
 export default function Mocks() {
+  const navigate = useNavigate();
   const [mocks, setMocks] = useState(null);
   const [best, setBest] = useState({});
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function Mocks() {
       </p>
       <h1 className="mt-1 font-display text-3xl font-bold">Timed mocks</h1>
       <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
-        Exact block timing. Flag, skip, review. Instant scoring with explanations. Best scores stay in this browser.
+        Full-length ACER-style blocks with real timing. Flag, skip, review. Instant scoring with explanations. Best scores stay in this browser.
       </p>
       {!mocks ? (
         <div className="mt-4 grid gap-3.5 sm:grid-cols-2">
@@ -51,9 +53,9 @@ export default function Mocks() {
                     Best: {best[m.id].score}/{best[m.id].total}
                   </p>
                 )}
-                <Link to={'/mocks/' + encodeURIComponent(m.id)} className="mt-2 inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+                <Button size="sm" variant="primary" onPress={() => navigate('/mocks/' + encodeURIComponent(m.id))} className="mt-2">
                   Start →
-                </Link>
+                </Button>
               </div>
             </BlurFade>
           ))}

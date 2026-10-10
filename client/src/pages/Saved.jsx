@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Button } from '@heroui/react/button';
+import { Input } from '@heroui/react/input';
 import { api } from '../lib/api';
 import { keys, useSyncedLocal } from '../lib/store';
 import { useToast } from '../providers';
@@ -14,6 +16,7 @@ const encodeIds = (ids) =>
 
 export default function Saved() {
   const toast = useToast();
+  const navigate = useNavigate();
   const [savedIds] = useSyncedLocal(keys.saved, []);
   const [items, setItems] = useState(null);
   const [lists, setLists] = useSyncedLocal(keys.lists, []);
@@ -87,26 +90,22 @@ export default function Saved() {
                 {(l.items || []).length} resources
               </p>
               <div className="flex flex-wrap gap-2">
-                <button onClick={() => share(l)} className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+                <Button size="sm" variant="secondary" onPress={() => share(l)}>
                   Share link
-                </button>
-                <Link
-                  to={'/list/' + encodeIds(l.items || [])}
-                  className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold"
-                  style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
-                >
+                </Button>
+                <Button size="sm" variant="secondary" onPress={() => navigate('/list/' + encodeIds(l.items || []))}>
                   Open
-                </Link>
-                <button
-                  onClick={() => {
+                </Button>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => {
                     setLists((x) => x.filter((_, k) => k !== i));
                     toast('Folder deleted');
                   }}
-                  className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold"
-                  style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
                 >
                   Delete
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -124,19 +123,18 @@ export default function Saved() {
         }}
         className="mt-3 flex max-w-[480px] gap-2"
       >
-        <input
+        <Input
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
           maxLength={60}
           placeholder="New folder name…"
           aria-label="New folder name"
-          className="min-h-[42px] min-w-0 flex-1 rounded-[10px] border px-3 py-2 text-base"
-          style={{ borderColor: 'var(--line2)', background: 'var(--panel)', color: 'var(--txt)' }}
+          className="min-w-0 flex-1"
         />
-        <button type="submit" className="inline-flex min-h-[42px] items-center rounded-[10px] bg-[#2f49e5] px-4 py-2 text-sm font-bold text-white">
+        <Button type="submit" variant="primary">
           Create folder
-        </button>
+        </Button>
       </form>
       <p className="mt-1.5 text-xs" style={{ color: 'var(--faint)' }}>
         Folders live in this browser. Share links encode public resource IDs only.

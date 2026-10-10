@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Lenis from 'lenis';
@@ -55,6 +55,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <Providers router={<RouterProvider router={router} />} />
   </React.StrictMode>
 );
+
+// Apply stored theme before first paint (module executes pre-paint in practice).
+try {
+  if (localStorage.getItem('sehs-theme') === 'dark') document.documentElement.classList.add('dark');
+} catch {
+  /* noop */
+}
 
 // Buttery smooth scrolling (Lenis). Skipped for reduced-motion users;
 // React Router's ScrollRestoration keeps working (native scrollTo passes through).

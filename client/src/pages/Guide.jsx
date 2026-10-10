@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '@heroui/react/button';
+import { Input } from '@heroui/react/input';
+import { TypingText } from '../components/magic';
 import { api } from '../lib/api';
 
 export default function Guide() {
@@ -72,21 +75,24 @@ export default function Guide() {
       <h2 className="mb-3 mt-6 font-display text-xl font-bold">Ask about the exam</h2>
       <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         <div className="flex gap-2">
-          <input
+          <Input
             value={tq}
             onChange={(e) => setTq(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && ask()}
             maxLength={800}
             placeholder="e.g. How do I pace the 55-min block?"
             aria-label="Ask the tutor"
-            className="min-h-[42px] min-w-0 flex-1 rounded-lg border px-3 py-2 text-base"
-            style={{ borderColor: 'var(--line2)', background: 'var(--panel)', color: 'var(--txt)' }}
+            className="min-w-0 flex-1"
           />
-          <button onClick={ask} disabled={busy} className="inline-flex min-h-[42px] items-center rounded-[10px] bg-[#2f49e5] px-4 py-2 text-sm font-bold text-white disabled:opacity-60">
+          <Button variant="primary" isDisabled={busy} onPress={ask}>
             {busy ? '…' : 'Ask'}
-          </button>
+          </Button>
         </div>
-        {!!ta && <p className="mt-2 whitespace-pre-wrap text-sm">{ta}</p>}
+        {!!ta && (
+          <p className="mt-2 whitespace-pre-wrap text-sm">
+            <TypingText text={ta} />
+          </p>
+        )}
       </div>
       <h2 className="mb-3 mt-6 font-display text-xl font-bold">FAQ</h2>
       <div className="rounded-2xl border p-[18px] text-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>

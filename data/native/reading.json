@@ -1,628 +1,784 @@
 {
- "passages": [
-  {
-   "id": "pass-1",
-   "title": "The Lighthouse Keeper",
-   "genre": "fiction",
-   "text": "The lighthouse stood white against the grey sea. Mara had kept its lamp for eleven years, and she knew every gull by its cry. That night the storm took the radio, the spare bulb, and \u2014 worst of all \u2014 her certainty. When the small boat appeared between waves, she had only the old oil lamp and her own judgement.",
-   "questions": [
+  "passages": [
     {
-     "stem": "What does the lighthouse symbolise?",
-     "options": [
-      "Safety",
-      "Danger",
-      "Isolation",
-      "Guidance"
-     ],
-     "answer": 3,
-     "explain": "It guides the boat despite the storm."
+      "id": "pass-1",
+      "title": "The Lighthouse Keeper",
+      "genre": "fiction",
+      "text": "The lighthouse stood white against the grey sea. Mara had kept its lamp for eleven years, and she knew every gull by its cry. That night the storm took the radio, the spare bulb, and — worst of all — her certainty. When the small boat appeared between waves, she had only the old oil lamp and her own judgement.",
+      "questions": [
+        {
+          "stem": "What does the lighthouse symbolise?",
+          "options": [
+            "Safety",
+            "Danger",
+            "Isolation",
+            "Guidance"
+          ],
+          "answer": 3,
+          "explain": "It guides the boat despite the storm."
+        },
+        {
+          "stem": "Why is Mara uncertain?",
+          "options": [
+            "She is new",
+            "Equipment failed",
+            "She is afraid of boats",
+            "The sea is calm"
+          ],
+          "answer": 1,
+          "explain": "Radio, bulb and certainty are gone."
+        },
+        {
+          "stem": "'knew every gull by its cry' suggests?",
+          "options": [
+            "She is lonely",
+            "She is observant",
+            "She is deaf",
+            "She dislikes birds"
+          ],
+          "answer": 1,
+          "explain": "Detail shows long attention."
+        },
+        {
+          "stem": "Tone of the passage?",
+          "options": [
+            "Comic",
+            "Tense but hopeful",
+            "Angry",
+            "Flat"
+          ],
+          "answer": 1,
+          "explain": "Storm + rescue = tension with hope."
+        }
+      ]
     },
     {
-     "stem": "Why is Mara uncertain?",
-     "options": [
-      "She is new",
-      "Equipment failed",
-      "She is afraid of boats",
-      "The sea is calm"
-     ],
-     "answer": 1,
-     "explain": "Radio, bulb and certainty are gone."
+      "id": "pass-2",
+      "title": "Opinion: Phones in Schools",
+      "genre": "opinion",
+      "text": "Banning phones sounds decisive, but it confuses the tool with the behaviour. Phones can distract, yet they can also document experiments, translate words, and time sprints. The fair rule is not a ban but managed use: pouches in class, freedom at lunch, consequences for misuse.",
+      "questions": [
+        {
+          "stem": "Author's position?",
+          "options": [
+            "Total ban",
+            "Managed use",
+            "No rules",
+            "Ban teachers' phones"
+          ],
+          "answer": 1,
+          "explain": "Pouches in class, freedom at lunch."
+        },
+        {
+          "stem": "'confuses the tool with the behaviour' means?",
+          "options": [
+            "Phones are bad",
+            "Blame use not object",
+            "Tools think",
+            "Behaviour is fine"
+          ],
+          "answer": 1,
+          "explain": "Distinguish object vs misuse."
+        },
+        {
+          "stem": "Which evidence is used?",
+          "options": [
+            "Stats",
+            "Examples of uses",
+            "Quotes",
+            "None"
+          ],
+          "answer": 1,
+          "explain": "Document/translate/time examples."
+        },
+        {
+          "stem": "Tone?",
+          "options": [
+            "Balanced persuasive",
+            "Furious",
+            "Joking",
+            "Sad"
+          ],
+          "answer": 0,
+          "explain": "Concedes then argues."
+        }
+      ]
     },
     {
-     "stem": "'knew every gull by its cry' suggests?",
-     "options": [
-      "She is lonely",
-      "She is observant",
-      "She is deaf",
-      "She dislikes birds"
-     ],
-     "answer": 1,
-     "explain": "Detail shows long attention."
+      "id": "pass-3",
+      "title": "Volcanoes Explained",
+      "genre": "informational",
+      "text": "Volcanoes form where plates pull apart or collide. Magma rises because it is less dense than rock. Thin, runny lava flows far; thick lava traps gas and explodes. Ash can cool the planet for a year, even as lava rebuilds the land.",
+      "questions": [
+        {
+          "stem": "Why does magma rise?",
+          "options": [
+            "It is hot",
+            "Less dense than rock",
+            "Plates push it",
+            "Wind"
+          ],
+          "answer": 1,
+          "explain": "Stated directly."
+        },
+        {
+          "stem": "Thick lava does what?",
+          "options": [
+            "Flows far",
+            "Traps gas, explodes",
+            "Cools planet",
+            "Forms plates"
+          ],
+          "answer": 1,
+          "explain": "Contrast with runny lava."
+        },
+        {
+          "stem": "Ash effect?",
+          "options": [
+            "Warming",
+            "Cooling",
+            "Nothing",
+            "More eruptions"
+          ],
+          "answer": 1,
+          "explain": "Ash can cool the planet."
+        },
+        {
+          "stem": "Main idea?",
+          "options": [
+            "Volcanoes destroy",
+            "How/why volcanoes work",
+            "Travel guide",
+            "History"
+          ],
+          "answer": 1,
+          "explain": "Mechanism explanation."
+        }
+      ]
     },
     {
-     "stem": "Tone of the passage?",
-     "options": [
-      "Comic",
-      "Tense but hopeful",
-      "Angry",
-      "Flat"
-     ],
-     "answer": 1,
-     "explain": "Storm + rescue = tension with hope."
+      "id": "pass-4",
+      "title": "Poem: Winter Bus",
+      "genre": "poetry",
+      "text": "The bus breathes fog. / Windows bloom with frost-flowers. / A girl counts stops like beads. / The city slides past, grey as a sleeve.",
+      "questions": [
+        {
+          "stem": "Frost-flowers are?",
+          "options": [
+            "Real flowers",
+            "Frost patterns",
+            "Drawings",
+            "Beads"
+          ],
+          "answer": 1,
+          "explain": "Metaphor for frost."
+        },
+        {
+          "stem": "Mood?",
+          "options": [
+            "Quiet, watchful",
+            "Loud party",
+            "Angry",
+            "Scary"
+          ],
+          "answer": 0,
+          "explain": "Still images, counting."
+        },
+        {
+          "stem": "'counts stops like beads' suggests?",
+          "options": [
+            "Prayer/routine comfort",
+            "She is lost",
+            "She sells beads",
+            "She is bored only"
+          ],
+          "answer": 0,
+          "explain": "Simile of habit."
+        },
+        {
+          "stem": "Which device dominates?",
+          "options": [
+            "Metaphor",
+            "Essay",
+            "Graph",
+            "Speech"
+          ],
+          "answer": 0,
+          "explain": "Fog breath, frost-flowers."
+        }
+      ]
+    },
+    {
+      "id": "pass-5",
+      "title": "The Lighthouse Keeper (2)",
+      "genre": "fiction",
+      "text": "The lighthouse stood white against the grey sea. Mara had kept its lamp for eleven years, and she knew every gull by its cry. That night the storm took the radio, the spare bulb, and — worst of all — her certainty. When the small boat appeared between waves, she had only the old oil lamp and her own judgement.",
+      "questions": [
+        {
+          "stem": "What does the lighthouse symbolise?",
+          "options": [
+            "Safety",
+            "Danger",
+            "Isolation",
+            "Guidance"
+          ],
+          "answer": 3,
+          "explain": "It guides the boat despite the storm."
+        },
+        {
+          "stem": "Why is Mara uncertain?",
+          "options": [
+            "She is new",
+            "Equipment failed",
+            "She is afraid of boats",
+            "The sea is calm"
+          ],
+          "answer": 1,
+          "explain": "Radio, bulb and certainty are gone."
+        },
+        {
+          "stem": "'knew every gull by its cry' suggests?",
+          "options": [
+            "She is lonely",
+            "She is observant",
+            "She is deaf",
+            "She dislikes birds"
+          ],
+          "answer": 1,
+          "explain": "Detail shows long attention."
+        },
+        {
+          "stem": "Tone of the passage?",
+          "options": [
+            "Comic",
+            "Tense but hopeful",
+            "Angry",
+            "Flat"
+          ],
+          "answer": 1,
+          "explain": "Storm + rescue = tension with hope."
+        }
+      ]
+    },
+    {
+      "id": "pass-6",
+      "title": "Opinion: Phones in Schools (2)",
+      "genre": "opinion",
+      "text": "Banning phones sounds decisive, but it confuses the tool with the behaviour. Phones can distract, yet they can also document experiments, translate words, and time sprints. The fair rule is not a ban but managed use: pouches in class, freedom at lunch, consequences for misuse.",
+      "questions": [
+        {
+          "stem": "Author's position?",
+          "options": [
+            "Total ban",
+            "Managed use",
+            "No rules",
+            "Ban teachers' phones"
+          ],
+          "answer": 1,
+          "explain": "Pouches in class, freedom at lunch."
+        },
+        {
+          "stem": "'confuses the tool with the behaviour' means?",
+          "options": [
+            "Phones are bad",
+            "Blame use not object",
+            "Tools think",
+            "Behaviour is fine"
+          ],
+          "answer": 1,
+          "explain": "Distinguish object vs misuse."
+        },
+        {
+          "stem": "Which evidence is used?",
+          "options": [
+            "Stats",
+            "Examples of uses",
+            "Quotes",
+            "None"
+          ],
+          "answer": 1,
+          "explain": "Document/translate/time examples."
+        },
+        {
+          "stem": "Tone?",
+          "options": [
+            "Balanced persuasive",
+            "Furious",
+            "Joking",
+            "Sad"
+          ],
+          "answer": 0,
+          "explain": "Concedes then argues."
+        }
+      ]
+    },
+    {
+      "id": "pass-7",
+      "title": "Volcanoes Explained (2)",
+      "genre": "informational",
+      "text": "Volcanoes form where plates pull apart or collide. Magma rises because it is less dense than rock. Thin, runny lava flows far; thick lava traps gas and explodes. Ash can cool the planet for a year, even as lava rebuilds the land.",
+      "questions": [
+        {
+          "stem": "Why does magma rise?",
+          "options": [
+            "It is hot",
+            "Less dense than rock",
+            "Plates push it",
+            "Wind"
+          ],
+          "answer": 1,
+          "explain": "Stated directly."
+        },
+        {
+          "stem": "Thick lava does what?",
+          "options": [
+            "Flows far",
+            "Traps gas, explodes",
+            "Cools planet",
+            "Forms plates"
+          ],
+          "answer": 1,
+          "explain": "Contrast with runny lava."
+        },
+        {
+          "stem": "Ash effect?",
+          "options": [
+            "Warming",
+            "Cooling",
+            "Nothing",
+            "More eruptions"
+          ],
+          "answer": 1,
+          "explain": "Ash can cool the planet."
+        },
+        {
+          "stem": "Main idea?",
+          "options": [
+            "Volcanoes destroy",
+            "How/why volcanoes work",
+            "Travel guide",
+            "History"
+          ],
+          "answer": 1,
+          "explain": "Mechanism explanation."
+        }
+      ]
+    },
+    {
+      "id": "pass-8",
+      "title": "Poem: Winter Bus (2)",
+      "genre": "poetry",
+      "text": "The bus breathes fog. / Windows bloom with frost-flowers. / A girl counts stops like beads. / The city slides past, grey as a sleeve.",
+      "questions": [
+        {
+          "stem": "Frost-flowers are?",
+          "options": [
+            "Real flowers",
+            "Frost patterns",
+            "Drawings",
+            "Beads"
+          ],
+          "answer": 1,
+          "explain": "Metaphor for frost."
+        },
+        {
+          "stem": "Mood?",
+          "options": [
+            "Quiet, watchful",
+            "Loud party",
+            "Angry",
+            "Scary"
+          ],
+          "answer": 0,
+          "explain": "Still images, counting."
+        },
+        {
+          "stem": "'counts stops like beads' suggests?",
+          "options": [
+            "Prayer/routine comfort",
+            "She is lost",
+            "She sells beads",
+            "She is bored only"
+          ],
+          "answer": 0,
+          "explain": "Simile of habit."
+        },
+        {
+          "stem": "Which device dominates?",
+          "options": [
+            "Metaphor",
+            "Essay",
+            "Graph",
+            "Speech"
+          ],
+          "answer": 0,
+          "explain": "Fog breath, frost-flowers."
+        }
+      ]
+    },
+    {
+      "id": "pass-9",
+      "title": "The Lighthouse Keeper (3)",
+      "genre": "fiction",
+      "text": "The lighthouse stood white against the grey sea. Mara had kept its lamp for eleven years, and she knew every gull by its cry. That night the storm took the radio, the spare bulb, and — worst of all — her certainty. When the small boat appeared between waves, she had only the old oil lamp and her own judgement.",
+      "questions": [
+        {
+          "stem": "What does the lighthouse symbolise?",
+          "options": [
+            "Safety",
+            "Danger",
+            "Isolation",
+            "Guidance"
+          ],
+          "answer": 3,
+          "explain": "It guides the boat despite the storm."
+        },
+        {
+          "stem": "Why is Mara uncertain?",
+          "options": [
+            "She is new",
+            "Equipment failed",
+            "She is afraid of boats",
+            "The sea is calm"
+          ],
+          "answer": 1,
+          "explain": "Radio, bulb and certainty are gone."
+        },
+        {
+          "stem": "'knew every gull by its cry' suggests?",
+          "options": [
+            "She is lonely",
+            "She is observant",
+            "She is deaf",
+            "She dislikes birds"
+          ],
+          "answer": 1,
+          "explain": "Detail shows long attention."
+        },
+        {
+          "stem": "Tone of the passage?",
+          "options": [
+            "Comic",
+            "Tense but hopeful",
+            "Angry",
+            "Flat"
+          ],
+          "answer": 1,
+          "explain": "Storm + rescue = tension with hope."
+        }
+      ]
+    },
+    {
+      "id": "pass-10",
+      "title": "Opinion: Phones in Schools (3)",
+      "genre": "opinion",
+      "text": "Banning phones sounds decisive, but it confuses the tool with the behaviour. Phones can distract, yet they can also document experiments, translate words, and time sprints. The fair rule is not a ban but managed use: pouches in class, freedom at lunch, consequences for misuse.",
+      "questions": [
+        {
+          "stem": "Author's position?",
+          "options": [
+            "Total ban",
+            "Managed use",
+            "No rules",
+            "Ban teachers' phones"
+          ],
+          "answer": 1,
+          "explain": "Pouches in class, freedom at lunch."
+        },
+        {
+          "stem": "'confuses the tool with the behaviour' means?",
+          "options": [
+            "Phones are bad",
+            "Blame use not object",
+            "Tools think",
+            "Behaviour is fine"
+          ],
+          "answer": 1,
+          "explain": "Distinguish object vs misuse."
+        },
+        {
+          "stem": "Which evidence is used?",
+          "options": [
+            "Stats",
+            "Examples of uses",
+            "Quotes",
+            "None"
+          ],
+          "answer": 1,
+          "explain": "Document/translate/time examples."
+        },
+        {
+          "stem": "Tone?",
+          "options": [
+            "Balanced persuasive",
+            "Furious",
+            "Joking",
+            "Sad"
+          ],
+          "answer": 0,
+          "explain": "Concedes then argues."
+        }
+      ]
+    },
+    {
+      "id": "pass-11",
+      "title": "Volcanoes Explained (3)",
+      "genre": "informational",
+      "text": "Volcanoes form where plates pull apart or collide. Magma rises because it is less dense than rock. Thin, runny lava flows far; thick lava traps gas and explodes. Ash can cool the planet for a year, even as lava rebuilds the land.",
+      "questions": [
+        {
+          "stem": "Why does magma rise?",
+          "options": [
+            "It is hot",
+            "Less dense than rock",
+            "Plates push it",
+            "Wind"
+          ],
+          "answer": 1,
+          "explain": "Stated directly."
+        },
+        {
+          "stem": "Thick lava does what?",
+          "options": [
+            "Flows far",
+            "Traps gas, explodes",
+            "Cools planet",
+            "Forms plates"
+          ],
+          "answer": 1,
+          "explain": "Contrast with runny lava."
+        },
+        {
+          "stem": "Ash effect?",
+          "options": [
+            "Warming",
+            "Cooling",
+            "Nothing",
+            "More eruptions"
+          ],
+          "answer": 1,
+          "explain": "Ash can cool the planet."
+        },
+        {
+          "stem": "Main idea?",
+          "options": [
+            "Volcanoes destroy",
+            "How/why volcanoes work",
+            "Travel guide",
+            "History"
+          ],
+          "answer": 1,
+          "explain": "Mechanism explanation."
+        }
+      ]
+    },
+    {
+      "id": "pass-12",
+      "title": "Poem: Winter Bus (3)",
+      "genre": "poetry",
+      "text": "The bus breathes fog. / Windows bloom with frost-flowers. / A girl counts stops like beads. / The city slides past, grey as a sleeve.",
+      "questions": [
+        {
+          "stem": "Frost-flowers are?",
+          "options": [
+            "Real flowers",
+            "Frost patterns",
+            "Drawings",
+            "Beads"
+          ],
+          "answer": 1,
+          "explain": "Metaphor for frost."
+        },
+        {
+          "stem": "Mood?",
+          "options": [
+            "Quiet, watchful",
+            "Loud party",
+            "Angry",
+            "Scary"
+          ],
+          "answer": 0,
+          "explain": "Still images, counting."
+        },
+        {
+          "stem": "'counts stops like beads' suggests?",
+          "options": [
+            "Prayer/routine comfort",
+            "She is lost",
+            "She sells beads",
+            "She is bored only"
+          ],
+          "answer": 0,
+          "explain": "Simile of habit."
+        },
+        {
+          "stem": "Which device dominates?",
+          "options": [
+            "Metaphor",
+            "Essay",
+            "Graph",
+            "Speech"
+          ],
+          "answer": 0,
+          "explain": "Fog breath, frost-flowers."
+        }
+      ]
+    },
+    {
+      "id": "pass-13",
+      "title": "Should School Start Later?",
+      "genre": "opinion",
+      "text": "Nobody learns well at 8am — at least, that is what the sleep researchers keep telling us. Teenagers' body clocks shift later during adolescence, which means a 9am start asks students to think hardest exactly when their brains are still booting up. Several Australian schools that trialled later starts reported calmer first periods and fewer late arrivals.\n\nCritics argue the day would simply finish later, pushing sport and part-time jobs into the evening. That is a fair concern, but it confuses scheduling with learning. If the goal of school is learning, the timetable should follow the evidence about when learning happens best, not when buses have always run.\n\nA later start will not fix everything — phones at midnight undo any timetable. Yet of all the reforms debated in education, moving first period later is among the cheapest and most studied. We should try what the evidence supports.",
+      "questions": [
+        {
+          "stem": "The author's main position is",
+          "options": [
+            "Schools should start later",
+            "Schools should start earlier",
+            "Timetables don't matter",
+            "Sport matters most"
+          ],
+          "answer": 0,
+          "explain": "Stated in the opening and conclusion."
+        },
+        {
+          "stem": "'boots up' in paragraph 1 means",
+          "options": [
+            "Starts working properly",
+            "Shuts down",
+            "Updates software",
+            "Makes noise"
+          ],
+          "answer": 0,
+          "explain": "Context: brains waking up."
+        },
+        {
+          "stem": "How does the author handle the sport/jobs objection?",
+          "options": [
+            "Admits it then argues learning comes first",
+            "Ignores it",
+            "Agrees schools shouldn't change",
+            "Says sport doesn't matter"
+          ],
+          "answer": 0,
+          "explain": "'Fair concern, but…' then rebuts."
+        },
+        {
+          "stem": "The tone is best described as",
+          "options": [
+            "Persuasive and reasonable",
+            "Angry and mocking",
+            "Purely neutral",
+            "Humorous and silly"
+          ],
+          "answer": 0,
+          "explain": "Argues a case with concessions."
+        }
+      ]
+    },
+    {
+      "id": "pass-14",
+      "title": "How Vaccines Train the Immune System",
+      "genre": "informational",
+      "text": "A vaccine is a training session for your immune system. Most vaccines contain a harmless preview of a germ — a weakened virus, an inactivated one, or just a fragment of its outer coat. Your body studies this preview and builds memory cells: specialised defenders that remember the invader's shape for years.\n\nIf the real germ arrives later, those memory cells recognise it immediately and multiply into an army within days instead of weeks. That speed is the whole trick. Many illnesses only become dangerous because they outrun a first-time immune response; with memory cells waiting, the race is over before symptoms begin.\n\nThis is also why most vaccines cannot give you the disease they prevent. A fragment of a coat cannot build a house, and an inactivated virus cannot replicate. The training happens without the battle.",
+      "questions": [
+        {
+          "stem": "Memory cells matter because they",
+          "options": [
+            "Respond within days instead of weeks",
+            "Kill all germs instantly",
+            "Prevent all infection",
+            "Replace vaccines"
+          ],
+          "answer": 0,
+          "explain": "Speed is 'the whole trick'."
+        },
+        {
+          "stem": "The house-building comparison shows that",
+          "options": [
+            "Fragments can't cause disease",
+            "Vaccines build houses",
+            "Germs are architects",
+            "Coats are warm"
+          ],
+          "answer": 0,
+          "explain": "A fragment can't replicate."
+        },
+        {
+          "stem": "'Preview' most nearly means",
+          "options": [
+            "Harmless sample",
+            "Movie trailer",
+            "Test score",
+            "Warning"
+          ],
+          "answer": 0,
+          "explain": "A harmless version shown first."
+        },
+        {
+          "stem": "The passage's structure is",
+          "options": [
+            "Explanation then implication",
+            "Story then moral",
+            "Argument then rebuttal",
+            "List then summary"
+          ],
+          "answer": 0,
+          "explain": "How it works, then why it's safe."
+        }
+      ]
+    },
+    {
+      "id": "pass-15",
+      "title": "The Night the River Rose",
+      "genre": "fiction",
+      "text": "Lena woke to the sound of the rain arguing with the roof. By dawn the creek behind the house had become something else entirely — brown, hurried, carrying branches like messages it couldn't deliver. Her father stood on the veranda with his hands in his pockets, watching the water take the fence posts one by one.\n\n'We go now,' he said, not loudly. Lena carried the photo albums; her brother carried the dog, who objected to everything. They waded to the neighbour's ute with their trousers rolled, laughing in the nervous way people laugh when they have decided not to be afraid.\n\nBy afternoon the street was a slow canal. From the evacuation centre on the hill, Lena watched a wheelie bin sail past like a small green boat, and understood for the first time what her grandmother meant when she said the river remembers where it used to go.",
+      "questions": [
+        {
+          "stem": "'Branches like messages it couldn't deliver' suggests the water is",
+          "options": [
+            "Overwhelmed and chaotic",
+            "Neat and calm",
+            "Frozen solid",
+            "Completely still"
+          ],
+          "answer": 0,
+          "explain": "Hurried water carrying debris."
+        },
+        {
+          "stem": "The family's laughter shows they are",
+          "options": [
+            "Nervous but coping",
+            "Finding it funny",
+            "Unaware of danger",
+            "Angry"
+          ],
+          "answer": 0,
+          "explain": "'Nervous way… decided not to be afraid'."
+        },
+        {
+          "stem": "'The river remembers' most nearly means",
+          "options": [
+            "Floods return to old paths",
+            "Rivers have brains",
+            "Grandmother is forgetful",
+            "The street is new"
+          ],
+          "answer": 0,
+          "explain": "Water reclaiming its former course."
+        },
+        {
+          "stem": "The father's 'We go now, not loudly' shows he is",
+          "options": [
+            "Calm and decisive",
+            "Panicked",
+            "Indifferent",
+            "Lost"
+          ],
+          "answer": 0,
+          "explain": "Quiet authority under pressure."
+        }
+      ]
     }
-   ]
-  },
-  {
-   "id": "pass-2",
-   "title": "Opinion: Phones in Schools",
-   "genre": "opinion",
-   "text": "Banning phones sounds decisive, but it confuses the tool with the behaviour. Phones can distract, yet they can also document experiments, translate words, and time sprints. The fair rule is not a ban but managed use: pouches in class, freedom at lunch, consequences for misuse.",
-   "questions": [
-    {
-     "stem": "Author's position?",
-     "options": [
-      "Total ban",
-      "Managed use",
-      "No rules",
-      "Ban teachers' phones"
-     ],
-     "answer": 1,
-     "explain": "Pouches in class, freedom at lunch."
-    },
-    {
-     "stem": "'confuses the tool with the behaviour' means?",
-     "options": [
-      "Phones are bad",
-      "Blame use not object",
-      "Tools think",
-      "Behaviour is fine"
-     ],
-     "answer": 1,
-     "explain": "Distinguish object vs misuse."
-    },
-    {
-     "stem": "Which evidence is used?",
-     "options": [
-      "Stats",
-      "Examples of uses",
-      "Quotes",
-      "None"
-     ],
-     "answer": 1,
-     "explain": "Document/translate/time examples."
-    },
-    {
-     "stem": "Tone?",
-     "options": [
-      "Balanced persuasive",
-      "Furious",
-      "Joking",
-      "Sad"
-     ],
-     "answer": 0,
-     "explain": "Concedes then argues."
-    }
-   ]
-  },
-  {
-   "id": "pass-3",
-   "title": "Volcanoes Explained",
-   "genre": "informational",
-   "text": "Volcanoes form where plates pull apart or collide. Magma rises because it is less dense than rock. Thin, runny lava flows far; thick lava traps gas and explodes. Ash can cool the planet for a year, even as lava rebuilds the land.",
-   "questions": [
-    {
-     "stem": "Why does magma rise?",
-     "options": [
-      "It is hot",
-      "Less dense than rock",
-      "Plates push it",
-      "Wind"
-     ],
-     "answer": 1,
-     "explain": "Stated directly."
-    },
-    {
-     "stem": "Thick lava does what?",
-     "options": [
-      "Flows far",
-      "Traps gas, explodes",
-      "Cools planet",
-      "Forms plates"
-     ],
-     "answer": 1,
-     "explain": "Contrast with runny lava."
-    },
-    {
-     "stem": "Ash effect?",
-     "options": [
-      "Warming",
-      "Cooling",
-      "Nothing",
-      "More eruptions"
-     ],
-     "answer": 1,
-     "explain": "Ash can cool the planet."
-    },
-    {
-     "stem": "Main idea?",
-     "options": [
-      "Volcanoes destroy",
-      "How/why volcanoes work",
-      "Travel guide",
-      "History"
-     ],
-     "answer": 1,
-     "explain": "Mechanism explanation."
-    }
-   ]
-  },
-  {
-   "id": "pass-4",
-   "title": "Poem: Winter Bus",
-   "genre": "poetry",
-   "text": "The bus breathes fog. / Windows bloom with frost-flowers. / A girl counts stops like beads. / The city slides past, grey as a sleeve.",
-   "questions": [
-    {
-     "stem": "Frost-flowers are?",
-     "options": [
-      "Real flowers",
-      "Frost patterns",
-      "Drawings",
-      "Beads"
-     ],
-     "answer": 1,
-     "explain": "Metaphor for frost."
-    },
-    {
-     "stem": "Mood?",
-     "options": [
-      "Quiet, watchful",
-      "Loud party",
-      "Angry",
-      "Scary"
-     ],
-     "answer": 0,
-     "explain": "Still images, counting."
-    },
-    {
-     "stem": "'counts stops like beads' suggests?",
-     "options": [
-      "Prayer/routine comfort",
-      "She is lost",
-      "She sells beads",
-      "She is bored only"
-     ],
-     "answer": 0,
-     "explain": "Simile of habit."
-    },
-    {
-     "stem": "Which device dominates?",
-     "options": [
-      "Metaphor",
-      "Essay",
-      "Graph",
-      "Speech"
-     ],
-     "answer": 0,
-     "explain": "Fog breath, frost-flowers."
-    }
-   ]
-  },
-  {
-   "id": "pass-5",
-   "title": "The Lighthouse Keeper (2)",
-   "genre": "fiction",
-   "text": "The lighthouse stood white against the grey sea. Mara had kept its lamp for eleven years, and she knew every gull by its cry. That night the storm took the radio, the spare bulb, and \u2014 worst of all \u2014 her certainty. When the small boat appeared between waves, she had only the old oil lamp and her own judgement.",
-   "questions": [
-    {
-     "stem": "What does the lighthouse symbolise?",
-     "options": [
-      "Safety",
-      "Danger",
-      "Isolation",
-      "Guidance"
-     ],
-     "answer": 3,
-     "explain": "It guides the boat despite the storm."
-    },
-    {
-     "stem": "Why is Mara uncertain?",
-     "options": [
-      "She is new",
-      "Equipment failed",
-      "She is afraid of boats",
-      "The sea is calm"
-     ],
-     "answer": 1,
-     "explain": "Radio, bulb and certainty are gone."
-    },
-    {
-     "stem": "'knew every gull by its cry' suggests?",
-     "options": [
-      "She is lonely",
-      "She is observant",
-      "She is deaf",
-      "She dislikes birds"
-     ],
-     "answer": 1,
-     "explain": "Detail shows long attention."
-    },
-    {
-     "stem": "Tone of the passage?",
-     "options": [
-      "Comic",
-      "Tense but hopeful",
-      "Angry",
-      "Flat"
-     ],
-     "answer": 1,
-     "explain": "Storm + rescue = tension with hope."
-    }
-   ]
-  },
-  {
-   "id": "pass-6",
-   "title": "Opinion: Phones in Schools (2)",
-   "genre": "opinion",
-   "text": "Banning phones sounds decisive, but it confuses the tool with the behaviour. Phones can distract, yet they can also document experiments, translate words, and time sprints. The fair rule is not a ban but managed use: pouches in class, freedom at lunch, consequences for misuse.",
-   "questions": [
-    {
-     "stem": "Author's position?",
-     "options": [
-      "Total ban",
-      "Managed use",
-      "No rules",
-      "Ban teachers' phones"
-     ],
-     "answer": 1,
-     "explain": "Pouches in class, freedom at lunch."
-    },
-    {
-     "stem": "'confuses the tool with the behaviour' means?",
-     "options": [
-      "Phones are bad",
-      "Blame use not object",
-      "Tools think",
-      "Behaviour is fine"
-     ],
-     "answer": 1,
-     "explain": "Distinguish object vs misuse."
-    },
-    {
-     "stem": "Which evidence is used?",
-     "options": [
-      "Stats",
-      "Examples of uses",
-      "Quotes",
-      "None"
-     ],
-     "answer": 1,
-     "explain": "Document/translate/time examples."
-    },
-    {
-     "stem": "Tone?",
-     "options": [
-      "Balanced persuasive",
-      "Furious",
-      "Joking",
-      "Sad"
-     ],
-     "answer": 0,
-     "explain": "Concedes then argues."
-    }
-   ]
-  },
-  {
-   "id": "pass-7",
-   "title": "Volcanoes Explained (2)",
-   "genre": "informational",
-   "text": "Volcanoes form where plates pull apart or collide. Magma rises because it is less dense than rock. Thin, runny lava flows far; thick lava traps gas and explodes. Ash can cool the planet for a year, even as lava rebuilds the land.",
-   "questions": [
-    {
-     "stem": "Why does magma rise?",
-     "options": [
-      "It is hot",
-      "Less dense than rock",
-      "Plates push it",
-      "Wind"
-     ],
-     "answer": 1,
-     "explain": "Stated directly."
-    },
-    {
-     "stem": "Thick lava does what?",
-     "options": [
-      "Flows far",
-      "Traps gas, explodes",
-      "Cools planet",
-      "Forms plates"
-     ],
-     "answer": 1,
-     "explain": "Contrast with runny lava."
-    },
-    {
-     "stem": "Ash effect?",
-     "options": [
-      "Warming",
-      "Cooling",
-      "Nothing",
-      "More eruptions"
-     ],
-     "answer": 1,
-     "explain": "Ash can cool the planet."
-    },
-    {
-     "stem": "Main idea?",
-     "options": [
-      "Volcanoes destroy",
-      "How/why volcanoes work",
-      "Travel guide",
-      "History"
-     ],
-     "answer": 1,
-     "explain": "Mechanism explanation."
-    }
-   ]
-  },
-  {
-   "id": "pass-8",
-   "title": "Poem: Winter Bus (2)",
-   "genre": "poetry",
-   "text": "The bus breathes fog. / Windows bloom with frost-flowers. / A girl counts stops like beads. / The city slides past, grey as a sleeve.",
-   "questions": [
-    {
-     "stem": "Frost-flowers are?",
-     "options": [
-      "Real flowers",
-      "Frost patterns",
-      "Drawings",
-      "Beads"
-     ],
-     "answer": 1,
-     "explain": "Metaphor for frost."
-    },
-    {
-     "stem": "Mood?",
-     "options": [
-      "Quiet, watchful",
-      "Loud party",
-      "Angry",
-      "Scary"
-     ],
-     "answer": 0,
-     "explain": "Still images, counting."
-    },
-    {
-     "stem": "'counts stops like beads' suggests?",
-     "options": [
-      "Prayer/routine comfort",
-      "She is lost",
-      "She sells beads",
-      "She is bored only"
-     ],
-     "answer": 0,
-     "explain": "Simile of habit."
-    },
-    {
-     "stem": "Which device dominates?",
-     "options": [
-      "Metaphor",
-      "Essay",
-      "Graph",
-      "Speech"
-     ],
-     "answer": 0,
-     "explain": "Fog breath, frost-flowers."
-    }
-   ]
-  },
-  {
-   "id": "pass-9",
-   "title": "The Lighthouse Keeper (3)",
-   "genre": "fiction",
-   "text": "The lighthouse stood white against the grey sea. Mara had kept its lamp for eleven years, and she knew every gull by its cry. That night the storm took the radio, the spare bulb, and \u2014 worst of all \u2014 her certainty. When the small boat appeared between waves, she had only the old oil lamp and her own judgement.",
-   "questions": [
-    {
-     "stem": "What does the lighthouse symbolise?",
-     "options": [
-      "Safety",
-      "Danger",
-      "Isolation",
-      "Guidance"
-     ],
-     "answer": 3,
-     "explain": "It guides the boat despite the storm."
-    },
-    {
-     "stem": "Why is Mara uncertain?",
-     "options": [
-      "She is new",
-      "Equipment failed",
-      "She is afraid of boats",
-      "The sea is calm"
-     ],
-     "answer": 1,
-     "explain": "Radio, bulb and certainty are gone."
-    },
-    {
-     "stem": "'knew every gull by its cry' suggests?",
-     "options": [
-      "She is lonely",
-      "She is observant",
-      "She is deaf",
-      "She dislikes birds"
-     ],
-     "answer": 1,
-     "explain": "Detail shows long attention."
-    },
-    {
-     "stem": "Tone of the passage?",
-     "options": [
-      "Comic",
-      "Tense but hopeful",
-      "Angry",
-      "Flat"
-     ],
-     "answer": 1,
-     "explain": "Storm + rescue = tension with hope."
-    }
-   ]
-  },
-  {
-   "id": "pass-10",
-   "title": "Opinion: Phones in Schools (3)",
-   "genre": "opinion",
-   "text": "Banning phones sounds decisive, but it confuses the tool with the behaviour. Phones can distract, yet they can also document experiments, translate words, and time sprints. The fair rule is not a ban but managed use: pouches in class, freedom at lunch, consequences for misuse.",
-   "questions": [
-    {
-     "stem": "Author's position?",
-     "options": [
-      "Total ban",
-      "Managed use",
-      "No rules",
-      "Ban teachers' phones"
-     ],
-     "answer": 1,
-     "explain": "Pouches in class, freedom at lunch."
-    },
-    {
-     "stem": "'confuses the tool with the behaviour' means?",
-     "options": [
-      "Phones are bad",
-      "Blame use not object",
-      "Tools think",
-      "Behaviour is fine"
-     ],
-     "answer": 1,
-     "explain": "Distinguish object vs misuse."
-    },
-    {
-     "stem": "Which evidence is used?",
-     "options": [
-      "Stats",
-      "Examples of uses",
-      "Quotes",
-      "None"
-     ],
-     "answer": 1,
-     "explain": "Document/translate/time examples."
-    },
-    {
-     "stem": "Tone?",
-     "options": [
-      "Balanced persuasive",
-      "Furious",
-      "Joking",
-      "Sad"
-     ],
-     "answer": 0,
-     "explain": "Concedes then argues."
-    }
-   ]
-  },
-  {
-   "id": "pass-11",
-   "title": "Volcanoes Explained (3)",
-   "genre": "informational",
-   "text": "Volcanoes form where plates pull apart or collide. Magma rises because it is less dense than rock. Thin, runny lava flows far; thick lava traps gas and explodes. Ash can cool the planet for a year, even as lava rebuilds the land.",
-   "questions": [
-    {
-     "stem": "Why does magma rise?",
-     "options": [
-      "It is hot",
-      "Less dense than rock",
-      "Plates push it",
-      "Wind"
-     ],
-     "answer": 1,
-     "explain": "Stated directly."
-    },
-    {
-     "stem": "Thick lava does what?",
-     "options": [
-      "Flows far",
-      "Traps gas, explodes",
-      "Cools planet",
-      "Forms plates"
-     ],
-     "answer": 1,
-     "explain": "Contrast with runny lava."
-    },
-    {
-     "stem": "Ash effect?",
-     "options": [
-      "Warming",
-      "Cooling",
-      "Nothing",
-      "More eruptions"
-     ],
-     "answer": 1,
-     "explain": "Ash can cool the planet."
-    },
-    {
-     "stem": "Main idea?",
-     "options": [
-      "Volcanoes destroy",
-      "How/why volcanoes work",
-      "Travel guide",
-      "History"
-     ],
-     "answer": 1,
-     "explain": "Mechanism explanation."
-    }
-   ]
-  },
-  {
-   "id": "pass-12",
-   "title": "Poem: Winter Bus (3)",
-   "genre": "poetry",
-   "text": "The bus breathes fog. / Windows bloom with frost-flowers. / A girl counts stops like beads. / The city slides past, grey as a sleeve.",
-   "questions": [
-    {
-     "stem": "Frost-flowers are?",
-     "options": [
-      "Real flowers",
-      "Frost patterns",
-      "Drawings",
-      "Beads"
-     ],
-     "answer": 1,
-     "explain": "Metaphor for frost."
-    },
-    {
-     "stem": "Mood?",
-     "options": [
-      "Quiet, watchful",
-      "Loud party",
-      "Angry",
-      "Scary"
-     ],
-     "answer": 0,
-     "explain": "Still images, counting."
-    },
-    {
-     "stem": "'counts stops like beads' suggests?",
-     "options": [
-      "Prayer/routine comfort",
-      "She is lost",
-      "She sells beads",
-      "She is bored only"
-     ],
-     "answer": 0,
-     "explain": "Simile of habit."
-    },
-    {
-     "stem": "Which device dominates?",
-     "options": [
-      "Metaphor",
-      "Essay",
-      "Graph",
-      "Speech"
-     ],
-     "answer": 0,
-     "explain": "Fog breath, frost-flowers."
-    }
-   ]
-  }
- ]
+  ]
 }

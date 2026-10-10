@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Form, Link, NavLink, useNavigate } from 'react-router-dom';
 import { Command } from 'cmdk';
+import { Avatar } from '@heroui/react/avatar';
+import { Button } from '@heroui/react/button';
+import { Dropdown } from '@heroui/react/dropdown';
+import { Tooltip } from '@heroui/react/tooltip';
 import { useOpener, useTheme, useToast } from '../providers';
 import { api, pretty } from '../lib/api';
 import { keys, useLocal } from '../lib/store';
@@ -210,14 +214,9 @@ export function Topbar({ onMenu }) {
       style={{ background: 'color-mix(in srgb, var(--panel) 90%, transparent)', borderColor: 'var(--line)' }}
     >
       <div className="mx-auto flex min-h-[62px] max-w-[1240px] items-center gap-2.5 px-4 sm:px-6">
-        <button
-          onClick={onMenu}
-          className="grid h-10 min-w-10 place-items-center rounded-[11px] border text-[15px] shadow-sm lg:hidden"
-          style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
-          aria-label="Open menu"
-        >
+        <Button isIconOnly variant="secondary" onPress={onMenu} aria-label="Open menu" className="lg:hidden">
           ☰
-        </button>
+        </Button>
         <div className="relative mx-auto w-full max-w-[560px]" ref={boxRef}>
           <Form
             onSubmit={submit}
@@ -272,40 +271,48 @@ export function Topbar({ onMenu }) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => window.dispatchEvent(new CustomEvent('sehs:palette'))}
-            className="grid h-10 min-w-10 place-items-center rounded-[11px] border px-2.5 text-[15px] font-bold shadow-sm transition-all hover:-translate-y-px"
-            style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
-            title="Quick search (Ctrl+K)"
-            aria-label="Quick search"
-          >
-            ⌘K
-          </button>
-          <button
-            onClick={() => {
-              const next = prompt('Display name (stored only in this browser):', name || '');
-              if (next === null) return;
-              const v = String(next).trim().slice(0, 24);
-              setName(v);
-              toast(v ? `Hi, ${v}` : 'Profile cleared');
-            }}
-            className="grid h-10 w-10 place-items-center rounded-full border-2 text-base font-extrabold text-white transition-transform hover:scale-105"
-            style={{ borderColor: 'var(--acc-line)', background: 'linear-gradient(135deg,#2f49e5,#7c3aed)' }}
-            title="Your profile"
-            aria-label="Your profile"
-          >
-            {(name?.trim()?.[0] || 'G').toUpperCase()}
-          </button>
-          <button
-            onClick={toggle}
-            className="grid h-10 min-w-10 place-items-center rounded-[11px] border text-[15px] shadow-sm transition-all hover:-translate-y-px"
-            style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
-            title="Toggle light / dark"
-            aria-label="Toggle light and dark mode"
-            aria-pressed={String(dark)}
-          >
-            ◐
-          </button>
+          <Tooltip>
+            <Tooltip.Trigger aria-label="Quick search (Ctrl+K)">
+              <Button isIconOnly variant="secondary" onPress={() => window.dispatchEvent(new CustomEvent('sehs:palette'))}>
+                ⌘K
+              </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Quick search (Ctrl+K)</Tooltip.Content>
+          </Tooltip>
+          <Dropdown>
+            <Dropdown.Trigger aria-label="Your profile menu">
+              <Avatar>
+                <AvatarFallback>{(name?.trim()?.[0] || 'G').toUpperCase()}</AvatarFallback>
+              </Avatar>
+            </Dropdown.Trigger>
+            <Dropdown.Popover>
+              <Dropdown.Menu
+                onAction={(key) => {
+                  if (key === 'library') navigate('/saved');
+                  if (key === 'theme') toggle();
+                  if (key === 'name') {
+                    const next = window.prompt('Display name (stored only in this browser):', name || '');
+                    if (next === null) return;
+                    const v = String(next).trim().slice(0, 24);
+                    setName(v);
+                    toast(v ? `Hi, ${v}` : 'Profile cleared');
+                  }
+                }}
+              >
+                <Dropdown.Item id="library">Your library</Dropdown.Item>
+                <Dropdown.Item id="name">Set display name…</Dropdown.Item>
+                <Dropdown.Item id="theme">Toggle light / dark</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown.Popover>
+          </Dropdown>
+          <Tooltip>
+            <Tooltip.Trigger aria-label="Toggle light and dark mode">
+              <Button isIconOnly variant="secondary" onPress={(e) => toggle(e)} aria-pressed={String(dark)}>
+                ◐
+              </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Toggle light / dark</Tooltip.Content>
+          </Tooltip>
         </div>
       </div>
     </header>

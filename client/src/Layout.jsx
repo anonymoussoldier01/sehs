@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, ScrollRestoration } from 'react-router-dom';
 import { Palette, Sidebar, Topbar, useFolders } from './components/shell';
+import { Dock } from './components/magic';
 import { ThemeProvider, ToastProvider } from './providers';
 import { TermsProvider } from './providers';
 import { api } from './lib/api';
@@ -132,6 +133,7 @@ function Layout() {
         </footer>
       </div>
       <Palette />
+      <Dock />
       <CookieBar />
       <ScrollRestoration />
     </div>

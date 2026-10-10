@@ -5,6 +5,8 @@ import { api } from '../lib/api';
 import { keys, useSyncedLocal } from '../lib/store';
 import { useToast } from '../providers';
 import { Skeleton } from '../components/magic';
+import { Button } from '@heroui/react/button';
+import { Tabs } from '@heroui/react/tabs';
 
 const shuffle = (a) => {
   const x = [...a];
@@ -113,23 +115,16 @@ export default function Deck() {
       <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
         {deck.description} · {cards.length} cards
       </p>
-      <div className="my-3 flex gap-0.5 rounded-[11px] border p-[3px] shadow-sm" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }} role="group" aria-label="Study mode">
-        {[
-          ['flip', 'Flashcards'],
-          ['learn', 'Learn'],
-          ['test', 'Test'],
-        ].map(([m, l]) => (
-          <button
-            key={m}
-            onClick={() => switchMode(m)}
-            aria-pressed={String(mode === m)}
-            className="min-h-[36px] flex-1 rounded-lg px-3 text-sm font-bold transition-all"
-            style={mode === m ? { background: 'var(--txt)', color: 'var(--bg)' } : { color: 'var(--mut)' }}
-          >
-            {l}
-          </button>
-        ))}
-      </div>
+      <Tabs selectedKey={mode} onSelectionChange={(k) => switchMode(String(k))} aria-label="Study mode" className="my-3">
+        <Tabs.ListContainer>
+          <Tabs.List>
+            <Tabs.Tab id="flip">Flashcards</Tabs.Tab>
+            <Tabs.Tab id="learn">Learn</Tabs.Tab>
+            <Tabs.Tab id="test">Test</Tabs.Tab>
+            <Tabs.Indicator />
+          </Tabs.List>
+        </Tabs.ListContainer>
+      </Tabs>
 
       {!cards.length && <p className="text-sm" style={{ color: 'var(--mut)' }}>This deck is empty.</p>}
 
@@ -241,9 +236,9 @@ function Flip({ cards, order, pos, setPos, flipped, setFlipped, box, setBox }) {
           ['Still learning', () => { setBox(i, 1); go(1); }],
           ['Next →', () => go(1)],
         ].map(([l, fn]) => (
-          <button key={l} onClick={fn} className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+          <Button key={l} size="sm" variant="secondary" onPress={fn}>
             {l}
-          </button>
+          </Button>
         ))}
       </div>
       <p className="mt-2 text-center text-xs" style={{ color: 'var(--faint)' }}>

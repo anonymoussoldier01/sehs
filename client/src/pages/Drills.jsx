@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Button } from '@heroui/react/button';
+import { Input } from '@heroui/react/input';
 import { api } from '../lib/api';
 import { recordMistake } from '../lib/store';
 import { useToast } from '../providers';
@@ -147,28 +149,28 @@ export default function Drills() {
             {l}
           </button>
         ))}
-        <button onClick={aiDrill} className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+        <Button size="sm" variant="secondary" onPress={aiDrill}>
           ✦ AI set
-        </button>
+        </Button>
       </div>
       <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         <h3 className="font-display text-xl font-bold tabular-nums">{shown.q}</h3>
         {aiSet && <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>AI question {aiIdx + 1} of {aiSet.length}</p>}
         <div className="mt-2.5 flex gap-2">
-          <input
+          <Input
             value={val}
             onChange={(e) => setVal(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && check()}
             placeholder="Your answer"
             aria-label="Your answer"
-            className="min-h-[42px] min-w-0 flex-1 rounded-lg border px-3 py-2 text-base"
-            style={{ borderColor: 'var(--line2)', background: 'var(--panel)', color: 'var(--txt)' }}
+            className="min-w-0 flex-1"
           />
-          <button onClick={check} className="inline-flex min-h-[42px] items-center rounded-[10px] bg-[#2f49e5] px-4 py-2 text-sm font-bold text-white">
+          <Button variant="primary" onPress={check}>
             Check
-          </button>
-          <button
-            onClick={() => {
+          </Button>
+          <Button
+            variant="secondary"
+            onPress={() => {
               if (aiSet) {
                 if (aiIdx + 1 < aiSet.length) {
                   setAiIdx(aiIdx + 1);
@@ -177,11 +179,9 @@ export default function Drills() {
                 } else setAiSet(null);
               } else next();
             }}
-            className="inline-flex min-h-[42px] items-center rounded-[10px] border px-4 py-2 text-sm font-bold"
-            style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
           >
             Next
-          </button>
+          </Button>
         </div>
         {!!msg && <p className="mt-2 text-[13px]">{msg}</p>}
       </div>

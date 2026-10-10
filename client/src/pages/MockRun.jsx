@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Button } from '@heroui/react/button';
+import { ProgressBar } from '@heroui/react/progress-bar';
 import { api } from '../lib/api';
 import { keys, recordMistake } from '../lib/store';
 import { useToast } from '../providers';
@@ -10,6 +12,7 @@ const fmt = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 
 
 export default function MockRun() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const toast = useToast();
   const [mock, setMock] = useState(null);
   const [missing, setMissing] = useState(false);
@@ -117,12 +120,12 @@ export default function MockRun() {
             {perfect ? 'Perfect. 🎉' : score >= qs.length * 0.7 ? 'Solid — review misses below.' : 'Review below, then retry.'}
           </p>
           <p className="mt-3 flex justify-center gap-2">
-            <Link to="/mocks" className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+            <Button size="sm" variant="primary" onPress={() => navigate('/mocks')}>
               All mocks
-            </Link>
-            <button onClick={() => window.location.reload()} className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+            </Button>
+            <Button size="sm" variant="secondary" onPress={() => window.location.reload()}>
               Retry
-            </button>
+            </Button>
           </p>
         </motion.div>
         {!!misses.length && (
@@ -173,12 +176,12 @@ export default function MockRun() {
           })}
         </div>
         <div className="mt-4 flex gap-2">
-          <button onClick={() => setReview(false)} className="inline-flex min-h-[42px] items-center rounded-[11px] border px-5 py-2.5 text-sm font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+          <Button variant="secondary" onPress={() => setReview(false)}>
             ← Back to questions
-          </button>
-          <button onClick={finish} className="inline-flex min-h-[42px] items-center rounded-[11px] bg-[#2f49e5] px-5 py-2.5 text-sm font-bold text-white">
+          </Button>
+          <Button variant="primary" onPress={finish}>
             Submit mock
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -203,26 +206,27 @@ export default function MockRun() {
           Q{i + 1}/{qs.length} · {q.strand}
         </span>
         <span className="ml-auto flex gap-1.5">
-          <button
-            onClick={() => setFlags((f) => ({ ...f, [i]: !f[i] }))}
+          <Button
+            size="sm"
+            variant={flags[i] ? 'primary' : 'secondary'}
+            onPress={() => setFlags((f) => ({ ...f, [i]: !f[i] }))}
             aria-pressed={String(!!flags[i])}
-            title="Flag for review"
-            className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold"
-            style={{ borderColor: flags[i] ? 'var(--amber, #b45309)' : 'var(--line2)', background: flags[i] ? 'var(--amber-bg, #fdf0d8)' : 'var(--panel)' }}
           >
             ⚑ {flags[i] ? 'Flagged' : 'Flag'}
-          </button>
-          <button onClick={() => { setAnswers((a) => { const n = [...a]; n[i] = -1; return n; }); setI((v) => Math.min(v + 1, qs.length - 1)); }} className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+          </Button>
+          <Button size="sm" variant="secondary" onPress={() => { setAnswers((a) => { const n = [...a]; n[i] = -1; return n; }); setI((v) => Math.min(v + 1, qs.length - 1)); }}>
             Skip →
-          </button>
-          <button onClick={() => setReview(true)} className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+          </Button>
+          <Button size="sm" variant="secondary" onPress={() => setReview(true)}>
             Review
-          </button>
+          </Button>
         </span>
       </div>
-      <div className="mb-1 mt-2.5 h-2 overflow-hidden rounded-lg border" style={{ background: 'var(--bg2)', borderColor: 'var(--line)' }} role="progressbar" aria-valuenow={i} aria-valuemin={0} aria-valuemax={qs.length} aria-label="Mock progress">
-        <div className="h-full rounded-lg transition-all" style={{ width: pct + '%', background: 'linear-gradient(90deg,#2f49e5,#7c3aed)' }} />
-      </div>
+      <ProgressBar value={i} maxValue={qs.length} aria-label="Mock progress" className="mb-1 mt-2.5">
+        <ProgressBar.Track>
+          <ProgressBar.Fill />
+        </ProgressBar.Track>
+      </ProgressBar>
       <div className="mt-3 grid items-start gap-3.5 lg:grid-cols-[minmax(0,1fr)_220px]">
         <AnimatePresence mode="wait">
           <motion.div
@@ -302,9 +306,11 @@ function MissTools({ misses, coach, setCoach, variants, setVariants }) {
   return (
     <div className="mt-2 rounded-2xl border p-4" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
       <p className="flex flex-wrap gap-2">
-        <button
-          disabled={busy === 'coach'}
-          onClick={async () => {
+        <Button
+          size="sm"
+          variant="secondary"
+          isDisabled={busy === 'coach'}
+          onPress={async () => {
             setBusy('coach');
             try {
               const t = await api.aiChat(
@@ -317,14 +323,14 @@ function MissTools({ misses, coach, setCoach, variants, setVariants }) {
             }
             setBusy(null);
           }}
-          className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold disabled:opacity-60"
-          style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
         >
           {busy === 'coach' ? 'Coaching…' : 'Coach my errors'}
-        </button>
-        <button
-          disabled={busy === 'var'}
-          onClick={async () => {
+        </Button>
+        <Button
+          size="sm"
+          variant="secondary"
+          isDisabled={busy === 'var'}
+          onPress={async () => {
             setBusy('var');
             try {
               const j = await api.aiVariants(misses.slice(0, 5));
@@ -334,13 +340,13 @@ function MissTools({ misses, coach, setCoach, variants, setVariants }) {
             }
             setBusy(null);
           }}
-          className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold disabled:opacity-60"
-          style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
         >
           {busy === 'var' ? 'Writing…' : 'Variants of my misses'}
-        </button>
-        <button
-          onClick={() => {
+        </Button>
+        <Button
+          size="sm"
+          variant="secondary"
+          onPress={() => {
             try {
               const decks = JSON.parse(localStorage.getItem(keys.decks) || '[]');
               decks.push({ title: 'Mock misses ' + new Date().toISOString().slice(0, 10), cards: misses.map((m) => ({ front: m.stem, back: 'Strand: ' + m.strand })) });
@@ -350,11 +356,9 @@ function MissTools({ misses, coach, setCoach, variants, setVariants }) {
               toast('Could not save deck');
             }
           }}
-          className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold"
-          style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
         >
           Deck my misses
-        </button>
+        </Button>
       </p>
       {coach && <p className="mt-2 whitespace-pre-wrap text-[13.5px]">{coach}</p>}
       {!!variants?.length && (
@@ -433,9 +437,11 @@ function ResultCard({ n, q, picked, ok }) {
       </p>
       {!ok && (
         <div className="mt-1.5">
-          <button
-            disabled={busy}
-            onClick={async () => {
+          <Button
+            size="sm"
+            variant="secondary"
+            isDisabled={busy}
+            onPress={async () => {
               setBusy(true);
               setExp('Asking the tutor…');
               try {
@@ -446,11 +452,9 @@ function ResultCard({ n, q, picked, ok }) {
               }
               setBusy(false);
             }}
-            className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold disabled:opacity-60"
-            style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
           >
             {busy ? 'Thinking…' : 'Explain with AI'}
-          </button>
+          </Button>
           {exp && <p className="mt-1 whitespace-pre-wrap text-[13px]">{exp}</p>}
         </div>
       )}

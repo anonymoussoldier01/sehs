@@ -108,6 +108,7 @@ function secureHeaders(res) {
   res.setHeader('Content-Security-Policy',
     "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; " +
     "font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; " +
+    "frame-src 'self' https://drive.google.com; " +
     "frame-ancestors 'self'; base-uri 'self'; form-action 'self'");
 }
 function sendJson(res, code, obj, extra = {}) {
@@ -299,6 +300,47 @@ async function apiAccess(req, res, ip, publicId) {
   return sendJson(res, 200, { ok: true, openUrl: `/open/${token}` });
 }
 
+// In-site preview: same guarantees as opens (single-use 15-min grant, logged,
+// uniform 404s, IDs never shipped) but lands on Drive's /preview endpoint so
+// PDFs read inside an iframe on the resource page.
+async function apiPreview(req, res, ip, publicId) {
+  const rl = rlAccess.allow('p:' + ip);
+  if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Too many requests. Slow down.' });
+  const row = findResource(publicId);
+  if (!row || !row.visibility || row.file_type === 'folder' || row.category === 'folder') {
+    logEvent('open_denied', { data: {} });
+    return apiMissing(res);
+  }
+  if (row.status === 'unavailable') {
+    logEvent('open_denied', { resourceId: row.id, data: { reason: 'unavailable' } });
+    return sendJson(res, 410, { ok: false, error: 'This resource is temporarily unavailable.' });
+  }
+  const token = newToken(24);
+  const now = nowIso();
+  db.prepare(`INSERT INTO grants(token, resource_id, session_hash, created_at, expires_at, used_at)
+    VALUES (?, ?, NULL, ?, ?, NULL)`)
+    .run(token, row.id, now, new Date(Date.now() + 15 * 60 * 1000).toISOString());
+  logEvent('preview', { resourceId: row.id, data: {} });
+  return sendJson(res, 200, { ok: true, embedUrl: `/embed/${token}` });
+}
+
+function embedGrant(_req, res, token) {
+  if (!/^[A-Za-z0-9_-]{16,64}$/.test(token || '')) return apiMissing(res);
+  const g = db.prepare('SELECT * FROM grants WHERE token = ?').get(token);
+  const now = nowIso();
+  if (!g || g.used_at || g.expires_at < now) return apiMissing(res);
+  const row = db.prepare('SELECT * FROM resources WHERE id = ?').get(g.resource_id);
+  if (!row || !row.visibility || row.file_type === 'folder' || row.category === 'folder') return apiMissing(res);
+  const src = db.prepare('SELECT * FROM resource_sources WHERE resource_id = ?').get(row.id);
+  db.prepare('UPDATE grants SET used_at = ? WHERE token = ?').run(now, token);
+  logEvent('preview_redeemed', { resourceId: row.id, data: {} });
+  if (!src || !src.provider_file_id) return apiMissing(res);
+  const dest = `https://drive.google.com/file/d/${src.provider_file_id}/preview`;
+  secureHeaders(res);
+  res.writeHead(302, { Location: dest });
+  res.end();
+}
+
 function openGrant(_req, res, token) {
   if (!/^[A-Za-z0-9_-]{16,64}$/.test(token || '')) return apiMissing(res);
   const g = db.prepare('SELECT * FROM grants WHERE token = ?').get(token);
@@ -456,11 +498,14 @@ function buildBankMcqs(cards, n, strand) {
     if (out.length >= n) break;
     if (!c || !c.front || !c.back) continue;
     const correct = shortAns(c.back);
-    if (!correct) continue;
+    // skip degenerate items: empty/short answers, or answer == question
+    if (!correct || correct.length < 2) continue;
+    if (correct.toLowerCase() === String(c.front).trim().toLowerCase().slice(0, 90)) continue;
     const distract = [];
     for (const d of shuffled([...pool])) {
       if (d === c || !d.back) continue;
       const s = shortAns(d.back);
+      if (!s || s.length < 2) continue;
       if (s && s.toLowerCase() !== correct.toLowerCase() &&
         !distract.some(x => x.toLowerCase() === s.toLowerCase())) distract.push(s);
       if (distract.length >= 3) break;
@@ -505,6 +550,34 @@ function assembleMock(mock) {
 function planTotal(m) {
   if (!m.plan) return (m.questions || []).length;
   return m.plan.reduce((a, p) => a + (p.bank === 'reading' ? p.n * 4 : p.n), 0);
+}
+// Native flashcard banks as studiable decks (data/native/*.json).
+// These are curated built-in content — no Drive IDs involved.
+const BANK_DECKS = [
+  ['bank-verbal', 'verbal.json', 'Verbal reasoning builder', 'Analogies, synonyms, codes and deductions.'],
+  ['bank-quant', 'quant.json', 'Quantitative reasoning builder', 'Series, matrices, arithmetic and logic.'],
+  ['bank-maths', 'maths.json', 'Year-8 maths facts', 'Fractions, percent, algebra, angles, BODMAS.'],
+  ['bank-vocab', 'vocab.json', 'Vocabulary tiers', 'High-value words in context.'],
+  ['bank-grammar', 'grammar.json', 'Grammar + spelling fixes', 'The errors that cost marks.'],
+];
+function bankDecks() {
+  return BANK_DECKS.map(([id, file, title, description]) => {
+    const bj = nativeJson(file);
+    const cards = bj?.cards || [];
+    return { id, source: 'bank', title, description, count: cards.length };
+  });
+}
+function bankDeckCards(id) {
+  const found = BANK_DECKS.find(([bid]) => bid === id);
+  if (!found) return null;
+  const bj = nativeJson(found[1]);
+  const cards = (bj?.cards || []).slice(0, 200).map(c => ({
+    front: String(c.front || '').slice(0, 500),
+    back: String(c.back || '').slice(0, 2000),
+    resourceId: null,
+  })).filter(c => c.front && c.back);
+  if (!cards.length) return null;
+  return { id, source: 'bank', title: found[2], description: found[3], count: cards.length, cards };
 }
 function apiMocks(_req, res) {
   const j = nativeJson('mocks.json');
@@ -1003,7 +1076,7 @@ const server = http.createServer(async (req, res) => {
         const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
         return sendJson(res, 200, {
           ok: true,
-          decks: [...autoDecks(forRole(indexes), rowMap), ...adminDecks(db)]
+          decks: [...bankDecks(), ...autoDecks(forRole(indexes), rowMap), ...adminDecks(db)]
             .map(d => ({ id: d.id, source: d.source, title: d.title, description: d.description, count: d.count })),
         });
       }
@@ -1022,6 +1095,11 @@ const server = http.createServer(async (req, res) => {
       if (url.pathname === '/api/ai/variants' && req.method === 'POST') return apiAiVariants(req, res, ip);
       const dm = url.pathname.match(/^\/api\/decks\/([A-Za-z0-9-]{1,40})$/);
       if (dm && req.method === 'GET') {
+        if (dm[1].startsWith('bank-')) {
+          const deck = bankDeckCards(dm[1]);
+          if (!deck) return sendJson(res, 404, { ok: false, error: 'Not found.' });
+          return sendJson(res, 200, { ok: true, deck });
+        }
         const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
         const deck = deckCards(db, forRole(indexes), rowMap, dm[1]);
         if (!deck) return sendJson(res, 404, { ok: false, error: 'Not found.' });
@@ -1035,6 +1113,8 @@ const server = http.createServer(async (req, res) => {
       if (mmm && req.method === 'GET') return apiMockById(req, res, mmm[1]);
       const m = url.pathname.match(/^\/api\/access\/([A-Za-z0-9_-]{1,64})$/);
       if (m && req.method === 'POST') return apiAccess(req, res, ip, m[1]);
+      const pm = url.pathname.match(/^\/api\/preview\/([A-Za-z0-9_-]{1,64})$/);
+      if (pm && req.method === 'POST') return apiPreview(req, res, ip, pm[1]);
       // ---- admin API (bearer-gated, uniform 404 otherwise) ----
       if (url.pathname.startsWith('/api/admin/')) {
         const admin = getAdmin(req);
@@ -1333,6 +1413,8 @@ const server = http.createServer(async (req, res) => {
     // single-use grant redemption (no session needed — the token IS the capability)
     const g = url.pathname.match(/^\/open\/([A-Za-z0-9_-]{16,64})$/);
     if (g && req.method === 'GET') return openGrant(req, res, g[1]);
+    const eg = url.pathname.match(/^\/embed\/([A-Za-z0-9_-]{16,64})$/);
+    if (eg && req.method === 'GET') return embedGrant(req, res, eg[1]);
 
     // React SPA (client/dist) owns these routes once built; otherwise the
     // legacy server-rendered pages below handle them. /admin* stays legacy.
