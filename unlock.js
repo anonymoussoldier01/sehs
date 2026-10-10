@@ -1,5 +1,5 @@
 // Admin unlock: password → bearer token kept in THIS TAB ONLY (sessionStorage).
-// Closing the tab locks it again. No cookies are used anywhere on this site.
+// Closing the tab locks it again.
 (function () {
   'use strict';
   var KEY = 'sehs-admin-token';

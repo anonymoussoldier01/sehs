@@ -1,7 +1,7 @@
-// Local-first insights: the most useful "user data" without any tracking.
-// Everything stays in this browser (localStorage). No cookies, no fingerprinting,
-// nothing sent to any server. The server separately keeps only anonymous,
-// auto-deleted open counts (30-day purge) — see README + /about.
+// Local-first insights: personal progress without an account.
+// Everything stays in this browser (cookies + local storage) unless you export
+// it. The server separately keeps only anonymous, auto-deleted open counts
+// (30-day purge) — see README + /about.
 //
 // What we record locally: page views per section, searches run, resources opened
 // + saved, mocks/drills/writing/reading sessions, study streak days, weak strands

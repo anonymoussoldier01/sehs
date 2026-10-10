@@ -1,6 +1,6 @@
 // Everyday quality-of-life: density, bookmarks, recents, back-to-top, shortcuts,
 // copy-link buttons, client-side facet search, scroll progress, reveal on scroll.
-// localStorage only (zero cookies).
+// Browser storage only (cookies + local storage).
 (function () {
   'use strict';
   function store(k, v) {
@@ -226,9 +226,70 @@
     try { rec = JSON.parse(store('sehs-recent') || '[]'); } catch (e) { rec = []; }
     if (rec.length) {
       recentStrip.hidden = false;
+      var fb0 = document.getElementById('recent-fallback');
+      if (fb0) fb0.hidden = true;
       hydrateIds(document.getElementById('recent-grid'), rec.map(function (x) { return x.id; }));
     }
   }
+
+  /* sidebar drawer (mobile) */
+  (function sideDrawer() {
+    var btn = document.getElementById('side-toggle');
+    var side = document.getElementById('side');
+    var scrim = document.getElementById('side-scrim');
+    if (!btn || !side) return;
+    function set(open) {
+      side.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', String(open));
+      if (scrim) scrim.hidden = !open;
+    }
+    btn.addEventListener('click', function () { set(!side.classList.contains('open')); });
+    if (scrim) scrim.addEventListener('click', function () { set(false); });
+    side.addEventListener('click', function (e) {
+      if (e.target.closest && e.target.closest('a') && window.innerWidth <= 960) set(false);
+    });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') set(false); });
+  })();
+
+  /* avatar: local profile initial + quick menu (no account needed) */
+  (function avatar() {
+    var b = document.getElementById('avatar-btn');
+    if (!b) return;
+    var name = null;
+    try { name = localStorage.getItem('sehs-name') || null; } catch (e) {}
+    b.textContent = (name ? name.trim()[0] : 'G').toUpperCase();
+    b.addEventListener('click', function () {
+      var cur = null;
+      try { cur = localStorage.getItem('sehs-name') || ''; } catch (e) {}
+      var next = prompt('Display name (stored only in this browser):', cur || '');
+      if (next === null) return;
+      next = String(next).trim().slice(0, 24);
+      try {
+        if (next) localStorage.setItem('sehs-name', next);
+        else localStorage.removeItem('sehs-name');
+      } catch (e) {}
+      b.textContent = (next ? next[0] : 'G').toUpperCase();
+      toast(next ? 'Hi, ' + next : 'Profile cleared');
+    });
+  })();
+
+  /* cookie notice: one tap, remembered in this browser */
+  (function cookies() {
+    var ok = null;
+    try { ok = localStorage.getItem('sehs-cookie-ok'); } catch (e) { ok = '1'; }
+    if (ok) return;
+    var bar = document.createElement('div');
+    bar.className = 'cookie-bar';
+    bar.setAttribute('role', 'status');
+    bar.innerHTML = '<span>We use cookies + local storage to remember your theme, library and progress.</span>' +
+      '<span style="display:flex;gap:8px"><a class="link-btn" style="color:inherit" href="/about">Details</a>' +
+      '<button class="btn small" id="cookie-ok">Got it</button></span>';
+    document.body.appendChild(bar);
+    document.getElementById('cookie-ok').addEventListener('click', function () {
+      try { localStorage.setItem('sehs-cookie-ok', '1'); } catch (e) {}
+      bar.remove();
+    });
+  })();
 
   paintSaved();
   countups();

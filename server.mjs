@@ -120,11 +120,12 @@ async function bumpAggregate(day, kind, key) {
   } catch { /* noop */ }
 }
 
-// ---- admin auth (bearer token, NO cookies) ------------------------------------------
+// ---- admin auth (per-tab bearer token) ------------------------------------------
 // The admin password exchanges for a random 256-bit bearer token kept in the
-// browser tab's sessionStorage and sent as an Authorization header. No cookies
-// are ever set: no ambient credentials means CSRF is impossible by construction.
-// Token dies with the tab (sessionStorage) and expires server-side in 12h.
+// browser tab's sessionStorage and sent as an Authorization header. Admin
+// requests never rely on ambient credentials, so CSRF is impossible by
+// construction. Token dies with the tab (sessionStorage) and expires
+// server-side in 12h.
 const ADMIN_TTL_SEC = 12 * 3600;
 function bearerToken(req) {
   const h = req.headers.authorization || '';

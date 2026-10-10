@@ -1,4 +1,4 @@
-// Timed mocks client (server-only). Progress in localStorage, zero cookies.
+// Timed mocks client (server-only). Progress in this browser's local storage.
 (function () {
   'use strict';
   function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }

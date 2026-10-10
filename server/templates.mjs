@@ -8,9 +8,36 @@ export function esc(s) {
 const NAV_MAIN = [['/', 'Home'], ['/study', 'Study'], ['/mocks', 'Mocks'], ['/exam-guide', 'Guide']];
 const NAV_MORE = [['/search', 'Browse'], ['/writing', 'Writing'], ['/drills', 'Drills'], ['/reading', 'Reading'], ['/subjects', 'Subjects'], ['/providers', 'Providers'], ['/saved', 'Saved'], ['/about', 'About']];
 
+const SIDE_MAIN = [
+  ['/', 'Home', '⌂'],
+  ['/saved', 'Your library', '▤'],
+  ['/search', 'Browse', '⚲'],
+  ['/study', 'Study hub', '✎'],
+];
+const SIDE_START = [
+  ['/study', 'Flashcards', '▢'],
+  ['/mocks', 'Timed mocks', '◷'],
+  ['/exam-guide', 'Study guides', '≡'],
+  ['/drills', 'Games & drills', '▦'],
+  ['/writing', 'Writing studio', '✒'],
+  ['/reading', 'Reading room', '☰'],
+];
+const SIDE_MORE = [
+  ['/subjects', 'Subjects', '○'],
+  ['/providers', 'Providers', '○'],
+  ['/request', 'Request', '＋'],
+  ['/about', 'About', 'ⓘ'],
+];
+
+function sideLink(h, l, ico, active) {
+  return `<a class="side-link${active === h ? ' on' : ''}" href="${h}"${active === h ? ' aria-current="page"' : ''}><span class="side-ico" aria-hidden="true">${ico}</span>${l}</a>`;
+}
+
 export function layout({ title, desc = '', body, active = '', session = null, extraHead = '' }) {
-  // No per-visitor state on the server (no cookies): the header always shows
-  // a neutral Admin link; admin.js reveals state once a bearer token exists.
+  // Per-tab admin token lives in sessionStorage; the shell always renders the
+  // same neutral links. Progress + library live in the browser (cookies +
+  // local storage) — see the cookie notice + /about.
+  const q = '';
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,7 +45,7 @@ export function layout({ title, desc = '', body, active = '', session = null, ex
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(title)} — SEHS Study Directory</title>
 ${desc ? `<meta name="description" content="${esc(desc)}">` : ''}
-<meta name="theme-color" content="#155e46">
+<meta name="theme-color" content="#15132e">
 <link rel="icon" href="https://ssl.gstatic.com/docs/doclist/images/drive_2022q3_32dp.png">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifest.json">
@@ -33,35 +60,52 @@ ${extraHead}
 <body>
 <div id="scroll-progress" aria-hidden="true"></div>
 <a class="skip" href="#main">Skip to content</a>
-<header class="topbar" role="banner">
-  <div class="wrap topbar-inner">
-    <a class="brand" href="/" aria-label="SEHS Study Directory home">
-      <span class="brand-mark" aria-hidden="true">S</span>
-      <span class="brand-text"><strong>SEHS Study Directory</strong><small>Past papers · notes · mocks · guides</small></span>
+<div class="app">
+  <aside class="side" id="side" aria-label="Primary">
+    <a class="brand side-brand" href="/" aria-label="SEHS Study Directory home">
+      <span class="brand-mark" aria-hidden="true">Q</span>
+      <span class="brand-text"><strong>SEHS Study</strong><small>Flashcards · mocks · papers</small></span>
     </a>
-    <nav class="topnav" aria-label="Sections">
-      ${NAV_MAIN.map(([h, l]) => `<a href="${h}"${active === h ? ' aria-current="page" class="on"' : ''}>${l}</a>`).join('')}
-      <details class="moremenu"${NAV_MORE.some(([h]) => active === h) ? ' open' : ''}><summary aria-label="More sections">Library ▾</summary>
-        <span class="moremenu-body">${NAV_MORE.map(([h, l]) => `<a href="${h}"${active === h ? ' aria-current="page" class="on"' : ''}>${l}</a>`).join('')}</span>
-      </details>
+    <nav class="side-nav" aria-label="Sections">
+      ${SIDE_MAIN.map(([h, l, i]) => sideLink(h, l, i, active)).join('')}
+      <p class="side-h">Start here</p>
+      ${SIDE_START.map(([h, l, i]) => sideLink(h, l, i, active)).join('')}
+      <p class="side-h">More</p>
+      ${SIDE_MORE.map(([h, l, i]) => sideLink(h, l, i, active)).join('')}
     </nav>
-    <div class="top-actions">
-      <button id="filters-toggle" class="btn secondary only-mobile" aria-expanded="false" aria-controls="filters" hidden>Filters</button>
-      <button id="palette-open" class="icon-btn" title="Quick search (Ctrl+K)" aria-label="Quick search">⌘K</button>
-      <a class="btn secondary small" href="/unlock">Admin</a>
-      <button id="theme-toggle" class="icon-btn" title="Toggle dark mode" aria-label="Toggle dark mode" aria-pressed="false">◐</button>
+    <div class="side-foot">
+      <a class="side-new" href="/saved#list-new">＋ New folder</a>
+      <p class="side-note">Progress saves in this browser.</p>
     </div>
+  </aside>
+  <div class="drawer-scrim" id="side-scrim" hidden></div>
+  <div class="app-main">
+    <header class="topbar" role="banner">
+      <div class="wrap topbar-inner">
+        <button id="side-toggle" class="icon-btn" aria-label="Open menu" aria-expanded="false">☰</button>
+        <form class="topsearch" action="/search" method="get" role="search">
+          <svg class="search-ico" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input name="q" type="search" placeholder="Search papers, decks, topics…" autocomplete="off" aria-label="Search study resources" value="${esc(q)}">
+        </form>
+        <div class="top-actions">
+          <button id="filters-toggle" class="btn secondary only-mobile" aria-expanded="false" aria-controls="filters" hidden>Filters</button>
+          <button id="palette-open" class="icon-btn" title="Quick search (Ctrl+K)" aria-label="Quick search">⌘K</button>
+          <button id="avatar-btn" class="avatar" title="Your profile" aria-label="Your profile">G</button>
+          <button id="theme-toggle" class="icon-btn" title="Toggle light / dark" aria-label="Toggle light and dark mode" aria-pressed="false">◐</button>
+        </div>
+      </div>
+    </header>
+    <main id="main">${body}</main>
+    <footer class="wrap foot">
+      <div class="about">
+        <h2>About this directory</h2>
+        <p>A searchable collection of selective-entry study resources — past papers, notes, flashcards, mocks and guides. Free for anyone studying, no account needed.</p>
+        <p class="foot-meta">We use cookies + local storage to remember your theme, library and progress. Anonymous usage counts auto-delete after 30 days. <a class="link-btn" href="/about">Privacy &amp; cookies</a></p>
+      </div>
+      <div class="foot-actions"><a class="link-btn" href="/about">About</a><a class="link-btn" href="/saved">Library</a><a class="link-btn" href="/study">Study hub</a><a class="link-btn" href="/request">Request</a><a class="link-btn" href="/unlock">Admin</a></div>
+    </footer>
   </div>
-</header>
-<main id="main">${body}</main>
-<footer class="wrap foot">
-  <div class="about">
-    <h2>About this directory</h2>
-    <p>A searchable collection of SEHS selective-entry study resources, put together for Year 8 students in Victoria. Search the index, open what you need, save your own lists — no account, no tracking.</p>
-    <p class="foot-meta">Privacy-first: your saves, decks and progress never leave this browser. Anonymous open counts auto-delete after 30 days.</p>
-  </div>
-  <div class="foot-actions"><a class="link-btn" href="/about">About</a><a class="link-btn" href="/saved">Saved</a><a class="link-btn" href="/study">Study hub</a><a class="link-btn" href="/request">Request</a><a class="link-btn" href="/unlock">Admin</a></div>
-</footer>
+</div>
 <div class="modal-backdrop" id="terms-modal" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="terms-title">
     <h2 id="terms-title">Terms &amp; Conditions <span id="terms-version" style="font-size:13px;color:var(--faint)"></span></h2>

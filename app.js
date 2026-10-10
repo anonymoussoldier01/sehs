@@ -40,7 +40,7 @@ function toast(msg) {
 /* ---------- theme ---------- */
 function initTheme() {
   const saved = localStorage.getItem('sehs-theme');
-  const dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const dark = saved ? saved === 'dark' : true;
   document.documentElement.dataset.theme = dark ? 'dark' : '';
   els['theme-toggle'].setAttribute('aria-pressed', String(dark));
 }

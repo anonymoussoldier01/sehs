@@ -40,62 +40,77 @@ export function landing(ctx) {
     return resultRow(publicView(row), d ? d.displayTitle : row.title, [], true);
   }).join('');
   const stat = (label, n) => `<div><dt>${label}</dt><dd data-countup="${n}">${Number(n).toLocaleString()}</dd></div>`;
+  const deckCard = (href, ico, title, sub, badge) => `
+    <a class="deck-card" href="${href}"><span class="deck-top"><span class="deck-ico" aria-hidden="true">${ico}</span>${badge ? `<span class="studiers">${esc(badge)}</span>` : ''}</span>
+    <h3>${esc(title)}</h3><p>${esc(sub)}</p><span class="deck-go">Study →</span></a>`;
+  const nextRail = topSubj.slice(0, 6).map(([s, c]) =>
+    deckCard(`/search?q=${encodeURIComponent(s)}`, '▢', pretty(s), `${Number(c).toLocaleString()} resources · flashcards + papers`, `${Number(c).toLocaleString()} resources`)).join('');
   const body = `
-  <section class="wrap hero" aria-label="Search">
-    <span class="hero-kicker"><span class="dot"></span>${Number(stats.total).toLocaleString()} resources · free · no sign-up</span>
-    <h1>Find the right paper, <span class="scribble">fast.<svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 60 2, 140 2, 198 7" stroke="#b45309" stroke-width="4" fill="none" stroke-linecap="round"/></svg></span></h1>
-    <p class="hero-sub">Past papers, topic notes and practice sets for the SEHS selective-entry exam — maths, reasoning, reading and writing. Type a topic, a provider, or just “fractions”.</p>
-    <form class="search-wrap" action="/search" method="get" role="search">
-      <div class="searchbox">
-        <svg class="search-ico" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <input name="q" type="search" placeholder="Try “VSSE maths”, “verbal analogy”, “reading answers”…" autocomplete="off" aria-label="Search study resources">
-        <kbd title="Press / to focus">/</kbd>
+  <div class="feed" id="discovery">
+    <section aria-label="Search">
+      <form class="search-wrap" action="/search" method="get" role="search">
+        <div class="searchbox">
+          <svg class="search-ico" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16.5 16.5 21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input name="q" type="search" placeholder="Search papers, decks, topics — try “fractions”…" autocomplete="off" aria-label="Search study resources">
+          <kbd title="Press / to focus">/</kbd>
+        </div>
+      </form>
+      <div class="quick-row"><span class="quick-label">Popular:</span>
+        <a class="quick-chip" href="/search?q=vsse">VSSE</a>
+        <a class="quick-chip" href="/search?q=maths&answers=1">Maths + answers</a>
+        <a class="quick-chip" href="/search?q=numerical%20reasoning">Numerical</a>
+        <a class="quick-chip" href="/search?q=reading%20comprehension">Reading</a>
+        <a class="quick-chip" href="/mocks">Timed mock</a>
       </div>
-    </form>
-    <div class="quick-row"><span class="quick-label">Popular:</span>
-      <a class="quick-chip" href="/search?q=vsse">VSSE</a>
-      <a class="quick-chip" href="/search?q=maths&answers=1">Maths + answers</a>
-      <a class="quick-chip" href="/search?q=numerical%20reasoning">Numerical</a>
-      <a class="quick-chip" href="/search?q=reading%20comprehension">Reading</a>
-      <a class="quick-chip" href="/mocks">Timed mock</a>
+      <dl class="stats" aria-label="Collection statistics">
+        ${stat('Resources', stats.total)}
+        ${stat('Subjects', stats.subjects)}
+        ${stat('Providers', stats.providers)}
+        ${stat('With answers', stats.answers)}
+      </dl>
+    </section>
+    <section class="progress-strip" id="progress-strip" aria-label="Your progress"></section>
+
+    <h2 class="feed-h">Recents <small id="home-next-inline"></small></h2>
+    <section class="disc-section" id="recent-strip" hidden><div class="disc-grid" id="recent-grid"></div></section>
+    <div class="disc-grid" id="recent-fallback">
+      <div class="disc-tile"><h3 id="home-next">Pick up where you left off</h3><p>Your recent decks and papers appear here.</p><p><a class="btn small" id="home-go" href="/study">Open study hub →</a></p></div>
+      <div class="disc-tile"><h3>Question of the day</h3><p id="home-qotd">Warming up…</p><p id="home-qotd-a" hidden style="font-size:13.5px"></p><p><button class="btn small secondary" id="home-qotd-reveal" hidden>Show answer</button></p></div>
     </div>
-    <dl class="stats" aria-label="Collection statistics">
-      ${stat('Resources', stats.total)}
-      ${stat('Subjects', stats.subjects)}
-      ${stat('Providers', stats.providers)}
-      ${stat('With answers', stats.answers)}
-      ${stat('PDFs', stats.pdfs)}
-    </dl>
-  </section>
-  <div class="wrap layout single" id="discovery">
-    <main aria-label="Browse resources">
-      <section class="progress-strip" id="progress-strip" aria-label="Your progress"></section>
-      <section class="disc-section"><div class="disc-head"><h2>Start here</h2></div>
-        <div class="disc-grid">
-          <div class="disc-tile"><h3>Today's next step</h3><p id="home-next">Picking your next best move…</p><p><a class="btn small" id="home-go" href="/study">Continue →</a></p></div>
-          <div class="disc-tile"><h3>Question of the day</h3><p id="home-qotd">Warming up…</p><p id="home-qotd-a" hidden style="font-size:13.5px"></p><p><button class="btn small secondary" id="home-qotd-reveal" hidden>Show answer</button></p></div>
-        </div></section>      <section class="disc-section"><div class="disc-head"><h2>Prep without the Drive hunt <small>built-in · works offline-ish</small></h2></div>
-        <div class="disc-grid">
-          <div class="disc-tile"><h3>Exam guide</h3><p>ACER 3-block format, pacing, schools, 12-week plan.</p><a class="btn small" href="/exam-guide">Open guide →</a></div>
-          <div class="disc-tile"><h3>Timed mocks</h3><p>Diagnostic + 60/55/40 min blocks with scoring.</p><a class="btn small" href="/mocks">Open mocks →</a></div>
-          <div class="disc-tile"><h3>Writing studio</h3><p>80 prompts, timer, word count, rubric.</p><a class="btn small" href="/writing">Open writing →</a></div>
-          <div class="disc-tile"><h3>Maths drills</h3><p>Infinite fractions, algebra, BODMAS.</p><a class="btn small" href="/drills">Open drills →</a></div>
-        </div></section>
-      <section class="disc-section" id="recent-strip" hidden><div class="disc-head"><h2>Recently viewed</h2></div><div class="disc-grid" id="recent-grid"></div></section>
-      <section class="disc-section" id="tuned-shelf" hidden><div class="disc-head"><h2>Tuned for you <small>based on what you open · stored only in this browser</small></h2></div><div class="disc-grid" id="tuned-grid"></div></section>
-      <section class="disc-section"><div class="disc-head"><h2>New arrivals</h2><a class="link-btn" href="/feed.xml">RSS →</a></div><div class="disc-grid" id="new-grid"></div></section>
-      ${trendingCards ? `<section class="disc-section"><div class="disc-head"><h2>Trending this week</h2></div><div class="disc-grid">${trendingCards}</div></section>` : ''}
-      <section class="disc-section"><div class="disc-head"><h2>Practice tests <small>${practice.length ? '' : ''}</small></h2><a class="link-btn" href="/search?cat=practice-test">View all →</a></div>
-        <div class="disc-grid">${practice.map(card).join('')}</div></section>
-      <section class="disc-section"><div class="disc-head"><h2>Resources with answers</h2><a class="link-btn" href="/search?answers=1">View all →</a></div>
-        <div class="disc-grid">${answers.map(card).join('')}</div></section>
-      <section class="disc-section"><div class="disc-head"><h2>By subject</h2><a class="link-btn" href="/subjects">All subjects →</a></div>
-        <div class="disc-sub">${topSubj.map(([s, c]) => `<div class="disc-tile"><h3>${esc(pretty(s))}</h3><p>${c.toLocaleString()} resources</p><a class="link-btn" href="/search?q=${encodeURIComponent(s)}">View all ${esc(pretty(s))} →</a></div>`).join('')}</div></section>
-    </main>
+
+    <h2 class="feed-h">Personalize your content</h2>
+    <section class="disc-tile" id="tuned-shelf" hidden><h3>Picked for how you study</h3><p style="color:var(--mut);font-size:13px">Based on what you open · stored in this browser · <a class="link-btn" href="/subjects">update subjects</a></p><div class="disc-grid" id="tuned-grid" style="margin-top:10px"></div></section>
+    <section class="disc-tile" id="tuned-fallback"><h3>Find content based on your exams</h3><p style="color:var(--mut);font-size:13.5px">Open a few resources and this shelf tunes itself to your subjects.</p><p><a class="btn small secondary" href="/subjects">Browse subjects</a></p></section>
+
+    <h2 class="feed-h">New: timed mode</h2>
+    <section class="promo"><div><h3>Exam blocks, real timing</h3><p>60 / 55 / 40-minute blocks with instant scoring and explanations. Best scores stay in your browser.</p><p><a class="btn small" href="/mocks">Generate a mock</a></p></div><div class="promo-art" aria-hidden="true">◷</div></section>
+
+    <h2 class="feed-h">For your next study session <small>from the library</small></h2>
+    <div class="rail">${nextRail}</div>
+
+    <h2 class="feed-h">Learn questions <small>try one now</small></h2>
+    <section class="learn-card" id="feed-learn" aria-label="Sample learn question">
+      <p class="qpos">1 / 5 · sample</p>
+      <p class="q" id="feed-learn-q">Loading a sample question…</p>
+      <div id="feed-learn-opts"></div>
+      <p class="opt-fb" id="feed-learn-fb" hidden></p>
+      <p style="margin:14px 0 0"><a class="btn small" href="/study">Open flashcards</a> <a class="btn small secondary" href="/mocks">Take a timed mock</a></p>
+    </section>
+
+    <h2 class="feed-h">New arrivals <small><a class="link-btn" href="/feed.xml">RSS</a></small></h2>
+    <section class="disc-grid" id="new-grid"></section>
+    ${trendingCards ? `<h2 class="feed-h">Trending this week</h2><div class="disc-grid">${trendingCards}</div>` : ''}
+    <h2 class="feed-h">Practice tests <small><a class="link-btn" href="/search?cat=practice-test">View all</a></small></h2>
+    <div class="disc-grid">${practice.map(card).join('')}</div>
+    <h2 class="feed-h">Resources with answers <small><a class="link-btn" href="/search?answers=1">View all</a></small></h2>
+    <div class="disc-grid">${answers.map(card).join('')}</div>
+    <h2 class="feed-h">By subject <small><a class="link-btn" href="/subjects">All subjects</a></small></h2>
+    <div class="disc-sub">${topSubj.map(([s, c]) => `<div class="disc-tile"><h3>${esc(pretty(s))}</h3><p>${c.toLocaleString()} resources</p><a class="link-btn" href="/search?q=${encodeURIComponent(s)}">View all ${esc(pretty(s))} →</a></div>`).join('')}</div>
   </div>
   <script src="/ai.js" defer></script>
-  <script src="/home.js" defer></script>`;
-  return layout({ title: 'Find exactly what you need to study', desc: 'Search the SEHS resource collection across practice papers, notes, tests and more.', body, active: '/', session });
+  <script src="/home.js" defer></script>
+  <script src="/feed-learn.js" defer></script>`;
+  return layout({ title: 'Study flashcards, mocks and past papers', desc: 'Flashcards, timed mocks and a searchable library of selective-entry study resources.', body, active: '/', session });
 }
 
 export function parseSearchParams(sp) {
@@ -483,11 +498,12 @@ export function aboutPage(ctx) {
   const n = db.prepare(`SELECT COUNT(*) AS n FROM resources WHERE visibility = 1 AND file_type != 'folder' AND category != 'folder'`).get().n;
   const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:760px" id="main">
     <h1 style="font-family:var(--disp)">About this directory</h1>
-    <p style="color:var(--mut)">A searchable collection of ${Number(n).toLocaleString()} SEHS selective-entry study resources — practice papers, notes, homework and tests. Search runs on our own index; opening a resource takes you to its hosted file.</p>
+    <p style="color:var(--mut)">A searchable collection of ${Number(n).toLocaleString()} selective-entry study resources — practice papers, notes, flashcards, mocks and study guides. Free for anyone studying, no account needed. Search runs on our own index; opening a resource takes you to its hosted file.</p>
     <h2 style="font-size:16px;margin-top:24px">Access</h2>
     <p style="color:var(--mut)">Every resource is open to everyone — no account, no login. You will be asked to accept the Terms &amp; Conditions when you open your first resource in each browser tab.</p>
-    <h2 style="font-size:16px;margin-top:24px">Privacy</h2>
-    <p style="color:var(--mut)">No cookies. No accounts. No third-party tracking or advertising. Preferences and saved items stay in your own browser. We log the minimum needed to operate the service, and raw usage statistics auto-purge after 30 days.</p></div>`;
+    <h2 style="font-size:16px;margin-top:24px">Privacy &amp; cookies</h2>
+    <p style="color:var(--mut)">We use cookies and local storage to remember your theme, library, decks and study progress. We don't sell personal data and we don't run third-party advertising. Anonymous usage counts (resource opens, searches) auto-delete after 30 days. Your library and progress stay in your own browser unless you choose to export them — clearing site data removes them.</p>
+    <p style="color:var(--mut)">Admin sign-in uses a per-tab token (closing the tab locks it again). Contact the site operator if you want your data removed.</p></div>`;
   return layout({ title: 'About', body, active: '/about', session });
 }
 

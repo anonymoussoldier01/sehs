@@ -153,6 +153,8 @@
         encodeURIComponent(s.label) + '">Explore →</a></div>';
     }).join('');
     shelf.hidden = false;
+    var tfb = document.getElementById('tuned-fallback');
+    if (tfb) tfb.hidden = true;
   })();
   paintChip();
 })();

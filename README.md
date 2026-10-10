@@ -1,8 +1,9 @@
 # SEHS Study Directory — secure study-resource platform
 
-Searchable collection of SEHS selective-entry study resources with a smart local
+Searchable collection of selective-entry study resources with a smart local
 search engine, study tools, and an admin console. Zero dependencies (plain
-Node 22+ with `node:sqlite`), no build step, **zero cookies**, no accounts.
+Node 22+ with `node:sqlite`), no build step, no accounts required — open to
+anyone studying.
 
 Live dataset: 1,641 resources served from SQLite — clients never receive raw
 storage URLs or folder IDs.
@@ -24,8 +25,8 @@ storage URLs or folder IDs.
 - **Admin** (`/admin`, single password): dashboard with charts, resource CRUD +
   bulk import, decks manager, triage, audit log + sessions, announcements,
   Terms publishing, retention + purge, DB backup, health check.
-- **Privacy**: no cookies, no accounts, no third-party tracking. Preferences,
-  decks, lists and tuning live in the visitor's own browser. Raw analytics
+- **Privacy**: no accounts, no third-party ads. Cookies + local storage
+  remember the visitor's theme, library, decks and progress. Raw analytics
   auto-purge after 30 days (configurable). Admin auth is a per-tab bearer token.
 
 ## Project structure
@@ -87,8 +88,9 @@ Open `http://localhost:8080`, search, open `/unlock` for admin. Re-running
 ## Security model (summary)
 
 - Single generated admin password, `scrypt` hash + salt, `timingSafeEqual`.
-- Per-tab bearer token (`Authorization` header, sessionStorage); no cookies
-  anywhere, so CSRF is impossible by construction (header check retained).
+- Per-tab bearer token (`Authorization` header, sessionStorage); admin actions
+  never rely on ambient credentials, so CSRF is impossible by construction
+  (header check retained).
 - Server checks on every privileged request; uniform 404s (no oracle).
 - Unlock rate-limited + escalating lockouts; 100KB payload caps (500KB bulk);
   security headers incl. same-origin CSP (no inline scripts anywhere).

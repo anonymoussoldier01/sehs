@@ -87,7 +87,7 @@ export function lockoutTracker({ threshold = 5, baseDelaySec = 60, maxDelaySec =
 }
 
 export function parseCookies(header) {
-  // Legacy helper retained for tests; the server sets zero cookies.
+  // Cookie parsing helper (the site uses cookies + storage for preferences).
   const out = {};
   if (!header) return out;
   for (const part of String(header).split(';')) {

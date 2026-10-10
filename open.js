@@ -1,5 +1,4 @@
 // Shared open flow: per-tab Terms acceptance, then single-use grant URL.
-// POST /api/access/:id → {openUrl: /open/:token} → new tab. No cookies anywhere.
 (function () {
   function toast(msg) {
     var t = document.getElementById('toast');

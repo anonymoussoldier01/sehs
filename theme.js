@@ -1,9 +1,8 @@
-// Theme toggle. Preferences live in localStorage (your browser only).
-// This site sets zero cookies — nothing here leaves your device.
+  // Default to dark (deep-navy study theme) unless the visitor chose otherwise.
 (function () {
   var saved = null;
   try { saved = localStorage.getItem('sehs-theme'); } catch (e) { /* storage unavailable */ }
-  var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var dark = saved ? saved === 'dark' : true;
   document.documentElement.dataset.theme = dark ? 'dark' : '';
   function sync() {
     var b = document.getElementById('theme-toggle');

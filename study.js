@@ -1,4 +1,4 @@
-// Study hub + deck modes. All personal data in localStorage (zero cookies).
+// Study hub + deck modes. All personal data in this browser (localStorage).
 // Modes: flip (flashcards) · learn (Leitner MCQ→recall) · test (timed mock).
 (function () {
   'use strict';

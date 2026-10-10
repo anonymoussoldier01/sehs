@@ -1,4 +1,4 @@
-// Terms gate: per-tab acceptance, zero cookies, zero persistence.
+// Terms gate: per-tab acceptance, no server-side account needed.
 // The flag lives in this tab's memory only: a new tab asks again. This is
 // stated plainly in the modal copy — acceptance is an agreement step, and the
 // server independently logs every resource open. No secrets here.
