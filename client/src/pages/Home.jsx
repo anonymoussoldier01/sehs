@@ -6,7 +6,7 @@ import { Button } from '../components/ui/button';
 import { AuroraText, BlurFade, DeckCard, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText, DotPattern, Magnet, ClickSpark, StarBorder, TextGenerate, BlurText, SpotlightCard } from '../components/magic';
 import { ResourceCard } from '../components/cards';
 import { BoxReveal, SpinningText, VanishInput, Typewriter, ScrollVelocity, Ripple, InteractiveHover, OrbitingCircles } from '../components/bits';
-import { BentoGrid, BentoCard, MiniTimer, MiniViewer, MiniDeck, MiniPen, MiniBars, MiniLines, ContainerScroll, AuroraBg, SnapCarousel, Evervault } from '../components/ace';
+import { BentoGrid, BentoCard, MiniTimer, MiniViewer, MiniDeck, MiniPen, MiniBars, MiniLines, ContainerScroll, AuroraBg, SnapCarousel, Evervault, Lamp } from '../components/ace';
 
 function useApi(fn, deps) {
   const [data, setData] = useState(null);
@@ -31,7 +31,7 @@ function Hero() {
       <DotPattern />
       <Particles />
       <Meteors count={5} />
-      <div className="mhero-inner relative">
+      <div className="mhero-inner relative" style={{ maxWidth: 1060 }}>
         <BlurFade>
           <span className="flex flex-wrap items-center gap-3">
             <ShinyBadge>
@@ -42,15 +42,15 @@ function Hero() {
             </SpinningText>
           </span>
         </BlurFade>
+        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="min-w-0">
         <BlurFade delay={0.08}>
-          <BoxReveal delay={0.1}>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(38px,6vw,64px)', lineHeight: 1.04, letterSpacing: '-.025em', margin: '18px 0 14px', fontWeight: 700 }}>
-              Study <AuroraText>anything</AuroraText>.<br />
-              <span className="hl-stroke">Master <WordRotate words={['maths', 'verbal reasoning', 'reading', 'writing', 'vocabulary']} />.
-                <svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 60 2, 140 2, 198 7" /></svg>
-              </span>
-            </h1>
-          </BoxReveal>
+          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(38px,6vw,64px)', lineHeight: 1.04, letterSpacing: '-.025em', margin: '18px 0 14px', fontWeight: 700 }}>
+            Study <AuroraText>anything</AuroraText>.<br />
+            <span className="hl-stroke">Master <WordRotate words={['maths', 'verbal reasoning', 'reading', 'writing', 'vocabulary']} />.
+              <svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 60 2, 140 2, 198 7" /></svg>
+            </span>
+          </h1>
         </BlurFade>
         <BlurFade delay={0.16}>
           <p className="lede" style={{ color: 'var(--mut)', fontSize: 17, maxWidth: '62ch', margin: '0 0 22px' }}>
@@ -75,6 +75,16 @@ function Hero() {
             </Magnet>
           </div>
         </BlurFade>
+          </div>
+          <BlurFade delay={0.2} className="mx-auto hidden sm:block">
+            <div className="text-center">
+              <OrbitingCircles core="✦" items={['∑', '◈', '☰', '✒', '⬡', '❖']} radius={104} duration={24} />
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--faint)' }}>
+                Maths · Verbal · Quant · Reading · Writing
+              </p>
+            </div>
+          </BlurFade>
+        </div>
         <BlurFade delay={0.28}>
           <VanishInput onSearch={(v) => navigate('/search?q=' + encodeURIComponent(v))} />
           <p className="mt-2 text-xs" style={{ color: 'var(--faint)' }}>Press <kbd className="kbd">/</kbd> anywhere to jump here</p>
@@ -214,7 +224,7 @@ export default function Home() {
             <Link
               key={t}
               to={'/search?q=' + encodeURIComponent(t === 'Maths + answers' ? 'maths' : t)}
-              className="inline-flex min-h-[38px] shrink-0 items-center rounded-full border px-4 text-[13px] font-bold transition-all hover:-translate-y-px"
+              className="chip-hover inline-flex min-h-[38px] shrink-0 items-center rounded-full border px-4 text-[13px] font-bold"
               style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
             >
               {t}
@@ -230,7 +240,7 @@ export default function Home() {
           ['Flashcard decks', deckCount ?? '–'],
           ['Writing prompts', 80],
         ].map(([l, n]) => (
-          <div key={l} className="flex min-w-[118px] flex-col rounded-xl border px-4 py-2.5 shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+          <div key={l} className="lift flex min-w-[118px] flex-col rounded-xl border px-4 py-2.5 shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
             <dd className="order-1 font-display text-[23px] font-bold tabular-nums">
               {typeof n === 'number' ? <NumberTicker value={n} /> : <span aria-label="loading">–</span>}
             </dd>
@@ -244,7 +254,7 @@ export default function Home() {
       <BlurFade className="mt-4">
         <Link
           to="/exam-guide"
-          className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl border px-4 py-3 text-[13.5px] shadow-sm transition-all hover:-translate-y-px"
+          className="lift flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl border px-4 py-3 text-[13.5px] shadow-sm"
           style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}
         >
           <strong>The selective entry test:</strong>
@@ -260,19 +270,12 @@ export default function Home() {
       </BlurFade>
 
       <section aria-label="Where you could be in Year 9" className="mt-10">
-        <div className="grid items-center gap-6 md:grid-cols-[minmax(0,1fr)_auto]">
-          <div>
-            <p className="text-xs font-extrabold uppercase tracking-[0.2em]" style={{ color: 'var(--acc)' }}>
-              Victorian selective entry · Year 9 intake
-            </p>
-            <h2 className="mt-1 font-display text-[26px] font-bold">
-              <TextGenerate words="Four schools. One exam. Walk in ready." />
-            </h2>
-            <p className="mt-2 max-w-[58ch] text-[15px]" style={{ color: 'var(--mut)' }}>
-              Around 1,000 Year 9 places across Melbourne High, Mac.Robertson Girls&apos;, Nossal and Suzanne Cory.
-              Offers come from the official selection process — this site exists so you meet exam day prepared, not surprised.
-            </p>
-          </div>
+        <Lamp
+          kicker="Victorian selective entry · Year 9 intake"
+          title="Four schools. One exam. Walk in ready."
+          sub="Around 1,000 Year 9 places across Melbourne High, Mac.Robertson Girls', Nossal and Suzanne Cory. Offers come from the official selection process — this site exists so you meet exam day prepared, not surprised."
+        />
+        <div className="mx-auto mt-4 max-w-[420px]">
           <OrbitingCircles core="✦" items={['MHS', 'MRG', 'NHS', 'SCS']} radius={72} duration={20} />
         </div>
         <div className="mt-4 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
