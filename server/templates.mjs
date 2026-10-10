@@ -88,6 +88,8 @@ ${extraHead}
 </div>
 <script src="/theme.js" defer></script>
 <script src="/gate.js" defer></script>
+<script src="/open.js" defer></script>
+<script src="/request.js" defer></script>
 <script src="/ux.js" defer></script>
 <script src="/pwa.js" defer></script>
 <script src="/suggest.js" defer></script>
