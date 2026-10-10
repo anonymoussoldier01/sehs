@@ -56,6 +56,7 @@ ${desc ? `<meta name="description" content="${esc(desc)}">` : ''}
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
+<script type="speculationrules">{"prerender": [{"source": "document", "where": {"and": [{"href_matches": "/*"}, {"not": {"href_matches": ["/open/*", "/api/*", "/admin*"]}}]}, "eagerness": "moderate"}]}</script>
 ${extraHead}
 </head>
 <body>
@@ -76,6 +77,7 @@ ${extraHead}
     </nav>
     <div class="side-foot">
       <a class="side-new" href="/saved#list-new">＋ New folder</a>
+      <div id="side-lists"></div>
       <p class="side-note">Progress saves in this browser.</p>
     </div>
   </aside>
@@ -145,6 +147,7 @@ ${extraHead}
 <script src="/palette.js" defer></script>
 <script src="/lists.js" defer></script>
 <script src="/insights.js" defer></script>
+<script src="/confetti.js" defer></script>
 </body>
 </html>`;
 }

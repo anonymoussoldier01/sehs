@@ -80,8 +80,22 @@
     });
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenu(); });
+  // ---- sidebar folders (every page has #side-lists) ----
+  function paintSide() {
+    var host = document.getElementById('side-lists');
+    if (!host) return;
+    var lists = load();
+    if (!lists.length) { host.innerHTML = ''; return; }
+    host.innerHTML = lists.slice(0, 6).map(function (l) {
+      var href = '/list/' + encodeIds(l.items || []);
+      return '<a class="side-link side-folder" href="' + href + '"><span class="side-ico" aria-hidden="true">▤</span>' +
+        '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(l.name) + '</span>' +
+        '<span class="c">' + (l.items || []).length + '</span></a>';
+    }).join('') + (lists.length > 6 ? '<a class="side-link" href="/saved"><span class="side-ico" aria-hidden="true">…</span>All folders</a>' : '');
+  }
   // ---- lists hub (Saved page) ----
   function paintHub() {
+    paintSide();
     var host = document.getElementById('lists-hub');
     if (!host) return;
     var lists = load();

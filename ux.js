@@ -59,6 +59,26 @@
     mo.observe(document.body, { childList: true, subtree: true });
   } catch (e) { /* older browser: skip */ }
 
+  /* cursor spotlight on cards + tiles (CSS reads --mx/--my) */
+  (function spotlight() {
+    try {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
+    } catch (e) {}
+    var pending = null;
+    document.addEventListener('pointermove', function (e) {
+      var t = e.target.closest && e.target.closest('.card, .disc-tile, .deck-card');
+      if (!t) return;
+      if (pending) return;
+      pending = requestAnimationFrame(function () {
+        pending = null;
+        var r = t.getBoundingClientRect();
+        t.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+        t.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+      });
+    }, { passive: true });
+  })();
+
   /* press feedback for every button */
   document.addEventListener('pointerdown', function (e) {
     var b = e.target.closest && e.target.closest('.btn, .icon-btn, .quick-chip, .seg-btn');

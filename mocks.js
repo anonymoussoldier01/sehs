@@ -45,9 +45,12 @@
     var area = document.getElementById('mock-area');
     if (state.i >= state.q.length) { finish(); return; }
     var q = state.q[state.i];
-    area.innerHTML = '<div style="display:flex;gap:12px;align-items:center;margin:10px 0;flex-wrap:wrap"><div id="mock-timer" style="font-family:var(--disp);font-size:26px;font-weight:800">' + fmt(state.secsLeft) + '</div>' +
+    var pct = Math.round(state.i / state.q.length * 100);
+    var low = state.secsLeft <= 60;
+    area.innerHTML = '<div style="display:flex;gap:12px;align-items:center;margin:10px 0 0;flex-wrap:wrap"><div id="mock-timer" class="' + (low ? 'mk-timer-low' : '') + '" style="font-family:var(--disp);font-size:26px;font-weight:800">' + fmt(state.secsLeft) + '</div>' +
       '<span style="color:var(--mut)">Q' + (state.i + 1) + '/' + state.q.length + ' · ' + esc(q.strand) + '</span>' +
       '<span style="margin-left:auto;display:flex;gap:6px"><button class="btn small secondary" id="mk-skip">Skip →</button><button class="btn small secondary" id="mk-finish">Finish</button></span></div>' +
+      '<div class="mk-progress" role="progressbar" aria-valuenow="' + state.i + '" aria-valuemin="0" aria-valuemax="' + state.q.length + '" aria-label="Mock progress"><i style="width:' + pct + '%"></i></div>' +
       '<div class="disc-tile"><h3>' + esc(q.stem) + '</h3><div style="display:grid;gap:8px;margin-top:12px">' +
       q.options.map(function (o, k) { return '<button class="btn secondary" data-opt="' + k + '">' + esc(o) + '</button>'; }).join('') + '</div></div>';
     area.querySelectorAll('[data-opt]').forEach(function (b) {
@@ -73,6 +76,9 @@
     });
     var best = load('sehs-mocks', {});
     if (!best[mockId] || score > best[mockId].score) { best[mockId] = { score: score, total: state.q.length, at: new Date().toISOString() }; save('sehs-mocks', best); }
+    if (score === state.q.length && state.q.length > 0 && window.__sehsConfetti) {
+      setTimeout(function () { window.__sehsConfetti(120); }, 350);
+    }
     var area = document.getElementById('mock-area');
     area.innerHTML = '<div class="disc-tile" style="text-align:center"><h3>Score: ' + score + ' / ' + state.q.length + '</h3>' +
       '<p style="color:var(--mut)">' + (score === state.q.length ? 'Perfect. 🎉' : score >= state.q.length * 0.7 ? 'Solid — review misses below.' : 'Review below, then retry.') + '</p>' +

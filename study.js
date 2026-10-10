@@ -210,17 +210,31 @@
       if (mode === 'flip') {
         var i = order[pos % order.length];
         var c = cards[i];
-        host.innerHTML = '<div class="disc-tile" style="text-align:center;padding:32px 20px;cursor:pointer" id="flip-card" role="button" tabindex="0" aria-label="Flip card">' +
-          '<p style="font-size:12px;color:var(--faint)">Card ' + ((pos % order.length) + 1) + ' of ' + order.length + (box(i) >= 3 ? ' · mastered ✓' : '') + '</p>' +
-          '<p style="font-size:20px;font-weight:700">' + esc(flipped ? c.back : c.front) + '</p>' +
-          '<p style="color:var(--faint);font-size:13px">' + (flipped ? 'Back — tap to flip' + srcLink(c) : 'Front — tap to reveal') + '</p></div>' +
+        var faceStyle = 'text-align:center;padding:32px 20px;min-height:230px;display:flex;flex-direction:column;justify-content:center;gap:10px';
+        host.innerHTML = '<div class="flip-wrap"><div class="flip-inner' + (flipped ? ' flipped' : '') + '" id="flip-card" role="button" tabindex="0" aria-label="Flashcard — activate to flip" style="cursor:pointer">' +
+          '<div class="flip-face front disc-tile" style="' + faceStyle + '">' +
+          '<p style="font-size:12px;color:var(--faint);margin:0">Card ' + ((pos % order.length) + 1) + ' of ' + order.length + (box(i) >= 3 ? ' · mastered ✓' : '') + '</p>' +
+          '<p style="font-size:20px;font-weight:700;margin:0">' + esc(c.front) + '</p>' +
+          '<p style="color:var(--faint);font-size:13px;margin:0">Front — tap to reveal</p></div>' +
+          '<div class="flip-face back disc-tile" style="' + faceStyle + '">' +
+          '<p style="font-size:12px;color:var(--faint);margin:0">Answer</p>' +
+          '<p style="font-size:20px;font-weight:700;margin:0;overflow:auto;max-height:30vh">' + esc(c.back) + '</p>' +
+          '<p style="color:var(--faint);font-size:13px;margin:0">Back — tap to flip' + srcLink(c) + '</p></div>' +
+          '</div></div>' +
           '<div style="display:flex;gap:8px;margin-top:12px;justify-content:center;flex-wrap:wrap">' +
           '<button class="btn secondary small" id="prev-c">← Prev</button>' +
           '<button class="btn small secondary" id="know-c">I knew it ✓</button>' +
           '<button class="btn small secondary" id="miss-c">Still learning</button>' +
           '<button class="btn secondary small" id="next-c">Next →</button></div>';
-        var flip = function () { flipped = !flipped; render(); };
-        document.getElementById('flip-card').addEventListener('click', flip);
+        var flipEl = document.getElementById('flip-card');
+        var flip = function () { flipped = !flipped; flipEl.classList.toggle('flipped', flipped); };
+        flipEl.addEventListener('click', function (ev) {
+          if (ev.target.closest && ev.target.closest('a')) return; // let source links work
+          flip();
+        });
+        flipEl.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); flip(); }
+        });
         document.getElementById('prev-c').onclick = function () { pos = (pos - 1 + order.length) % order.length; flipped = false; render(); };
         document.getElementById('next-c').onclick = function () { pos = (pos + 1) % order.length; flipped = false; render(); };
         document.getElementById('know-c').onclick = function () { setBox(i, Math.min(4, box(i) + 1)); pos = (pos + 1) % order.length; flipped = false; render(); };
@@ -246,6 +260,9 @@
       } else {
         var t = testState;
         if (t.i >= t.total) {
+          if (t.score === t.total && t.total > 0 && window.__sehsConfetti) {
+            setTimeout(function () { window.__sehsConfetti(100); }, 350);
+          }
           host.innerHTML = '<div class="disc-tile" style="text-align:center"><h3>Score: ' + t.score + ' / ' + t.total + '</h3>' +
             '<p style="color:var(--mut)">' + (t.score === t.total ? 'Perfect. 🎉' : t.score >= t.total * 0.7 ? 'Solid — review the misses below.' : 'Keep practising — review below.') + '</p></div>' +
             t.answers.map(function (a) {

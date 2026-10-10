@@ -98,7 +98,7 @@ export function landing(ctx) {
     </section>
 
     <h2 class="feed-h">New arrivals <small><a class="link-btn" href="/feed.xml">RSS</a></small></h2>
-    <section class="disc-grid" id="new-grid"></section>
+    <section class="disc-grid" id="new-grid"><div class="sk"><i style="height:16px;width:60%"></i><i style="height:12px;width:90%;margin-top:10px"></i></div><div class="sk"><i style="height:16px;width:55%"></i><i style="height:12px;width:85%;margin-top:10px"></i></div></section>
     ${trendingCards ? `<h2 class="feed-h">Trending this week</h2><div class="disc-grid">${trendingCards}</div>` : ''}
     <h2 class="feed-h">Practice tests <small><a class="link-btn" href="/search?cat=practice-test">View all</a></small></h2>
     <div class="disc-grid">${practice.map(card).join('')}</div>

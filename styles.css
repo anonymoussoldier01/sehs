@@ -517,6 +517,58 @@ input[type="date"], input[type="text"], input[type="search"], input[type="passwo
 .cookie-bar[hidden] { display: none; }
 .cookie-bar .btn { min-height: 38px; padding: 8px 14px; }
 
+/* ---------- feel layer: aurora, spotlight, glow, flip, progress ---------- */
+/* ambient aurora behind everything (dark navy only; still, calm, slow) */
+[data-theme="dark"] body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(560px 380px at 12% -80px, rgba(91, 108, 255, .20), transparent 65%),
+    radial-gradient(640px 420px at 88% 8%, rgba(109, 40, 217, .16), transparent 65%),
+    radial-gradient(700px 520px at 50% 115%, rgba(14, 116, 144, .14), transparent 65%);
+  animation: aurora 26s ease-in-out infinite alternate;
+}
+@keyframes aurora {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(0, -30px, 0) scale(1.06); }
+}
+/* cursor spotlight on cards + tiles (vars set by JS; invisible until hover) */
+.card, .disc-tile, .deck-card, .learn-card {
+  --mx: 50%; --my: 50%;
+}
+.card:hover, .disc-tile:hover, .deck-card:hover {
+  border-color: var(--acc-line);
+}
+.card::after, .disc-tile::after, .deck-card::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  opacity: 0; transition: opacity .25s var(--ease);
+  background: radial-gradient(220px circle at var(--mx) var(--my), rgba(91, 108, 255, .12), transparent 70%);
+}
+.card, .disc-tile, .deck-card { position: relative; }
+.card:hover::after, .disc-tile:hover::after, .deck-card:hover::after { opacity: 1; }
+/* search glow when focused */
+.searchbox:focus-within {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 4px rgba(91, 108, 255, .16), 0 0 32px rgba(91, 108, 255, .18), var(--shadow-md);
+}
+/* sidebar folders */
+#side-lists { display: flex; flex-direction: column; gap: 1px; margin-top: 6px; }
+#side-lists:empty { display: none; }
+.side-folder .c { margin-left: auto; font-size: 11px; color: var(--faint); background: var(--bg2);
+  border: 1px solid var(--line); border-radius: var(--r-pill); padding: 1px 8px; font-variant-numeric: tabular-nums; }
+/* 3D flashcard flip */
+.flip-wrap { perspective: 1200px; }
+.flip-inner { position: relative; transform-style: preserve-3d; transition: transform .45s var(--ease); }
+.flip-inner.flipped { transform: rotateY(180deg); }
+.flip-face { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.flip-face.back { position: absolute; inset: 0; transform: rotateY(180deg); }
+/* mock / quiz progress bar */
+.mk-progress { height: 8px; border-radius: 8px; background: var(--bg2); border: 1px solid var(--line);
+  overflow: hidden; margin: 10px 0 4px; }
+.mk-progress i { display: block; height: 100%; width: 0; border-radius: 8px;
+  background: linear-gradient(90deg, var(--acc), #7c3aed); transition: width .35s var(--ease); }
+.mk-timer-low { color: var(--bad) !important; animation: tpulse 1s ease-in-out infinite; }
+@keyframes tpulse { 50% { opacity: .55; } }
+
 /* ---------- fluid layer: view transitions, page-enter, render perf ---------- */
 @view-transition { navigation: auto; }
 ::view-transition-old(root) { animation: vt-out .22s var(--ease) both; }
