@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
-import { Input } from '@heroui/react/input';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { api } from '../lib/api';
 
 export default function Unlock() {
@@ -47,14 +47,14 @@ export default function Unlock() {
         </p>
         <div className="mt-2 flex gap-2">
           <Link to="/admin">
-            <Button size="sm" variant="primary">
+            <Button size="sm" variant="default">
               Open dashboard →
             </Button>
           </Link>
           <Button
             size="sm"
             variant="secondary"
-            onPress={() => {
+            onClick={() => {
               try {
                 sessionStorage.removeItem('sehs-admin-token');
               } catch {
@@ -90,7 +90,7 @@ export default function Unlock() {
           />
         </label>
         {!!err && <p className="mb-2 text-[13px] font-semibold" style={{ color: 'var(--bad)' }}>{err}</p>}
-        <Button type="submit" variant="primary" fullWidth>
+        <Button type="submit" variant="default" fullWidth>
           Unlock admin
         </Button>
       </form>

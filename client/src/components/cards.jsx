@@ -1,7 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
-import { Chip } from '@heroui/react/chip';
-import { Tooltip } from '@heroui/react/tooltip';
+import { Star } from 'lucide-react';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { useOpener, useToast } from '../providers';
 import { pretty } from '../lib/api';
 import { keys, useSyncedLocal } from '../lib/store';
@@ -49,20 +50,9 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
   const open = useOpener();
   const navigate = useNavigate();
   const { saved, toggle } = useSaved();
-  const toast = useToast();
   const displayTitle = title || v.displayTitle || v.title;
   const subj = v.subject ? pretty(v.subject) : pretty(v.category);
   const isPdf = v.fileType === 'pdf';
-
-  const copy = async () => {
-    const url = new URL('/r/' + v.id, window.location.origin).href;
-    try {
-      await navigator.clipboard.writeText(url);
-    } catch {
-      /* noop */
-    }
-    toast('Link copied');
-  };
 
   return (
     <article className="glare flex gap-3.5 rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg" style={{ background: 'var(--card)', borderColor: 'var(--line)' }}>
@@ -83,10 +73,10 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
           </p>
         ) : null}
         <div className="flex flex-wrap items-center gap-1.5 text-xs">
-          <Chip size="sm" variant="secondary">
+          <Badge variant="secondary">
             {TYPE_LABEL[v.fileType] || v.fileType}
-          </Chip>
-          {v.answersIncluded && <Chip size="sm" color="success">✓ Answers included</Chip>}
+          </Badge>
+          {v.answersIncluded && <Badge variant="success">✓ Answers included</Badge>}
         </div>
         <div className="mt-auto flex items-center justify-between gap-2.5 border-t border-dashed pt-2" style={{ borderColor: 'var(--line)' }}>
           <span className="text-[11.5px] tabular-nums" style={{ color: 'var(--faint)' }}>
@@ -94,25 +84,26 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
           </span>
           <span className="flex items-center gap-[7px]">
             <Tooltip>
-              <Tooltip.Trigger aria-label={saved.has(v.id) ? 'Remove from saved' : 'Save this resource'}>
+              <TooltipTrigger asChild>
                 <Button
                   size="sm"
-                  isIconOnly
-                  variant={saved.has(v.id) ? 'primary' : 'secondary'}
-                  onPress={() => toggle(v.id)}
+                  variant={saved.has(v.id) ? 'default' : 'secondary'}
+                  onClick={() => toggle(v.id)}
                   aria-pressed={String(saved.has(v.id))}
+                  aria-label={saved.has(v.id) ? 'Remove from saved' : 'Save this resource'}
+                  className="h-9 w-9 p-0"
                 >
-                  {saved.has(v.id) ? '★' : '☆'}
+                  <Star className="h-4 w-4" fill={saved.has(v.id) ? 'currentColor' : 'none'} aria-hidden="true" />
                 </Button>
-              </Tooltip.Trigger>
-              <Tooltip.Content>{saved.has(v.id) ? 'Saved' : 'Save'}</Tooltip.Content>
+              </TooltipTrigger>
+              <TooltipContent>{saved.has(v.id) ? 'Saved' : 'Save'}</TooltipContent>
             </Tooltip>
-            <Button size="sm" variant="secondary" onPress={() => navigate('/r/' + v.id)}>
+            <Button size="sm" variant="secondary" onClick={() => navigate('/r/' + v.id)}>
               Details
             </Button>
           </span>
         </div>
-        <Button variant="primary" size="sm" fullWidth onPress={() => open(v.id)}>
+        <Button variant="default" size="sm" onClick={() => open(v.id)} className="w-full">
           {isPdf ? 'Open PDF →' : 'Open resource →'}
         </Button>
       </div>

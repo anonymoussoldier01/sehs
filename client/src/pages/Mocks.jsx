@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
+import { Button } from '../components/ui/button';
 import { api } from '../lib/api';
 import { keys } from '../lib/store';
 import { BlurFade, Skeleton } from '../components/magic';
@@ -53,7 +53,7 @@ export default function Mocks() {
                     Best: {best[m.id].score}/{best[m.id].total}
                   </p>
                 )}
-                <Button size="sm" variant="primary" onPress={() => navigate('/mocks/' + encodeURIComponent(m.id))} className="mt-2">
+                <Button size="sm" variant="default" onClick={() => navigate('/mocks/' + encodeURIComponent(m.id))} className="mt-2">
                   Start →
                 </Button>
               </div>

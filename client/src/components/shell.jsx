@@ -1,38 +1,66 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Form, Link, NavLink, useNavigate } from 'react-router-dom';
 import { Command } from 'cmdk';
-import { Avatar } from '@heroui/react/avatar';
-import { Button } from '@heroui/react/button';
-import { Dropdown } from '@heroui/react/dropdown';
-import { Tooltip } from '@heroui/react/tooltip';
-import { useOpener, useTheme, useToast } from '../providers';
+import {
+  BookOpen,
+  Bookmark,
+  Command as CommandIcon,
+  FileText,
+  FlaskConical,
+  Gamepad2,
+  GraduationCap,
+  Home,
+  Info,
+  Layers,
+  Library,
+  Menu,
+  Moon,
+  PenLine,
+  Plus,
+  Search,
+  Shapes,
+  Sun,
+  Timer,
+} from 'lucide-react';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { Button } from './ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
+import { useTheme, useToast } from '../providers';
 import { api, pretty } from '../lib/api';
 import { keys, useLocal } from '../lib/store';
 import { cn } from './cn';
 
 const MAIN = [
-  ['/', 'Home', '⌂'],
-  ['/saved', 'Your library', '▤'],
-  ['/search', 'Browse', '⚲'],
-  ['/search?type=pdf', 'PDF papers', '❏'],
-  ['/study', 'Study hub', '✎'],
+  ['/', 'Home', Home],
+  ['/saved', 'Your library', Bookmark],
+  ['/search', 'Browse', Search],
+  ['/search?type=pdf', 'PDF papers', FileText],
+  ['/study', 'Study hub', GraduationCap],
 ];
 const START = [
-  ['/study', 'Flashcards', '▢'],
-  ['/mocks', 'Timed mocks', '◷'],
-  ['/exam-guide', 'Study guides', '≡'],
-  ['/drills', 'Games & drills', '▦'],
-  ['/writing', 'Writing studio', '✒'],
-  ['/reading', 'Reading room', '☰'],
+  ['/study', 'Flashcards', Layers],
+  ['/mocks', 'Timed mocks', Timer],
+  ['/exam-guide', 'Study guides', BookOpen],
+  ['/drills', 'Games & drills', Gamepad2],
+  ['/writing', 'Writing studio', PenLine],
+  ['/reading', 'Reading room', Library],
 ];
 const MORE = [
-  ['/subjects', 'Subjects', '○'],
-  ['/providers', 'Providers', '○'],
-  ['/request', 'Request', '＋'],
-  ['/about', 'About', 'ⓘ'],
+  ['/subjects', 'Subjects', Shapes],
+  ['/providers', 'Providers', FlaskConical],
+  ['/request', 'Request', Plus],
+  ['/about', 'About', Info],
 ];
 
-function SideLink({ to, icon, label, onNav }) {
+function SideLink({ to, icon: Icon, label, onNav }) {
   return (
     <NavLink
       to={to}
@@ -50,10 +78,10 @@ function SideLink({ to, icon, label, onNav }) {
       })}
     >
       <span
-        className="grid h-[26px] w-[26px] flex-none place-items-center rounded-lg border text-[15px]"
+        className="grid h-[26px] w-[26px] flex-none place-items-center rounded-lg border"
         style={{ background: 'var(--bg2)', borderColor: 'var(--line)' }}
       >
-        {icon}
+        <Icon className="h-4 w-4" aria-hidden="true" />
       </span>
       <span className="truncate">{label}</span>
     </NavLink>
@@ -77,7 +105,7 @@ export function Sidebar({ open, onClose, folders }) {
         aria-label="Primary"
       >
         <Link to="/" onClick={onClose} className="mb-2 flex items-center gap-2.5 rounded-xl p-2">
-          <span className="grid h-9 w-9 flex-none -rotate-2 place-items-center rounded-[11px] font-display text-xl font-black text-white shadow">
+          <span className="grid h-9 w-9 flex-none -rotate-2 place-items-center rounded-[11px] font-display text-xl font-black shadow" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>
             Q
           </span>
           <span className="leading-tight">
@@ -106,7 +134,7 @@ export function Sidebar({ open, onClose, folders }) {
         </nav>
         <div className="mt-auto border-t border-dashed px-2 pb-1 pt-3" style={{ borderColor: 'var(--line2)' }}>
           <Link to="/saved#list-new" onClick={onClose} className="flex min-h-[44px] items-center gap-2 rounded-xl px-3 text-[13.5px] font-bold">
-            ＋ New folder
+            <Plus className="h-4 w-4" aria-hidden="true" /> New folder
           </Link>
           {!!folders?.length && (
             <div className="mt-1.5 flex flex-col gap-[1px]">
@@ -119,10 +147,10 @@ export function Sidebar({ open, onClose, folders }) {
                   style={{ color: 'var(--mut)' }}
                 >
                   <span
-                    className="grid h-[26px] w-[26px] flex-none place-items-center rounded-lg border text-[15px]"
+                    className="grid h-[26px] w-[26px] flex-none place-items-center rounded-lg border"
                     style={{ background: 'var(--bg2)', borderColor: 'var(--line)' }}
                   >
-                    ▤
+                    <Bookmark className="h-3.5 w-3.5" aria-hidden="true" />
                   </span>
                   <span className="truncate">{f.name}</span>
                   <span
@@ -214,10 +242,10 @@ export function Topbar({ onMenu }) {
       style={{ background: 'color-mix(in srgb, var(--panel) 90%, transparent)', borderColor: 'var(--line)' }}
     >
       <div className="mx-auto flex min-h-[62px] max-w-[1240px] items-center gap-2.5 px-4 sm:px-6">
-        <Button isIconOnly variant="secondary" onPress={onMenu} aria-label="Open menu" className="lg:hidden">
-          ☰
+        <Button variant="secondary" size="icon" onClick={onMenu} aria-label="Open menu" className="lg:hidden">
+          <Menu className="h-5 w-5" />
         </Button>
-        <div className="relative mx-auto w-full max-w-[560px]" ref={boxRef}>
+        <div className="relative mx-auto w-full min-w-0 max-w-[560px]" ref={boxRef}>
           <Form
             onSubmit={submit}
             className="flex min-h-[44px] items-center gap-2.5 rounded-full border py-0 pl-4 pr-2 transition-all focus-within:-translate-y-px"
@@ -272,46 +300,46 @@ export function Topbar({ onMenu }) {
         </div>
         <div className="flex items-center gap-2">
           <Tooltip>
-            <Tooltip.Trigger aria-label="Quick search (Ctrl+K)">
-              <Button isIconOnly variant="secondary" onPress={() => window.dispatchEvent(new CustomEvent('sehs:palette'))}>
-                ⌘K
+            <TooltipTrigger asChild>
+              <Button variant="secondary" size="icon" onClick={() => window.dispatchEvent(new CustomEvent('sehs:palette'))} aria-label="Quick search (Ctrl+K)">
+                <CommandIcon className="h-4 w-4" />
               </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>Quick search (Ctrl+K)</Tooltip.Content>
+            </TooltipTrigger>
+            <TooltipContent>Quick search (Ctrl+K)</TooltipContent>
           </Tooltip>
-          <Dropdown>
-            <Dropdown.Trigger aria-label="Your profile menu">
-              <Avatar>
-                <AvatarFallback>{(name?.trim()?.[0] || 'G').toUpperCase()}</AvatarFallback>
-              </Avatar>
-            </Dropdown.Trigger>
-            <Dropdown.Popover>
-              <Dropdown.Menu
-                onAction={(key) => {
-                  if (key === 'library') navigate('/saved');
-                  if (key === 'theme') toggle();
-                  if (key === 'name') {
-                    const next = window.prompt('Display name (stored only in this browser):', name || '');
-                    if (next === null) return;
-                    const v = String(next).trim().slice(0, 24);
-                    setName(v);
-                    toast(v ? `Hi, ${v}` : 'Profile cleared');
-                  }
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button aria-label="Your profile menu" className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)]">
+                <Avatar>
+                  <AvatarFallback>{(name?.trim()?.[0] || 'G').toUpperCase()}</AvatarFallback>
+                </Avatar>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Profile (this browser)</DropdownMenuLabel>
+              <DropdownMenuItem onSelect={() => navigate('/saved')}>Your library</DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => {
+                  const next = window.prompt('Display name (stored only in this browser):', name || '');
+                  if (next === null) return;
+                  const v = String(next).trim().slice(0, 24);
+                  setName(v);
+                  toast(v ? `Hi, ${v}` : 'Profile cleared');
                 }}
               >
-                <Dropdown.Item id="library">Your library</Dropdown.Item>
-                <Dropdown.Item id="name">Set display name…</Dropdown.Item>
-                <Dropdown.Item id="theme">Toggle light / dark</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown.Popover>
-          </Dropdown>
+                Set display name…
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => toggle()}>Toggle light / dark</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Tooltip>
-            <Tooltip.Trigger aria-label="Toggle light and dark mode">
-              <Button isIconOnly variant="secondary" onPress={(e) => toggle(e)} aria-pressed={String(dark)}>
-                ◐
+            <TooltipTrigger asChild>
+              <Button variant="secondary" size="icon" onClick={(e) => toggle(e)} aria-pressed={String(dark)} aria-label="Toggle light and dark mode">
+                {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>Toggle light / dark</Tooltip.Content>
+            </TooltipTrigger>
+            <TooltipContent>Toggle light / dark</TooltipContent>
           </Tooltip>
         </div>
       </div>

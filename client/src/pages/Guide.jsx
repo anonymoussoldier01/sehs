@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
-import { Input } from '@heroui/react/input';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { TypingText } from '../components/magic';
 import { api } from '../lib/api';
 
@@ -44,7 +44,7 @@ export default function Guide() {
             <p className="mb-3 mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
               {p}
             </p>
-            <Link to={to} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+            <Link to={to} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
               {l}
             </Link>
           </div>
@@ -84,7 +84,7 @@ export default function Guide() {
             aria-label="Ask the tutor"
             className="min-w-0 flex-1"
           />
-          <Button variant="primary" isDisabled={busy} onPress={ask}>
+          <Button variant="default" disabled={busy} onClick={ask}>
             {busy ? '…' : 'Ask'}
           </Button>
         </div>

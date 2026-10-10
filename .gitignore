@@ -25,3 +25,4 @@ logs/*.log
 Thumbs.db
 .vscode/
 .idea/
+nit-review/

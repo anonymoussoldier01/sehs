@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api, pretty } from '../lib/api';
 import { keys, pushRecent } from '../lib/store';
 import { useToast } from '../providers';
-import { Button } from '@heroui/react/button';
+import { Button } from '../components/ui/button';
 import { AuroraText, BlurFade, DeckCard, Empty, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText } from '../components/magic';
 import { ResourceCard, highlight } from '../components/cards';
 
@@ -148,10 +148,10 @@ function LearnPreview() {
         </>
       )}
       <p className="mt-3.5 flex flex-wrap gap-2">
-        <Button size="sm" variant="primary" onPress={() => navigate('/study')}>
+        <Button size="sm" variant="default" onClick={() => navigate('/study')}>
           Open flashcards
         </Button>
-        <Button size="sm" variant="secondary" onPress={() => navigate('/mocks')}>
+        <Button size="sm" variant="secondary" onClick={() => navigate('/mocks')}>
           Take a timed mock
         </Button>
       </p>
@@ -283,7 +283,7 @@ export default function Home() {
             <p className="mb-3 mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
               Your recent decks and papers appear here.
             </p>
-            <Link to={next.href} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+            <Link to={next.href} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
               Continue →
             </Link>
           </div>
@@ -455,7 +455,7 @@ function Qotd() {
         </p>
       )}
       {!show && (
-        <Button size="sm" variant="secondary" onPress={() => setShow(true)} className="mt-2">
+        <Button size="sm" variant="secondary" onClick={() => setShow(true)} className="mt-2">
           Show answer
         </Button>
       )}

@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
-import { Input } from '@heroui/react/input';
-import { ListBox } from '@heroui/react/list-box';
-import { ListBoxItem } from '@heroui/react/list-box-item';
-import { Select } from '@heroui/react/select';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Select } from '../components/ui/select';
+
 import { api } from '../lib/api';
 import { keys, touchStreak, useLocal, useSyncedLocal } from '../lib/store';
 import { useToast } from '../providers';
@@ -153,13 +152,13 @@ export default function StudyHub() {
           className="mt-3 flex flex-wrap gap-2"
         >
           <input name="date" type="date" aria-label="Exam date" defaultValue={date || ''} className={inputCls} style={inputStyle} />
-          <Button type="submit" size="sm" variant="primary">
+          <Button type="submit" size="sm" variant="default">
             Set exam date
           </Button>
           <Button
             size="sm"
             variant="secondary"
-            onPress={() => {
+            onClick={() => {
               setDate(null);
               toast('Exam date cleared');
             }}
@@ -182,7 +181,7 @@ export default function StudyHub() {
             <p className="mb-3 mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
               {p}
             </p>
-            <Link to={to} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+            <Link to={to} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
               Open →
             </Link>
           </div>
@@ -195,7 +194,7 @@ export default function StudyHub() {
           <h3 className="font-display text-[15.5px] font-bold">Flashcards from any topic</h3>
           <div className="mt-2 flex gap-2">
             <Input value={aiTopic} onChange={(e) => setAiTopic(e.target.value)} maxLength={120} placeholder="e.g. analogies, fractions…" aria-label="Deck topic" className="min-w-0 flex-1" />
-            <Button size="sm" variant="primary" onPress={makeAiDeck}>
+            <Button size="sm" variant="default" onClick={makeAiDeck}>
               Make deck
             </Button>
           </div>
@@ -208,22 +207,12 @@ export default function StudyHub() {
         <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
           <h3 className="font-display text-[15.5px] font-bold">My study plan</h3>
           <div className="mt-2 flex flex-wrap gap-2">
-            <Select aria-label="Weeks" selectedKey={planWeeks} onSelectionChange={(k) => setPlanWeeks(String(k))} className="w-[130px]">
-              <Select.Trigger>
-                <Select.Value />
-                <Select.Indicator />
-              </Select.Trigger>
-              <Select.Popover>
-                <ListBox aria-label="Plan length">
-                  {[['4', '4 weeks'], ['8', '8 weeks'], ['12', '12 weeks']].map(([v, l]) => (
-                    <ListBoxItem key={v} id={v} textValue={l}>
-                      {l}
-                    </ListBoxItem>
-                  ))}
-                </ListBox>
-              </Select.Popover>
+            <Select aria-label="Weeks" value={planWeeks} onValueChange={(k) => setPlanWeeks(String(k))} className="w-[130px]">
+              <option value="4">4 weeks</option>
+              <option value="8">8 weeks</option>
+              <option value="12">12 weeks</option>
             </Select>
-            <Button size="sm" variant="primary" onPress={buildPlan}>
+            <Button size="sm" variant="default" onClick={buildPlan}>
               Build my plan
             </Button>
           </div>
@@ -262,7 +251,7 @@ export default function StudyHub() {
                 <p className="mb-3 text-xs" style={{ color: 'var(--faint)' }}>
                   {d.count} cards · {d.source}
                 </p>
-                <Link to={'/study/' + encodeURIComponent(d.id)} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white">
+                <Link to={'/study/' + encodeURIComponent(d.id)} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
                   Study →
                 </Link>
               </div>
@@ -328,13 +317,13 @@ export default function StudyHub() {
                 {d.cards.length} cards · yours
               </p>
               <span className="flex gap-2">
-                <Button size="sm" variant="primary" onPress={() => navigate('/study/local-' + i)}>
+                <Button size="sm" variant="default" onClick={() => navigate('/study/local-' + i)}>
                   Study →
                 </Button>
                 <Button
                   size="sm"
                   variant="secondary"
-                  onPress={() => setLocalDecks((x) => x.filter((_, k) => k !== i))}
+                  onClick={() => setLocalDecks((x) => x.filter((_, k) => k !== i))}
                 >
                   Delete
                 </Button>
@@ -351,30 +340,22 @@ export default function StudyHub() {
         <h3 className="font-display text-[15.5px] font-bold">New deck</h3>
         <form onSubmit={createDeck} className="mt-2 flex flex-wrap gap-2">
           <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} required maxLength={80} placeholder="Deck title" aria-label="Deck title" className="min-w-[200px] flex-1" />
-          <Button type="submit" size="sm" variant="primary">
+          <Button type="submit" size="sm" variant="default">
             Create
           </Button>
         </form>
         {!!localDecks.length && (
           <form onSubmit={addCard} className="mt-2 flex flex-wrap gap-2">
-            <Select aria-label="Deck" selectedKey={cardDeck} onSelectionChange={(k) => setCardDeck(String(k))} className="w-[180px]">
-              <Select.Trigger>
-                <Select.Value />
-                <Select.Indicator />
-              </Select.Trigger>
-              <Select.Popover>
-                <ListBox aria-label="Decks">
-                  {localDecks.map((d, i) => (
-                    <ListBoxItem key={i} id={String(i)} textValue={d.title}>
-                      {d.title}
-                    </ListBoxItem>
-                  ))}
-                </ListBox>
-              </Select.Popover>
+            <Select aria-label="Deck" value={cardDeck} onValueChange={(k) => setCardDeck(String(k))} className="w-[180px]">
+              {localDecks.map((d, i) => (
+                <option key={i} value={String(i)}>
+                  {d.title}
+                </option>
+              ))}
             </Select>
             <Input value={front} onChange={(e) => setFront(e.target.value)} required maxLength={500} placeholder="Front" aria-label="Card front" className="min-w-[140px] flex-1" />
             <Input value={back} onChange={(e) => setBack(e.target.value)} required maxLength={2000} placeholder="Back" aria-label="Card back" className="min-w-[140px] flex-1" />
-            <Button type="submit" size="sm" variant="primary">
+            <Button type="submit" size="sm" variant="default">
               Add card
             </Button>
           </form>
@@ -469,15 +450,15 @@ function Weaknesses() {
                     e.g. {byStrand[s][0].stem.slice(0, 70)}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    <Button size="sm" variant="primary" isDisabled={busy === s} onPress={() => variantQuiz(s)}>
+                    <Button size="sm" variant="default" disabled={busy === s} onClick={() => variantQuiz(s)}>
                       {busy === s ? 'Writing…' : 'Variant quiz'}
                     </Button>
                     {['maths', 'quant'].includes(s) && (
-                      <Button size="sm" variant="secondary" onPress={() => navigate('/drills')}>
+                      <Button size="sm" variant="secondary" onClick={() => navigate('/drills')}>
                         Drill it
                       </Button>
                     )}
-                    <Button size="sm" variant="secondary" onPress={() => dismissStrand(s)}>
+                    <Button size="sm" variant="secondary" onClick={() => dismissStrand(s)}>
                       Dismiss
                     </Button>
                   </div>
@@ -535,13 +516,13 @@ function Weaknesses() {
                     <span className="tabular-nums">{b.score}/{b.total}</span>
                   </p>
                   <div className="mt-0.5 h-2 overflow-hidden rounded-full" style={{ background: 'var(--bg2)' }}>
-                    <div className="h-full rounded-full transition-all" style={{ width: `${Math.round((b.score / Math.max(1, b.total)) * 100)}%`, background: 'linear-gradient(90deg,#2f49e5,#7c3aed)' }} />
+                    <div className="h-full rounded-full transition-all" style={{ width: `${Math.round((b.score / Math.max(1, b.total)) * 100)}%`, background: 'var(--primary)' }} />
                   </div>
                 </div>
               ))}
             </div>
             <p className="mt-2">
-              <Button size="sm" variant="secondary" onPress={() => navigate('/mocks')}>
+              <Button size="sm" variant="secondary" onClick={() => navigate('/mocks')}>
                 Take another mock
               </Button>
             </p>

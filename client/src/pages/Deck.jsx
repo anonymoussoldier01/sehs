@@ -5,8 +5,8 @@ import { api } from '../lib/api';
 import { keys, useSyncedLocal } from '../lib/store';
 import { useToast } from '../providers';
 import { Skeleton } from '../components/magic';
-import { Button } from '@heroui/react/button';
-import { Tabs } from '@heroui/react/tabs';
+import { Button } from '../components/ui/button';
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/tabs';
 
 const shuffle = (a) => {
   const x = [...a];
@@ -115,15 +115,12 @@ export default function Deck() {
       <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
         {deck.description} · {cards.length} cards
       </p>
-      <Tabs selectedKey={mode} onSelectionChange={(k) => switchMode(String(k))} aria-label="Study mode" className="my-3">
-        <Tabs.ListContainer>
-          <Tabs.List>
-            <Tabs.Tab id="flip">Flashcards</Tabs.Tab>
-            <Tabs.Tab id="learn">Learn</Tabs.Tab>
-            <Tabs.Tab id="test">Test</Tabs.Tab>
-            <Tabs.Indicator />
-          </Tabs.List>
-        </Tabs.ListContainer>
+      <Tabs value={mode} onValueChange={(k) => switchMode(String(k))} aria-label="Study mode" className="my-3">
+        <TabsList>
+          <TabsTrigger value="flip">Flashcards</TabsTrigger>
+          <TabsTrigger value="learn">Learn</TabsTrigger>
+          <TabsTrigger value="test">Test</TabsTrigger>
+        </TabsList>
       </Tabs>
 
       {!cards.length && <p className="text-sm" style={{ color: 'var(--mut)' }}>This deck is empty.</p>}
@@ -236,7 +233,7 @@ function Flip({ cards, order, pos, setPos, flipped, setFlipped, box, setBox }) {
           ['Still learning', () => { setBox(i, 1); go(1); }],
           ['Next →', () => go(1)],
         ].map(([l, fn]) => (
-          <Button key={l} size="sm" variant="secondary" onPress={fn}>
+          <Button key={l} size="sm" variant="secondary" onClick={fn}>
             {l}
           </Button>
         ))}
@@ -296,7 +293,7 @@ function Test({ cards, order, test, setTest }) {
           </p>
           <button
             onClick={() => setTest({ i: 0, score: 0, total: Math.min(10, cards.length), answers: [] })}
-            className="mt-3 inline-flex min-h-[38px] items-center rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white"
+            className="mt-3 inline-flex min-h-[38px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]"
           >
             Retake
           </button>

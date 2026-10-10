@@ -46,7 +46,7 @@ export function ShinyBadge({ children, className }) {
     >
       <span
         className="h-[7px] w-[7px] rounded-full"
-        style={{ background: 'linear-gradient(135deg,#5b6cff,#ec4899)', boxShadow: '0 0 10px #5b6cff' }}
+        style={{ background: 'var(--primary)', boxShadow: '0 0 10px var(--primary)' }}
       />
       <span className="shiny-text">{children}</span>
     </span>
@@ -89,7 +89,7 @@ export function ShimmerButton({ children, className, ...props }) {
         'btn-magic btn-pulse relative inline-flex min-h-[42px] items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-transform active:scale-[.97]',
         className
       )}
-      style={{ background: 'linear-gradient(135deg,#2f49e5,#6d28d9)' }}
+      style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
     >
       {children}
     </button>
@@ -184,7 +184,7 @@ export function Particles({ className, density = 60 }) {
         }
         d.tw += 0.03;
         ctx.globalAlpha = 0.25 + 0.35 * Math.abs(Math.sin(d.tw));
-        ctx.fillStyle = '#8b9bff';
+        ctx.fillStyle = '#7d9bf0';
         ctx.beginPath();
         ctx.arc(d.x * w, d.y * h, d.r, 0, Math.PI * 2);
         ctx.fill();

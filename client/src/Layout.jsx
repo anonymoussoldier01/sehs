@@ -29,7 +29,7 @@ function CookieBar() {
           Details
         </Link>
         <button
-          className="min-h-[38px] rounded-[10px] bg-[#2f49e5] px-3.5 py-2 text-[13px] font-bold text-white"
+          className="min-h-[38px] rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]"
           onClick={() => {
             try {
               localStorage.setItem(keys.cookieOk, '1');

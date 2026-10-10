@@ -1,14 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
-import { Chip } from '@heroui/react/chip';
-import { ListBox } from '@heroui/react/list-box';
-import { ListBoxItem } from '@heroui/react/list-box-item';
-import { Modal } from '@heroui/react/modal';
-import { Radio } from '@heroui/react/radio';
-import { RadioGroup } from '@heroui/react/radio-group';
-import { Select } from '@heroui/react/select';
-import { TextArea } from '@heroui/react/textarea';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
+import { Label } from '../components/ui/label';
+import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
+import { Select } from '../components/ui/select';
+import { Textarea } from '../components/ui/textarea';
 import { api, pretty } from '../lib/api';
 import { keys, pushRecent } from '../lib/store';
 import { useOpener, useToast } from '../providers';
@@ -116,7 +114,7 @@ export default function Resource() {
       <div className="mx-auto max-w-[900px] px-5 py-10">
         <Empty title="Resource not found" msg="It may have been moved, hidden, or the link is incorrect.">
           <div className="mt-4">
-            <Link to="/search" className="inline-flex min-h-[42px] items-center rounded-[11px] bg-[#2f49e5] px-[18px] py-2.5 text-sm font-bold text-white">
+            <Link to="/search" className="inline-flex min-h-[42px] items-center rounded-[11px] bg-[var(--primary)] px-[18px] py-2.5 text-sm font-bold text-[var(--primary-foreground)]">
               Clear search &amp; filters
             </Link>
           </div>
@@ -141,14 +139,14 @@ export default function Resource() {
       </p>
       <h1 className="mt-1 font-display text-3xl font-bold tracking-tight">{highlight(title, [])}</h1>
       <div className="mb-4 mt-2.5 flex flex-wrap items-center gap-1.5">
-        <Chip size="sm" color="accent">
+        <Badge variant="accent">
           {pretty(v.category)}
-        </Chip>
-        {v.provider && <Chip size="sm" variant="secondary">{pretty(v.provider)}</Chip>}
-        <Chip size="sm" variant="secondary">
+        </Badge>
+        {v.provider && <Badge variant="secondary">{pretty(v.provider)}</Badge>}
+        <Badge variant="secondary">
           {pretty(v.fileType)}
-        </Chip>
-        {v.answersIncluded && <Chip size="sm" color="success">Answers included</Chip>}
+        </Badge>
+        {v.answersIncluded && <Badge variant="success">Answers included</Badge>}
       </div>
       {v.description && (
         <p className="max-w-[70ch] text-[15px]" style={{ color: 'var(--mut)' }}>
@@ -168,20 +166,20 @@ export default function Resource() {
         ))}
       </div>
       <div className="mb-7 flex flex-wrap gap-2.5">
-        <Button variant="primary" onPress={() => open(v.id)}>
+        <Button variant="default" onClick={() => open(v.id)}>
           {v.fileType === 'pdf' ? 'Open PDF →' : 'Open resource →'}
         </Button>
         {v.fileType === 'pdf' && (
-          <Button variant="secondary" onPress={() => setPreviewOpen((o) => !o)} aria-expanded={String(previewOpen)}>
+          <Button variant="secondary" onClick={() => setPreviewOpen((o) => !o)} aria-expanded={String(previewOpen)}>
             {previewOpen ? 'Hide preview' : 'Preview here'}
           </Button>
         )}
-        <Button variant="secondary" onPress={() => toggle(v.id)} aria-pressed={String(saved.has(v.id))}>
+        <Button variant="secondary" onClick={() => toggle(v.id)} aria-pressed={String(saved.has(v.id))}>
           {saved.has(v.id) ? '★ Saved' : '☆ Save'}
         </Button>
         <Button
           variant="secondary"
-          onPress={async () => {
+          onClick={async () => {
             try {
               await navigator.clipboard.writeText(window.location.href);
             } catch {
@@ -192,7 +190,7 @@ export default function Resource() {
         >
           Copy link
         </Button>
-        <Button variant="secondary" onPress={() => setRepOpen(true)}>
+        <Button variant="secondary" onClick={() => setRepOpen(true)}>
           Report issue
         </Button>
       </div>
@@ -207,10 +205,10 @@ export default function Resource() {
           Turn this resource into flashcards or a short quiz. Made on the spot, saved to your browser.
         </p>
         <div className="flex flex-wrap gap-2">
-          <Button size="sm" variant="secondary" onPress={flashcards}>
+          <Button size="sm" variant="secondary" onClick={flashcards}>
             Make flashcards
           </Button>
-          <Button size="sm" variant="secondary" onPress={quizMe}>
+          <Button size="sm" variant="secondary" onClick={quizMe}>
             Quiz me on this
           </Button>
         </div>
@@ -245,17 +243,15 @@ export default function Resource() {
                     <div className="mt-2">
                       <RadioGroup
                         aria-label={'Question ' + (i + 1)}
-                        value={quizPick[i] !== undefined ? String(quizPick[i]) : null}
-                        onChange={(v) => setQuizPick((p) => ({ ...p, [i]: Number(v) }))}
-                        isDisabled={quizPick[i] !== undefined}
+                        value={quizPick[i] !== undefined ? String(quizPick[i]) : ''}
+                        onValueChange={(val) => setQuizPick((p) => ({ ...p, [i]: Number(val) }))}
+                        disabled={quizPick[i] !== undefined}
                       >
                         {qq.options.map((o, k) => (
-                          <Radio key={k} value={String(k)}>
-                            <Radio.Control>
-                              <Radio.Indicator />
-                            </Radio.Control>
-                            <Radio.Content>{o}</Radio.Content>
-                          </Radio>
+                          <Label key={k} className="flex cursor-pointer items-center gap-2.5 rounded-[10px] border border-[var(--line)] px-3.5 py-2.5 text-sm font-medium">
+                            <RadioGroupItem value={String(k)} id={`rq-${i}-${k}`} />
+                            <span>{o}</span>
+                          </Label>
                         ))}
                       </RadioGroup>
                     </div>
@@ -274,42 +270,27 @@ export default function Resource() {
       </div>
 
       {repOpen && (
-      <Modal defaultOpen onOpenChange={(open) => { if (!open) setRepOpen(false); }}>
-        <Modal.Backdrop>
-          <Modal.Container placement="center">
-            <Modal.Dialog aria-label="Report an issue">
-              <Modal.Header>
-                <h2 className="font-display text-xl font-bold">Report an issue</h2>
-              </Modal.Header>
-              <Modal.Body>
-                <form onSubmit={sendReport} className="grid gap-2">
-                  <Select aria-label="Reason" selectedKey={reason} onSelectionChange={(k) => setReason(String(k))}>
-                    <Select.Trigger>
-                      <Select.Value />
-                      <Select.Indicator />
-                    </Select.Trigger>
-                    <Select.Popover>
-                      <ListBox aria-label="Report reasons">
-                        {[['broken', 'Link is broken'], ['wrong-details', 'Wrong title/details'], ['other', 'Something else']].map(([v, l]) => (
-                          <ListBoxItem key={v} id={v} textValue={l}>
-                            {l}
-                          </ListBoxItem>
-                        ))}
-                      </ListBox>
-                    </Select.Popover>
-                  </Select>
-                  <TextArea value={detail} onChange={(e) => setDetail(e.target.value)} rows={3} maxLength={500} placeholder="Optional details…" aria-label="Optional details" />
-                  <div>
-                    <Button type="submit" variant="primary">
-                      Send report
-                    </Button>
-                  </div>
-                </form>
-              </Modal.Body>
-            </Modal.Dialog>
-          </Modal.Container>
-        </Modal.Backdrop>
-      </Modal>
+        <Dialog open onOpenChange={(isOpen) => { if (!isOpen) setRepOpen(false); }}>
+          <DialogContent aria-label="Report an issue">
+            <DialogHeader>
+              <DialogTitle>Report an issue</DialogTitle>
+              <DialogDescription>Tell us what is wrong and we will triage it.</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={sendReport} className="grid gap-2">
+              <Select aria-label="Reason" value={reason} onValueChange={(k) => setReason(String(k))}>
+                <option value="broken">Link is broken</option>
+                <option value="wrong-details">Wrong title/details</option>
+                <option value="other">Something else</option>
+              </Select>
+              <Textarea value={detail} onChange={(e) => setDetail(e.target.value)} rows={3} maxLength={500} placeholder="Optional details…" aria-label="Optional details" />
+              <div>
+                <Button type="submit" variant="default">
+                  Send report
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       )}
 
       {!!related.length && (
@@ -351,7 +332,7 @@ function PreviewPanel({ id, onOpen }) {
           <Button
             size="sm"
             variant="secondary"
-            onPress={() => {
+            onClick={() => {
               const el = wrapRef.current;
               if (!el) return;
               if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -360,7 +341,7 @@ function PreviewPanel({ id, onOpen }) {
           >
             Fullscreen
           </Button>
-          <Button size="sm" variant="primary" onPress={onOpen}>
+          <Button size="sm" variant="default" onClick={onOpen}>
             Open PDF →
           </Button>
         </span>
@@ -377,7 +358,7 @@ function PreviewPanel({ id, onOpen }) {
                 {err} — the file still opens fine in a new tab.
               </p>
               <p className="mt-3">
-                <Button size="sm" variant="primary" onPress={onOpen}>
+                <Button size="sm" variant="default" onClick={onOpen}>
                   Open PDF →
                 </Button>
               </p>

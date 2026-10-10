@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
-import { Checkbox } from '@heroui/react/checkbox';
-import { TextArea } from '@heroui/react/textarea';
+import { Button } from '../components/ui/button';
+import { Checkbox } from '../components/ui/checkbox';
+import { Textarea } from '../components/ui/textarea';
 import { TypingText } from '../components/magic';
 import { api } from '../lib/api';
 import { keys } from '../lib/store';
@@ -147,13 +147,13 @@ export default function Writing() {
         80 prompts (40 persuasive + 40 creative). 20:00 timer per task, word counter (target 250-350). Drafts autosave in this browser.
       </p>
       <div className="my-3 flex flex-wrap gap-2">
-        <Button size="sm" variant="primary" onPress={() => pick()}>Random prompt</Button>
+        <Button size="sm" variant="default" onClick={() => pick()}>Random prompt</Button>
         {['persuasive', 'creative'].map((k) => (
           <Button
             key={k}
             size="sm"
             variant={kind === k ? 'primary' : 'secondary'}
-            onPress={() => {
+            onClick={() => {
               setKind(kind === k ? null : k);
               pick((prompts || []).filter((p) => p.kind === k));
             }}
@@ -162,7 +162,7 @@ export default function Writing() {
             {k}
           </Button>
         ))}
-        <Button size="sm" variant="secondary" isDisabled={busy === 'prompt'} onPress={newAiPrompt}>
+        <Button size="sm" variant="secondary" disabled={busy === 'prompt'} onClick={newAiPrompt}>
           {busy === 'prompt' ? 'Writing…' : '✦ New AI prompt'}
         </Button>
       </div>
@@ -186,14 +186,14 @@ export default function Writing() {
         <Button
           size="sm"
           variant="secondary"
-          onPress={() => setRunning((r) => !r)}
+          onClick={() => setRunning((r) => !r)}
         >
           {running ? 'Pause' : 'Start'}
         </Button>
         <Button
           size="sm"
           variant="secondary"
-          onPress={() => {
+          onClick={() => {
             setRunning(false);
             setSecs(20 * 60);
           }}
@@ -204,7 +204,7 @@ export default function Writing() {
           {words} words{words >= 250 && words <= 350 ? ' · on target ✓' : ''}
         </span>
       </div>
-      <TextArea
+      <Textarea
         value={text}
         onChange={(e) => {
           setText(e.target.value);
@@ -220,10 +220,10 @@ export default function Writing() {
         className="w-full"
       />
       <div className="mt-2.5 flex flex-wrap items-center gap-2">
-        <Button size="sm" variant="primary" isDisabled={busy === 'fb'} onPress={feedback}>
+        <Button size="sm" variant="default" disabled={busy === 'fb'} onClick={feedback}>
           {busy === 'fb' ? 'Reading…' : 'Get AI feedback'}
         </Button>
-        <Button size="sm" variant="secondary" isDisabled={busy === 'grade'} onPress={gradeIt}>
+        <Button size="sm" variant="secondary" disabled={busy === 'grade'} onClick={gradeIt}>
           {busy === 'grade' ? 'Grading…' : 'Grade my writing'}
         </Button>
         <span className="text-xs" style={{ color: 'var(--faint)' }}>
@@ -248,7 +248,7 @@ export default function Writing() {
                   <div className="flex items-center gap-2">
                     <span className="w-[110px] flex-none text-[13px] font-semibold capitalize">{k}</span>
                     <span className="h-3 flex-1 overflow-hidden rounded-md border" style={{ background: 'var(--bg2)', borderColor: 'var(--line)' }}>
-                      <span className="block h-full rounded-md transition-all" style={{ width: `${(v / 5) * 100}%`, background: 'linear-gradient(90deg,#2f49e5,#b45309)' }} />
+                      <span className="block h-full rounded-md transition-all" style={{ width: `${(v / 5) * 100}%`, background: 'var(--primary)' }} />
                     </span>
                     <span className="w-[26px] flex-none text-right text-[13px] font-bold tabular-nums">{v}</span>
                   </div>
@@ -282,14 +282,12 @@ export default function Writing() {
         </div>
       )}
       <h2 className="mb-3 mt-6 font-display text-xl font-bold">Self-rubric (tick before you finish)</h2>
-      <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="flex flex-col gap-1 rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         {['Clear position / story problem by line 5', 'Paragraphs: 1 idea each, linked', '2+ persuasive devices / 3+ senses (creative)', 'Varied sentences (short punch + long flow)', 'Precise vocab (no repeats)', 'Spelling + punctuation checked'].map((t) => (
-          <Checkbox key={t} className="min-h-[40px] px-2 py-2 text-[13.5px]">
-            <Checkbox.Control>
-              <Checkbox.Indicator />
-            </Checkbox.Control>
+          <label key={t} className="flex min-h-[40px] cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 text-[13.5px] font-medium">
+            <Checkbox aria-label={t} />
             {t}
-          </Checkbox>
+          </label>
         ))}
       </div>
     </div>

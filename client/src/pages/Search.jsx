@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
-import { Checkbox } from '@heroui/react/checkbox';
-import { ListBox } from '@heroui/react/list-box';
-import { ListBoxItem } from '@heroui/react/list-box-item';
-import { Select } from '@heroui/react/select';
+import { Button } from '../components/ui/button';
+import { Checkbox } from '../components/ui/checkbox';
+import { Label } from '../components/ui/label';
+import { Select } from '../components/ui/select';
 import { api, pretty } from '../lib/api';
 import { bumpInsight } from '../lib/store';
 import { BlurFade, Empty, Skeleton, AnimatedGrid } from '../components/magic';
@@ -106,10 +105,8 @@ export default function Search() {
   };
 
   const check = (label, count, checked, onChange) => (
-    <Checkbox key={label} isSelected={checked} onChange={onChange} className="min-h-[40px] px-2 py-2 text-[13.5px]">
-      <Checkbox.Control>
-        <Checkbox.Indicator />
-      </Checkbox.Control>
+    <Label key={label} className="flex min-h-[40px] cursor-pointer items-center gap-2.5 px-2 py-2 text-[13.5px] font-medium">
+      <Checkbox checked={checked} onCheckedChange={onChange} aria-label={label} />
       <span className="truncate">{label}</span>
       <span
         className="ml-auto flex-none rounded-full border px-2 py-0.5 text-[11px] tabular-nums"
@@ -117,7 +114,7 @@ export default function Search() {
       >
         {Number(count || 0).toLocaleString()}
       </span>
-    </Checkbox>
+    </Label>
   );
 
   return (
@@ -151,12 +148,10 @@ export default function Search() {
         </details>
         <details className="border-t border-dashed py-3" style={{ borderColor: 'var(--line2)' }}>
           <summary className="flex min-h-[36px] cursor-pointer items-center justify-between rounded-lg px-0.5 text-[13.5px] font-bold">More options</summary>
-          <Checkbox isSelected={answers} onChange={(v) => set({ answers: v ? '1' : '' })} className="min-h-[40px] px-2 py-2 text-[13.5px]">
-            <Checkbox.Control>
-              <Checkbox.Indicator />
-            </Checkbox.Control>
+          <Label className="flex min-h-[40px] cursor-pointer items-center gap-2.5 px-2 py-2 text-[13.5px] font-medium">
+            <Checkbox checked={answers} onCheckedChange={(v) => set({ answers: v ? '1' : '' })} aria-label="Answers included" />
             Answers included
-          </Checkbox>
+          </Label>
         </details>
       </aside>
 
@@ -176,7 +171,7 @@ export default function Search() {
             <Button
               size="sm"
               variant="secondary"
-              onPress={() => {
+              onClick={() => {
                 setCompact((c) => {
                   try {
                     localStorage.setItem('sehs-density', !c ? 'compact' : 'comfortable');
@@ -191,8 +186,8 @@ export default function Search() {
             </Button>
             <Button
               size="sm"
-              variant={answers ? 'primary' : 'secondary'}
-              onPress={() => set({ answers: answers ? '' : '1' })}
+              variant={answers ? 'default' : 'secondary'}
+              onClick={() => set({ answers: answers ? '' : '1' })}
               aria-pressed={String(answers)}
             >
               {answers ? '✓ Answers' : 'Answers'}
@@ -223,30 +218,16 @@ export default function Search() {
             </div>
             <Select
               aria-label="Sort results"
-              selectedKey={sort}
-              onSelectionChange={(k) => set({ sort: k === 'relevance' ? '' : String(k) })}
+              value={sort}
+              onValueChange={(k) => set({ sort: k === 'relevance' ? '' : String(k) })}
               className="w-[150px]"
             >
-              <Select.Trigger>
-                <Select.Value />
-                <Select.Indicator />
-              </Select.Trigger>
-              <Select.Popover>
-                <ListBox aria-label="Sort options">
-                  {[
-                    ['relevance', 'Best match'],
-                    ['title-az', 'A–Z'],
-                    ['title-za', 'Z–A'],
-                    ['newest', 'Newest'],
-                    ['type', 'File type'],
-                    ['answers', 'Answers first'],
-                  ].map(([v, l]) => (
-                    <ListBoxItem key={v} id={v} textValue={l}>
-                      {l}
-                    </ListBoxItem>
-                  ))}
-                </ListBox>
-              </Select.Popover>
+              <option value="relevance">Best match</option>
+              <option value="title-az">A–Z</option>
+              <option value="title-za">Z–A</option>
+              <option value="newest">Newest</option>
+              <option value="type">File type</option>
+              <option value="answers">Answers first</option>
             </Select>
           </div>
         </div>
@@ -300,7 +281,7 @@ export default function Search() {
               ))}
             </div>
             <div className="mt-4 flex justify-center">
-              <Link to="/search" className="inline-flex min-h-[42px] items-center rounded-[11px] bg-[#2f49e5] px-[18px] py-2.5 text-sm font-bold text-white">
+              <Link to="/search" className="inline-flex min-h-[42px] items-center rounded-[11px] bg-[var(--primary)] px-[18px] py-2.5 text-sm font-bold text-[var(--primary-foreground)]">
                 Clear search &amp; filters
               </Link>
             </div>

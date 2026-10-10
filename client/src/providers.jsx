@@ -1,9 +1,10 @@
-﻿import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Toast } from '@heroui/react/toast';
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Toaster, toast as sonnerToast } from './components/ui/sonner';
 import { api } from './lib/api';
 import { keys } from './lib/store';
 
-// ---------- theme (HeroUI default theme; .dark class drives dark mode) ----------
+// ---------- theme (.dark class drives dark mode) ----------
 const ThemeCtx = createContext({ dark: false, toggle: () => {} });
 export const useTheme = () => useContext(ThemeCtx);
 
@@ -42,18 +43,18 @@ export function ThemeProvider({ children }) {
   return <ThemeCtx.Provider value={{ dark, toggle }}>{children}</ThemeCtx.Provider>;
 }
 
-// ---------- toast (HeroUI Toast; same useToast() signature for callers) ----------
+// ---------- toast (shadcn/ui Sonner; same useToast() signature for callers) ----------
 const ToastCtx = createContext((msg) => {});
 export const useToast = () => useContext(ToastCtx);
 
 export function ToastProvider({ children }) {
   const toast = useCallback((m) => {
-    Toast.toast(String(m ?? ''));
+    sonnerToast(String(m ?? ''));
   }, []);
   return (
     <ToastCtx.Provider value={toast}>
       {children}
-      <Toast.Provider />
+      <Toaster />
     </ToastCtx.Provider>
   );
 }
@@ -110,7 +111,7 @@ export function TermsProvider({ children }) {
               <h2 className="font-display text-xl font-bold">
                 Terms &amp; Conditions{' '}
                 <span className="text-sm font-normal" style={{ color: 'var(--faint)' }}>
-                  v{pending.version} ┬À this browser tab only
+                  v{pending.version} -� this browser tab only
                 </span>
               </h2>
               <p className="mt-1 font-semibold" style={{ color: 'var(--mut)' }}>
@@ -129,12 +130,12 @@ export function TermsProvider({ children }) {
                   ))}
               </div>
               <label className="mt-3 flex cursor-pointer items-center gap-2 text-sm">
-                <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="h-4 w-4 accent-[#5b6cff]" />
+                <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="h-4 w-4 accent-[var(--primary)]" />
                 I have read and agree to these Terms &amp; Conditions
               </label>
               <div className="mt-4 flex gap-2">
                 <button
-                  className="rounded-xl bg-[#2f49e5] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#2235b8]"
+                  className="rounded-xl bg-[var(--primary)] px-5 py-2.5 text-sm font-bold text-[var(--primary-foreground)] hover:brightness-110"
                   onClick={() => (agreed ? decide(true) : null)}
                 >
                   Accept &amp; continue
@@ -167,11 +168,11 @@ export function useOpener() {
       } catch {
         w = null;
       }
-      if (!w) toast('Popup blocked ÔÇö allow popups for this site, then try again');
+      if (!w) toast('Popup blocked ��� allow popups for this site, then try again');
       else {
         try {
           w.document.write(
-            '<!DOCTYPE html><title>OpeningÔÇª</title><body style="font-family:sans-serif;background:#0b0b28;color:#f2f2fb;display:grid;place-items:center;height:100vh;margin:0"><p>Opening your fileÔÇª</p></body>'
+            '<!DOCTYPE html><title>Opening�Ǫ</title><body style="font-family:sans-serif;background:#0b0b28;color:#f2f2fb;display:grid;place-items:center;height:100vh;margin:0"><p>Opening your file�Ǫ</p></body>'
           );
           w.document.close();
         } catch {

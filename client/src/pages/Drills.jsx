@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
-import { Input } from '@heroui/react/input';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { api } from '../lib/api';
 import { recordMistake } from '../lib/store';
 import { useToast } from '../providers';
@@ -142,14 +142,14 @@ export default function Drills() {
             className="inline-flex min-h-[38px] items-center rounded-[10px] border px-3.5 py-2 text-[13px] font-bold"
             style={
               kind === k && !aiSet
-                ? { background: '#2f49e5', borderColor: '#2f49e5', color: '#fff' }
+                ? { background: 'var(--primary)', borderColor: 'var(--primary)', color: 'var(--primary-foreground)' }
                 : { borderColor: 'var(--line2)', background: 'var(--panel)' }
             }
           >
             {l}
           </button>
         ))}
-        <Button size="sm" variant="secondary" onPress={aiDrill}>
+        <Button size="sm" variant="secondary" onClick={aiDrill}>
           ✦ AI set
         </Button>
       </div>
@@ -165,12 +165,12 @@ export default function Drills() {
             aria-label="Your answer"
             className="min-w-0 flex-1"
           />
-          <Button variant="primary" onPress={check}>
+          <Button variant="default" onClick={check}>
             Check
           </Button>
           <Button
             variant="secondary"
-            onPress={() => {
+            onClick={() => {
               if (aiSet) {
                 if (aiIdx + 1 < aiSet.length) {
                   setAiIdx(aiIdx + 1);

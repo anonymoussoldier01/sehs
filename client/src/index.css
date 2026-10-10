@@ -1,46 +1,149 @@
 @import "tailwindcss";
-@import "@heroui/styles";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme {
+@theme inline {
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-display: "Fraunces", Georgia, serif;
   --ease-out: cubic-bezier(0.2, 0.7, 0.25, 1);
+
+  --radius-lg: 0.625rem;
+  --radius-md: calc(0.625rem - 2px);
+  --radius-sm: calc(0.625rem - 4px);
+  --radius-xl: 0.875rem;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
-/* App chrome follows the HeroUI default theme via its tokens, so the whole
-   site (custom shell + HeroUI components) shares one personality in both
-   light and dark mode. */
+/* ---------- shadcn/ui theme tokens (Tailwind v4 CSS-first) ----------
+   Restrained, premium education palette: strong trustworthy blue primary,
+   neutral slate surfaces. Radius kept consistent (10px base). */
 :root {
+  --radius: 0.625rem;
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --primary: #1e40af;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2f7;
+  --secondary-foreground: #0f172a;
+  --muted: #eef2f7;
+  --muted-foreground: #475569;
+  --accent: #1e40af;
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #1e40af;
+  --success: #15803d;
+  --warning: #b45309;
+
+  /* Legacy app-chrome tokens, mapped onto the shadcn theme so existing
+     shell/cards/pages keep working unchanged during + after migration. */
   --bg: var(--background);
-  --bg2: var(--default);
-  --panel: color-mix(in srgb, var(--foreground) 3%, var(--background));
-  --card: color-mix(in srgb, var(--foreground) 4%, var(--background));
-  --line: var(--border, color-mix(in srgb, var(--foreground) 12%, transparent));
-  --line2: color-mix(in srgb, var(--foreground) 22%, transparent);
+  --bg2: var(--secondary);
+  --panel: #ffffff;
+  --line: var(--border);
+  --line2: #cbd5e1;
   --txt: var(--foreground);
-  --mut: var(--muted);
-  --faint: color-mix(in srgb, var(--muted) 68%, var(--background));
+  --mut: var(--muted-foreground);
+  --faint: #94a3b8;
   --acc: var(--accent);
-  --acc-soft: color-mix(in srgb, var(--accent) 12%, var(--background));
-  --acc-line: color-mix(in srgb, var(--accent) 38%, transparent);
+  --acc-soft: #dbe5fa;
+  --acc-line: #b3c6f2;
   --ok: var(--success);
-  --ok-bg: color-mix(in srgb, var(--success) 13%, var(--background));
-  --bad: var(--danger);
-  --bad-bg: color-mix(in srgb, var(--danger) 12%, var(--background));
+  --ok-bg: #dcf3e5;
+  --bad: var(--destructive);
+  --bad-bg: #fbe3e3;
+  --warn: var(--warning);
+  --warn-bg: #fdf0d8;
+  --amber: #b45309;
   --mark-bg: #fde68a;
+  --toast-bg: #0f172a;
+  --toast-fg: #f8fafc;
   color-scheme: light;
 }
 
 .dark {
+  --background: #0b1220;
+  --foreground: #e8edf5;
+  --card: #111a2e;
+  --card-foreground: #e8edf5;
+  --popover: #111a2e;
+  --popover-foreground: #e8edf5;
+  --primary: #5b8cff;
+  --primary-foreground: #0b1220;
+  --secondary: #1a2440;
+  --secondary-foreground: #e8edf5;
+  --muted: #1a2440;
+  --muted-foreground: #a8b3c7;
+  --accent: #5b8cff;
+  --accent-foreground: #0b1220;
+  --destructive: #f87171;
+  --border: #243252;
+  --input: #243252;
+  --ring: #5b8cff;
+  --success: #4ade80;
+  --warning: #fbbf24;
+
+  --bg: var(--background);
+  --bg2: var(--secondary);
+  --panel: #101830;
+  --line: var(--border);
+  --line2: #334155;
+  --txt: var(--foreground);
+  --mut: var(--muted-foreground);
+  --faint: #7c8aa5;
+  --acc: var(--accent);
+  --acc-soft: #1a2c55;
+  --acc-line: #2f4d8f;
+  --ok: var(--success);
+  --ok-bg: #0f2e1f;
+  --bad: var(--destructive);
+  --bad-bg: #3a1414;
+  --warn: var(--warning);
+  --warn-bg: #33230a;
+  --amber: #f59e0b;
   --mark-bg: #6b5d0a;
   --mark-fg: #fff7d6;
+  --toast-bg: #e8edf5;
+  --toast-fg: #0b1220;
   color-scheme: dark;
 }
 
-html {
-  scroll-behavior: smooth;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
 /* Lenis smooth scroll */
@@ -55,26 +158,13 @@ html.lenis body {
   overflow: hidden;
 }
 
-body {
-  background: var(--bg);
-  color: var(--txt);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  background-image: radial-gradient(rgba(127, 127, 180, 0.07) 1px, transparent 1px);
-  background-size: 22px 22px;
-}
-
-.dark body {
-  background-image: radial-gradient(rgba(160, 160, 255, 0.08) 1px, transparent 1px);
-}
-
 ::selection {
-  background: #5b6cff;
-  color: #fff;
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
 
 :focus-visible {
-  outline: 3px solid #ffd54d;
+  outline: 3px solid #fbbf24;
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -84,9 +174,18 @@ body {
   scrollbar-color: var(--line2) transparent;
 }
 
-/* ---------- magic: aurora text ---------- */
+/* Subject / topic / difficulty accents — one restrained hue family each,
+   used for badges, file icons and deck markers. */
+.subj-maths { --subj: #1d4ed8; }
+.subj-verbal { --subj: #6d28d9; }
+.subj-reading { --subj: #0e7490; }
+.subj-writing { --subj: #b45309; }
+.subj-science { --subj: #15803d; }
+.subj-mixed { --subj: #475569; }
+
+/* ---------- magic: aurora text (hero headline only) ---------- */
 .aurora-text {
-  background: linear-gradient(110deg, #5b6cff 10%, #a855f7 32%, #ec4899 50%, #5b6cff 72%);
+  background: linear-gradient(110deg, var(--primary) 20%, #6d28d9 50%, var(--primary) 80%);
   background-size: 220% auto;
   -webkit-background-clip: text;
   background-clip: text;
@@ -107,7 +206,7 @@ body {
   animation: aurora-slide 4.5s linear infinite;
 }
 
-/* ---------- magic: border beam ---------- */
+/* ---------- magic: border beam (featured cards only) ---------- */
 @property --beam-a {
   syntax: "<angle>";
   initial-value: 0deg;
@@ -130,8 +229,8 @@ body {
   background: conic-gradient(
     from var(--beam-a, 0deg) at 50% 50%,
     transparent 0 78%,
-    #5b6cff 86%,
-    #ec4899 90%,
+    var(--primary) 86%,
+    #6d28d9 90%,
     transparent 96%
   );
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -162,14 +261,14 @@ body {
   }
 }
 
-/* ---------- magic: meteors ---------- */
+/* ---------- magic: meteors (hero only, subtle) ---------- */
 .meteor {
   position: absolute;
   top: -10%;
   width: 2px;
   height: 120px;
   border-radius: 4px;
-  background: linear-gradient(to bottom, transparent, #8b9bff);
+  background: linear-gradient(to bottom, transparent, #93a8e8);
   transform: rotate(28deg);
   opacity: 0;
   animation: meteor-fall 7s linear infinite;
@@ -192,17 +291,17 @@ body {
   }
 }
 
-/* ---------- magic: pulse halo ---------- */
+/* ---------- magic: pulse halo (primary CTA only) ---------- */
 @keyframes pulse-halo {
   70% {
-    box-shadow: 0 0 0 16px rgba(91, 108, 255, 0);
+    box-shadow: 0 0 0 16px rgba(30, 64, 175, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(91, 108, 255, 0);
+    box-shadow: 0 0 0 0 rgba(30, 64, 175, 0);
   }
 }
 .btn-pulse {
-  box-shadow: 0 0 0 0 rgba(91, 108, 255, 0.5);
+  box-shadow: 0 0 0 0 rgba(30, 64, 175, 0.35);
   animation: pulse-halo 2.6s ease-out infinite;
 }
 
@@ -210,7 +309,7 @@ body {
 .sparkle-star {
   position: absolute;
   top: -0.4em;
-  color: #a855f7;
+  color: #6d28d9;
   pointer-events: none;
   animation: sparkle-tw 2.4s ease-in-out infinite;
 }
@@ -257,6 +356,50 @@ body {
   transform: translateX(70%);
 }
 
+/* ---------- bento cards (home study modes) ---------- */
+.bento-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-height: 150px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  padding: 1.1rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+.bento-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+}
+.bento-card h3 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0.35rem 0 0;
+}
+.bento-card p {
+  font-size: 0.83rem;
+  color: var(--mut);
+  margin: 0;
+}
+.bento-card .bico {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--acc-line);
+  background: var(--acc-soft);
+  font-size: 1.15rem;
+}
+
+/* ---------- legacy hero shell (home) ---------- */
+.mhero-inner {
+  max-width: 860px;
+}
+
 /* ---------- view transitions ---------- */
 @view-transition {
   navigation: auto;
@@ -278,6 +421,11 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+}
+
+/* ---------- sonner toasts follow the theme ---------- */
+[data-sonner-toaster] {
+  font-family: var(--font-sans);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
-import { Input } from '@heroui/react/input';
-import { TextArea } from '@heroui/react/textarea';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
 import { api } from '../lib/api';
 import { useToast } from '../providers';
 
@@ -41,9 +41,9 @@ export default function Request() {
       </p>
       <form onSubmit={send} className="mt-3 grid gap-2.5">
         <Input value={title} onChange={(e) => setTitle(e.target.value)} required minLength={4} maxLength={200} placeholder="What are you looking for? (e.g. 2023 ACER verbal reasoning)" aria-label="Request title" />
-        <TextArea value={detail} onChange={(e) => setDetail(e.target.value)} rows={4} maxLength={1000} placeholder="Extra detail (optional)" aria-label="Extra detail" />
+        <Textarea value={detail} onChange={(e) => setDetail(e.target.value)} rows={4} maxLength={1000} placeholder="Extra detail (optional)" aria-label="Extra detail" />
         <div>
-          <Button type="submit" variant="primary">
+          <Button type="submit" variant="default">
             Send request
           </Button>{' '}
           <span className="text-[13px]">{msg}</span>

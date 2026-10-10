@@ -8,7 +8,7 @@ export default function NotFound() {
         That link doesn&apos;t point anywhere here.
       </p>
       <p className="mt-4">
-        <Link to="/" className="inline-flex min-h-[42px] items-center rounded-[11px] bg-[#2f49e5] px-[18px] py-2.5 text-sm font-bold text-white">
+        <Link to="/" className="inline-flex min-h-[42px] items-center rounded-[11px] bg-[var(--primary)] px-[18px] py-2.5 text-sm font-bold text-[var(--primary-foreground)]">
           Back home
         </Link>
       </p>

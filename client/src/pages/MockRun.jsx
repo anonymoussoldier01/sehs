@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button } from '@heroui/react/button';
-import { ProgressBar } from '@heroui/react/progress-bar';
+import { Button } from '../components/ui/button';
+import { Progress } from '../components/ui/progress';
 import { api } from '../lib/api';
 import { keys, recordMistake } from '../lib/store';
 import { useToast } from '../providers';
@@ -120,10 +120,10 @@ export default function MockRun() {
             {perfect ? 'Perfect. 🎉' : score >= qs.length * 0.7 ? 'Solid — review misses below.' : 'Review below, then retry.'}
           </p>
           <p className="mt-3 flex justify-center gap-2">
-            <Button size="sm" variant="primary" onPress={() => navigate('/mocks')}>
+            <Button size="sm" variant="default" onClick={() => navigate('/mocks')}>
               All mocks
             </Button>
-            <Button size="sm" variant="secondary" onPress={() => window.location.reload()}>
+            <Button size="sm" variant="secondary" onClick={() => window.location.reload()}>
               Retry
             </Button>
           </p>
@@ -176,10 +176,10 @@ export default function MockRun() {
           })}
         </div>
         <div className="mt-4 flex gap-2">
-          <Button variant="secondary" onPress={() => setReview(false)}>
+          <Button variant="secondary" onClick={() => setReview(false)}>
             ← Back to questions
           </Button>
-          <Button variant="primary" onPress={finish}>
+          <Button variant="default" onClick={finish}>
             Submit mock
           </Button>
         </div>
@@ -209,24 +209,20 @@ export default function MockRun() {
           <Button
             size="sm"
             variant={flags[i] ? 'primary' : 'secondary'}
-            onPress={() => setFlags((f) => ({ ...f, [i]: !f[i] }))}
+            onClick={() => setFlags((f) => ({ ...f, [i]: !f[i] }))}
             aria-pressed={String(!!flags[i])}
           >
             ⚑ {flags[i] ? 'Flagged' : 'Flag'}
           </Button>
-          <Button size="sm" variant="secondary" onPress={() => { setAnswers((a) => { const n = [...a]; n[i] = -1; return n; }); setI((v) => Math.min(v + 1, qs.length - 1)); }}>
+          <Button size="sm" variant="secondary" onClick={() => { setAnswers((a) => { const n = [...a]; n[i] = -1; return n; }); setI((v) => Math.min(v + 1, qs.length - 1)); }}>
             Skip →
           </Button>
-          <Button size="sm" variant="secondary" onPress={() => setReview(true)}>
+          <Button size="sm" variant="secondary" onClick={() => setReview(true)}>
             Review
           </Button>
         </span>
       </div>
-      <ProgressBar value={i} maxValue={qs.length} aria-label="Mock progress" className="mb-1 mt-2.5">
-        <ProgressBar.Track>
-          <ProgressBar.Fill />
-        </ProgressBar.Track>
-      </ProgressBar>
+      <Progress value={i} max={qs.length} aria-label="Mock progress" className="mb-1 mt-2.5" />
       <div className="mt-3 grid items-start gap-3.5 lg:grid-cols-[minmax(0,1fr)_220px]">
         <AnimatePresence mode="wait">
           <motion.div
@@ -309,8 +305,8 @@ function MissTools({ misses, coach, setCoach, variants, setVariants }) {
         <Button
           size="sm"
           variant="secondary"
-          isDisabled={busy === 'coach'}
-          onPress={async () => {
+          disabled={busy === 'coach'}
+          onClick={async () => {
             setBusy('coach');
             try {
               const t = await api.aiChat(
@@ -329,8 +325,8 @@ function MissTools({ misses, coach, setCoach, variants, setVariants }) {
         <Button
           size="sm"
           variant="secondary"
-          isDisabled={busy === 'var'}
-          onPress={async () => {
+          disabled={busy === 'var'}
+          onClick={async () => {
             setBusy('var');
             try {
               const j = await api.aiVariants(misses.slice(0, 5));
@@ -346,7 +342,7 @@ function MissTools({ misses, coach, setCoach, variants, setVariants }) {
         <Button
           size="sm"
           variant="secondary"
-          onPress={() => {
+          onClick={() => {
             try {
               const decks = JSON.parse(localStorage.getItem(keys.decks) || '[]');
               decks.push({ title: 'Mock misses ' + new Date().toISOString().slice(0, 10), cards: misses.map((m) => ({ front: m.stem, back: 'Strand: ' + m.strand })) });
@@ -440,8 +436,8 @@ function ResultCard({ n, q, picked, ok }) {
           <Button
             size="sm"
             variant="secondary"
-            isDisabled={busy}
-            onPress={async () => {
+            disabled={busy}
+            onClick={async () => {
               setBusy(true);
               setExp('Asking the tutor…');
               try {

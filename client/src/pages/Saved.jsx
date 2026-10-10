@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
-import { Input } from '@heroui/react/input';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { api } from '../lib/api';
 import { keys, useSyncedLocal } from '../lib/store';
 import { useToast } from '../providers';
@@ -53,7 +53,7 @@ export default function Saved() {
       <h1 className="font-display text-3xl font-bold">
         Your library{' '}
         {!!savedIds.length && (
-          <span className="rounded-full bg-[#b45309] px-2 py-0.5 align-middle text-[11px] font-bold text-white">{savedIds.length}</span>
+          <span className="rounded-full px-2 py-0.5 align-middle text-[11px] font-bold" style={{ background: 'var(--warn-bg)', color: 'var(--warn)' }}>{savedIds.length}</span>
         )}
       </h1>
       <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
@@ -90,16 +90,16 @@ export default function Saved() {
                 {(l.items || []).length} resources
               </p>
               <div className="flex flex-wrap gap-2">
-                <Button size="sm" variant="secondary" onPress={() => share(l)}>
+                <Button size="sm" variant="secondary" onClick={() => share(l)}>
                   Share link
                 </Button>
-                <Button size="sm" variant="secondary" onPress={() => navigate('/list/' + encodeIds(l.items || []))}>
+                <Button size="sm" variant="secondary" onClick={() => navigate('/list/' + encodeIds(l.items || []))}>
                   Open
                 </Button>
                 <Button
                   size="sm"
                   variant="secondary"
-                  onPress={() => {
+                  onClick={() => {
                     setLists((x) => x.filter((_, k) => k !== i));
                     toast('Folder deleted');
                   }}
@@ -132,7 +132,7 @@ export default function Saved() {
           aria-label="New folder name"
           className="min-w-0 flex-1"
         />
-        <Button type="submit" variant="primary">
+        <Button type="submit" variant="default">
           Create folder
         </Button>
       </form>

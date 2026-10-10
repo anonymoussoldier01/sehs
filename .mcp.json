@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "nit": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "nit",
+        "mcp",
+        "nit-review"
+      ]
+    }
+  }
+}

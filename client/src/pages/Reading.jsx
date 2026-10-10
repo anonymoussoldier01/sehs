@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@heroui/react/button';
-import { ListBox } from '@heroui/react/list-box';
-import { ListBoxItem } from '@heroui/react/list-box-item';
-import { Select } from '@heroui/react/select';
+import { Button } from '../components/ui/button';
+
+
+import { Select } from '../components/ui/select';
 import { api } from '../lib/api';
 import { recordMistake } from '../lib/store';
 import { useToast } from '../providers';
@@ -77,7 +77,7 @@ export default function Reading() {
               key={p.id}
               size="sm"
               variant={cur?.id === p.id ? 'primary' : 'secondary'}
-              onPress={() => open(p)}
+              onClick={() => open(p)}
             >
               {p.title}
             </Button>
@@ -85,22 +85,15 @@ export default function Reading() {
         </div>
       )}
       <div className="my-3 flex flex-wrap items-center gap-2">
-        <Select aria-label="Genre" selectedKey={genre || 'any'} onSelectionChange={(k) => setGenre(k === 'any' ? '' : String(k))} className="w-[210px]">
-          <Select.Trigger>
-            <Select.Value />
-            <Select.Indicator />
-          </Select.Trigger>
-          <Select.Popover>
-            <ListBox aria-label="Genres">
-              {['any', 'fiction', 'nonfiction', 'opinion', 'poetry', 'informational'].map((g) => (
-                <ListBoxItem key={g} id={g} textValue={g}>
-                  {g === 'any' ? 'Any genre (rotates)' : g[0].toUpperCase() + g.slice(1)}
-                </ListBoxItem>
-              ))}
-            </ListBox>
-          </Select.Popover>
+        <Select aria-label="Genre" value={genre || 'any'} onValueChange={(k) => setGenre(k === 'any' ? '' : String(k))} className="w-[210px]">
+          <option value="any">Any genre (rotates)</option>
+          <option value="fiction">Fiction</option>
+          <option value="nonfiction">Nonfiction</option>
+          <option value="opinion">Opinion</option>
+          <option value="poetry">Poetry</option>
+          <option value="informational">Informational</option>
         </Select>
-        <Button variant="primary" size="sm" isDisabled={busy} onPress={aiPassage}>
+        <Button variant="default" size="sm" disabled={busy} onClick={aiPassage}>
           {busy ? 'Writing…' : '✦ New AI passage'}
         </Button>
       </div>
