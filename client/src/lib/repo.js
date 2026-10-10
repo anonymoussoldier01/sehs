@@ -1,0 +1,100 @@
+// Repository interface — all persisted learner data lives behind these functions.
+// Today the adapter is localStorage (no accounts by design; see docs/DECISIONS.md D2).
+// Migration path to accounts: implement the same function names against a REST
+// backend (e.g. /api/me/*) and swap this module's internals — UI code must not
+// touch localStorage directly for learner data (UI prefs like theme/view/motion
+// may keep using localStorage via useLocal).
+import { keys } from './store';
+
+function read(key, fallback) {
+  try {
+    const v = localStorage.getItem(key);
+    return v == null ? fallback : JSON.parse(v);
+  } catch {
+    return fallback;
+  }
+}
+function write(key, value) {
+  try {
+    if (value == null) localStorage.removeItem(key);
+    else localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* storage unavailable — callers treat as ephemeral */
+  }
+}
+
+export const repo = {
+  // Reading progress: { [resourceId]: { at, secondsRead } }
+  readingProgress: {
+    get: () => read('sehs-progress', {}),
+    touch: (id) => {
+      if (!id) return;
+      const p = read('sehs-progress', {});
+      p[id] = { at: new Date().toISOString(), secondsRead: (p[id]?.secondsRead || 0) + 1 };
+      write('sehs-progress', p);
+    },
+  },
+  // Bookmarks (saved resources): string[] of public ids
+  bookmarks: {
+    get: () => read(keys.saved, []),
+    set: (ids) => write(keys.saved, [...new Set(ids)].slice(0, 500)),
+  },
+  // Per-resource notes: { [resourceId]: { text, updatedAt } } (autosaved)
+  notes: {
+    getAll: () => read('sehs-notes', {}),
+    get: (id) => read('sehs-notes', {})[id]?.text || '',
+    set: (id, text) => {
+      const all = read('sehs-notes', {});
+      if (!text) delete all[id];
+      else all[id] = { text: String(text).slice(0, 8000), updatedAt: new Date().toISOString() };
+      write('sehs-notes', all);
+    },
+  },
+  // Attempts: { [mockId]: { score, total, at, seed } }
+  attempts: {
+    get: () => read(keys.mocks, {}),
+    record: (id, { score, total, seed }) => {
+      const best = read(keys.mocks, {});
+      if (!best[id] || score > best[id].score) {
+        best[id] = { score, total, seed, at: new Date().toISOString() };
+        write(keys.mocks, best);
+      }
+      return best[id];
+    },
+  },
+  // Review queue items: [{ stem, strand, box, nextDue, at }]
+  reviewQueue: {
+    get: () => read('sehs-review', []),
+    set: (items) => write('sehs-review', (items || []).slice(0, 200)),
+  },
+  settings: {
+    get: () => read('sehs-settings', { extraTime: 1, largerText: false, highContrast: false, dyslexiaFriendly: false }),
+    set: (s) => write('sehs-settings', s),
+  },
+};
+
+/** Export learner data (JSON). Nothing leaves the browser unless the user saves the file. */
+export function exportData() {
+  return {
+    exportedAt: new Date().toISOString(),
+    version: 1,
+    saved: repo.bookmarks.get(),
+    progress: repo.readingProgress.get(),
+    notes: repo.notes.getAll(),
+    attempts: repo.attempts.get(),
+    review: repo.reviewQueue.get(),
+    mistakes: read(keys.mistakes, []),
+    lists: read(keys.lists, []),
+    decks: read(keys.decks, []),
+  };
+}
+
+/** Delete all local learner data (irreversible — callers must confirm first). */
+export function deleteAllData() {
+  for (const k of ['sehs-progress', 'sehs-notes', 'sehs-review', keys.saved, keys.mocks, keys.mistakes, keys.lists, keys.decks, keys.leitner, keys.recent, keys.insights, keys.profile, keys.streak])
+    try {
+      localStorage.removeItem(k);
+    } catch {
+      /* noop */
+    }
+}
