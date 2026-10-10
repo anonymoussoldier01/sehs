@@ -5,7 +5,7 @@
   - `npm test` → 17 passed, 0 failed.
   - `npm run validate` → total=1641 errors=0 warnings=0.
   - `npm run relevance` → 39 passed, 0 failed (index 1641 docs).
-  - `npm run lint` (client oxlint) → 0 errors, 50 warnings (pre-existing style + unused-import notes; none blocking).
+  - `npm run lint` (client oxlint) → 0 errors, 46 warnings (pre-existing style + unused-import notes; none blocking; 4 fewer than baseline).
   - `node scripts/assessment.test.mjs` → 13 passed, 0 failed (new).
   - `node scripts/smoke-native.mjs` → all pass (native banks intact).
   - `npm run build` (client) → ✓ 2446 modules, JS 853.91KB raw / 259.15KB gzip (over the 250KB-gzip budget — D5 follow-up: LazyMotion migration).
