@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
@@ -10,8 +10,8 @@ import { Textarea } from '../components/ui/textarea';
 import { api, pretty } from '../lib/api';
 import { keys, pushRecent } from '../lib/store';
 import { repo } from '../lib/repo';
-import { useOpener, useToast } from '../providers';
-import { BlurFade, Empty, Skeleton } from '../components/magic';
+import { useOpener, useTerms, useToast } from '../providers';
+import { BlurFade, Empty, Skeleton, AnimatedTooltip, SpotlightCard } from '../components/magic';
 import { ResourceCard, highlight } from '../components/cards';
 import { useSaved } from '../components/cards';
 
@@ -95,7 +95,8 @@ export default function Resource() {
 
   const [quiz, setQuiz] = useState(null);
   const [quizPick, setQuizPick] = useState({});
-  const [previewOpen, setPreviewOpen] = useState(false);
+  const canPreview = v?.fileType === 'pdf' || v?.fileType === 'image';
+  const scrollToViewer = () => document.getElementById('viewer')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const quizMe = async () => {
     setQuiz(null);
     setQuizPick({});
@@ -143,7 +144,7 @@ export default function Resource() {
     return () => window.removeEventListener('beforeunload', onBefore);
   }, [noteState]);
 
-  // Viewer shortcuts: o open · s save · f fullscreen preview · ? help.
+  // Viewer shortcuts: o open · s save · f focus mode · ? help.
   useEffect(() => {
     const onKey = (e) => {
       const tag = document.activeElement?.tagName || '';
@@ -151,10 +152,11 @@ export default function Resource() {
       if (e.key === '?') setShowHelp(true);
       else if ((e.key === 's' || e.key === 'S') && v) toggle(v.id);
       else if ((e.key === 'o' || e.key === 'O') && v) open(v.id);
+      else if ((e.key === 'f' || e.key === 'F') && canPreview) setDistractionFree((d) => !d);
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [v, open, toggle]);
+  }, [v, open, toggle, canPreview]);
 
   // Answer-key candidates: same title stem + answer/solution/key words (inferred, never auto-applied).
   const answerKeys = (related || []).filter((r) => {
@@ -216,7 +218,7 @@ export default function Resource() {
           <Link
             key={t}
             to={'/search?q=' + encodeURIComponent(t)}
-            className="rounded-full border px-2.5 py-1 text-[11.5px] font-semibold transition-all hover:-translate-y-px"
+            className="chip-hover rounded-full border px-2.5 py-1 text-[11.5px] font-semibold"
             style={{ borderColor: 'var(--line2)', color: 'var(--mut)' }}
           >
             {pretty(t)}
@@ -225,12 +227,18 @@ export default function Resource() {
       </div>
       <div className="mb-7 flex flex-wrap items-center gap-2.5" role="toolbar" aria-label="Resource actions">
         <span className="flex flex-wrap gap-2.5" role="group" aria-label="Open">
-          <Button variant="default" onClick={() => open(v.id)}>
-            {v.fileType === 'pdf' ? 'Open PDF →' : 'Open resource →'}
-          </Button>
-          {v.fileType === 'pdf' && (
-            <Button variant="secondary" onClick={() => setPreviewOpen((o) => !o)} aria-expanded={String(previewOpen)}>
-              {previewOpen ? 'Hide preview' : 'Preview here'}
+          {canPreview ? (
+            <>
+              <Button variant="default" onClick={scrollToViewer}>
+                Read here ↓
+              </Button>
+              <Button variant="secondary" onClick={() => open(v.id)}>
+                Open original ↗
+              </Button>
+            </>
+          ) : (
+            <Button variant="default" onClick={() => open(v.id)}>
+              Open resource →
             </Button>
           )}
         </span>
@@ -265,12 +273,13 @@ export default function Resource() {
         </span>
       </div>
 
-      {v.fileType === 'pdf' && previewOpen && (
-        <PreviewPanel id={v.id} onOpen={() => open(v.id)} />
+      {canPreview && (
+        <PreviewPanel id={v.id} kind={v.fileType} title={title} onOpen={() => open(v.id)} />
       )}
 
       {!distractionFree && !!answerKeys.length && (
-        <section className="mb-7 rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--ok-paper, #FBFAF6)', borderColor: 'var(--line)' }} aria-label="Possible answer keys">
+        <SpotlightCard className="mb-7 rounded-2xl border shadow-sm" spotlight="rgba(245,158,11,0.10)">
+          <section className="rounded-2xl p-[18px]" style={{ background: 'var(--ok-paper, #FBFAF6)' }} aria-label="Possible answer keys">
           <h3 className="mt-0 font-display text-[15.5px] font-bold">Possible answer key</h3>
           <p className="mb-2 mt-0 text-[13px]" style={{ color: 'var(--mut)' }}>
             Inferred from the collection index (title match) — check it covers this paper before trusting it.
@@ -285,7 +294,8 @@ export default function Resource() {
               </li>
             ))}
           </ul>
-        </section>
+          </section>
+        </SpotlightCard>
       )}
 
       <div className="mb-7 rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
@@ -303,8 +313,9 @@ export default function Resource() {
               <DialogDescription>Available on this page. Shortcuts rest while typing.</DialogDescription>
             </DialogHeader>
             <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
-              <dt className="tnum font-bold">O</dt><dd>Open the file</dd>
+              <dt className="tnum font-bold">O</dt><dd>Open the file in its original location</dd>
               <dt className="tnum font-bold">S</dt><dd>Save to my list</dd>
+              <dt className="tnum font-bold">F</dt><dd>Toggle focus mode</dd>
               <dt className="tnum font-bold">?</dt><dd>Open this help</dd>
             </dl>
           </DialogContent>
@@ -423,57 +434,119 @@ export default function Resource() {
   );
 }
 
-function PreviewPanel({ id, onOpen }) {
+function PreviewPanel({ id, kind, title, onOpen }) {
+  const { ensure } = useTerms();
   const [src, setSrc] = useState(null);
   const [err, setErr] = useState(null);
   const [loaded, setLoaded] = useState(false);
+  const [needsTerms, setNeedsTerms] = useState(false);
+  const [blockedUrl, setBlockedUrl] = useState(null);
   const wrapRef = useRef(null);
+
+  const load = useCallback(async () => {
+    setErr(null);
+    setNeedsTerms(false);
+    let ok = false;
+    try {
+      ok = await ensure();
+    } catch {
+      ok = false;
+    }
+    if (!ok) {
+      setNeedsTerms(true);
+      return;
+    }
+    try {
+      const j = await api.preview(id);
+      setSrc(j.embedUrl);
+    } catch (e) {
+      setErr(e.message || 'Preview unavailable');
+    }
+  }, [ensure, id]);
+
   useEffect(() => {
     let live = true;
-    api
-      .preview(id)
-      .then((j) => live && setSrc(j.embedUrl))
-      .catch((e) => live && setErr(e.message || 'Preview unavailable'));
+    setSrc(null);
+    setLoaded(false);
+    setBlockedUrl(null);
+    load();
     return () => {
       live = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  const openOriginal = async () => {
+    const res = await onOpen();
+    if (res?.blocked) setBlockedUrl(res.url);
+  };
+
+  const fullscreen = () => {
+    const el = wrapRef.current;
+    if (!el) return;
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    else el.requestFullscreen?.().catch(() => {});
+  };
+
   return (
-    <div className="mb-7 overflow-hidden rounded-2xl border shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-      <div className="flex items-center gap-2 px-4 py-2.5">
-        <h3 className="font-display text-[15px] font-bold">PDF preview</h3>
-        <span className="ml-auto flex gap-2">
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => {
-              const el = wrapRef.current;
-              if (!el) return;
-              if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-              else el.requestFullscreen?.().catch(() => {});
-            }}
-          >
-            Fullscreen
-          </Button>
-          <Button size="sm" variant="default" onClick={onOpen}>
-            Open PDF →
-          </Button>
+    <div id="viewer" className="mb-7 scroll-mt-24 overflow-hidden rounded-2xl border shadow-md" style={{ background: 'var(--panel)', borderColor: 'var(--line2)' }}>
+      <div className="flex flex-wrap items-center gap-2 px-4 py-2.5">
+        <h2 className="font-display text-[15px] font-bold">
+          {kind === 'image' ? 'Image viewer' : 'Document viewer'}
+        </h2>
+        <span className="max-w-[40ch] truncate text-xs" style={{ color: 'var(--faint)' }}>{title}</span>
+        <span className="ml-auto flex flex-wrap gap-2">
+          <AnimatedTooltip tip="Fill the screen">
+            <Button size="sm" variant="secondary" onClick={fullscreen}>
+              ⛶ Fullscreen
+            </Button>
+          </AnimatedTooltip>
+          <AnimatedTooltip tip="Open the original file" shortcut="O">
+            <Button size="sm" variant="secondary" onClick={openOriginal}>
+              Open original ↗
+            </Button>
+          </AnimatedTooltip>
         </span>
       </div>
-      <div ref={wrapRef} className="relative bg-black/40" style={{ height: 'min(75vh, 640px)' }}>
-        {!loaded && !err && (
-          <div className="absolute inset-0 animate-pulse" style={{ background: 'var(--bg2)' }} aria-label="Loading preview" />
+      <div ref={wrapRef} className="relative" style={{ height: 'min(80vh, 720px)', background: 'var(--ok-paper, #FBFAF6)' }}>
+        {!loaded && !err && !needsTerms && (
+          <div className="absolute inset-0" aria-label="Loading document">
+            <div className="mx-auto mt-10 h-6 w-2/3 animate-pulse rounded" style={{ background: 'var(--line)' }} />
+            <div className="mx-auto mt-3 h-4 w-1/2 animate-pulse rounded" style={{ background: 'var(--line)' }} />
+            <div className="mx-6 mt-6 space-y-3">
+              {Array.from({ length: 8 }, (_, k) => (
+                <div key={k} className="h-3 animate-pulse rounded" style={{ background: 'var(--line)', opacity: 0.7, width: `${92 - (k % 3) * 12}%` }} />
+              ))}
+            </div>
+          </div>
         )}
-        {err ? (
+        {needsTerms ? (
+          <div className="grid h-full place-items-center p-6 text-center">
+            <div>
+              <p className="text-sm font-bold">One quick step before reading</p>
+              <p className="mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
+                Accept the Terms &amp; Conditions once per tab to read documents here.
+              </p>
+              <p className="mt-3">
+                <Button size="sm" variant="default" onClick={load}>
+                  Continue to document →
+                </Button>
+              </p>
+            </div>
+          </div>
+        ) : err ? (
           <div className="grid h-full place-items-center p-6 text-center">
             <div>
               <p className="text-sm font-bold">Preview didn&apos;t load</p>
               <p className="mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
-                {err} — the file still opens fine in a new tab.
+                {err} — the file still opens fine in its original location.
               </p>
-              <p className="mt-3">
-                <Button size="sm" variant="default" onClick={onOpen}>
-                  Open PDF →
+              <p className="mt-3 flex justify-center gap-2">
+                <Button size="sm" variant="secondary" onClick={load}>
+                  Retry
+                </Button>
+                <Button size="sm" variant="default" onClick={openOriginal}>
+                  Open original ↗
                 </Button>
               </p>
             </div>
@@ -481,18 +554,28 @@ function PreviewPanel({ id, onOpen }) {
         ) : (
           src && (
             <iframe
-              title="PDF preview"
+              title={kind === 'image' ? 'Image viewer' : 'Document viewer'}
               src={src}
-              className="absolute inset-0 h-full w-full border-0 bg-white"
+              className="absolute inset-0 h-full w-full border-0 bg-white transition-opacity duration-300"
+              style={{ opacity: loaded ? 1 : 0 }}
               onLoad={() => setLoaded(true)}
               allow="fullscreen"
             />
           )
         )}
       </div>
-      <p className="px-4 py-2 text-xs" style={{ color: 'var(--faint)' }}>
-        Preview not loading? Some files block embedding — use Open PDF instead.
-      </p>
+      {blockedUrl ? (
+        <p className="border-t px-4 py-2.5 text-[13px]" style={{ borderColor: 'var(--line)', background: 'var(--warn-bg)' }}>
+          <strong>Popup blocked — your file is ready:</strong>{' '}
+          <a href={blockedUrl} target="_blank" rel="noopener" className="font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>
+            Click to open the file
+          </a>
+        </p>
+      ) : (
+        <p className="border-t px-4 py-2 text-xs" style={{ borderColor: 'var(--line)', color: 'var(--faint)' }}>
+          Reading here keeps your place and notes together. Some files block embedding — use Open original instead. Press ? for shortcuts.
+        </p>
+      )}
     </div>
   );
 }

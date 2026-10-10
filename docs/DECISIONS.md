@@ -23,8 +23,11 @@ Log the smallest sensible change whenever a requirement conflicts with the archi
 - Fonts ≤ 120KB (Inter 400–800 + Fraunces 600–700 + mono 400–600, subset, preload critical only); framer-motion via LazyMotion/`m` where practical — full import retained only where already used (exam/results transitions), new code uses CSS transitions; PDF.js NOT bundled (Drive embed); KaTeX/charts lazy-loaded on guides/dashboard routes only. Target: interactive home < 250KB gz JS on first load (to be measured in Phase 10).
 
 ## D6 — Third-party animated components: adopt selectively
-- Adopted: none copied in this run (existing `magic.jsx` effects audited; aurora/marquee/meteors kept only on marketing hero, disabled under reduced motion / motion Off / low-power).
-- Rejected: heavy parallax, per-letter headline noise, confetti-on-everything (results use one calm count-up + ring draw, skippable).
+- Adopted (re-implemented on repo tokens + motion profiles in `components/magic.jsx`, all static under Reduced/Off, desktop-pointer gating where apt):
+  - MagicUI: MagicCard → `SpotlightCard`; ShineBorder/StarBorder → `StarBorder` (one featured surface per screen); DotPattern/GridPattern → `DotPattern`/`GridPattern` (hero, design specimens); PulsatingButton → existing `.btn-pulse` class; Confetti → `Confetti` (perfect mock score ONLY, self-cleaning canvas, never under reduced motion).
+  - Aceternity: Spotlight → folded into `SpotlightCard`; TextGenerateEffect → `TextGenerate` (hero/marketing); Tabs → `AnimatedTabs` (results filters, design tabs); AnimatedTooltip → `AnimatedTooltip` (viewer/exam toolbar shortcuts); card Tilt → `Tilt` (subtle, pointer:fine only).
+  - React Bits: BlurText → `BlurText` (section headings); Magnet → `Magnet` (marketing CTAs); ClickSpark → `ClickSpark` (marketing buttons; never exam/viewer); CountUp/RotatingText already existed as NumberTicker/WordRotate.
+- Rejected: heavy parallax, per-letter headline noise, confetti-everywhere, lamp/wavy backgrounds, cursor-following global effects (perf + calm-profile conflicts). Proxy + PDF.js re-confirmed dead by direct probe (Drive `uc` export → 303 → interstitial/garbage range bytes; no browser CORS) — embedded viewer stays (D1).
 
 ## D7 — Streaks kept neutral; no streak-shaming, urgency, locks, or peer comparison
 - The existing day-streak counter stays as a neutral fact ("3 days active") with no guilt copy, no artificial locks, no leaderboards.

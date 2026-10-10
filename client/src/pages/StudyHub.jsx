@@ -8,7 +8,7 @@ import { api } from '../lib/api';
 import { keys, touchStreak, useLocal, useSyncedLocal } from '../lib/store';
 import { repo, exportData, deleteAllData } from '../lib/repo';
 import { useToast } from '../providers';
-import { BlurFade, ShinyBadge, Skeleton, AnimatedGrid, TypingText } from '../components/magic';
+import { BlurFade, ShinyBadge, Skeleton, AnimatedGrid, TypingText, SpotlightCard } from '../components/magic';
 
 function useExam() {
   const [date, setDate] = useLocal(keys.examDate, null);
@@ -247,7 +247,8 @@ export default function StudyHub() {
         <AnimatedGrid className="grid gap-3.5 sm:grid-cols-2">
           {decks.map((d) => (
             <BlurFade key={d.id}>
-              <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+              <SpotlightCard className="h-full rounded-2xl border shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+              <div className="h-full rounded-2xl p-[18px]">
                 <h3 className="font-display text-[15.5px] font-bold">{d.title}</h3>
                 <p className="mb-1 mt-0.5 text-[13px]" style={{ color: 'var(--mut)' }}>
                   {d.description || ''}
@@ -259,6 +260,7 @@ export default function StudyHub() {
                   Study →
                 </Link>
               </div>
+              </SpotlightCard>
             </BlurFade>
           ))}
         </AnimatedGrid>

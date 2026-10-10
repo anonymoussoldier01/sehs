@@ -274,8 +274,101 @@ html[data-motion="off"] .hl-stroke > svg path {
   stroke-dashoffset: 0;
 }
 
-/* Print styles for study guides and results review. */
-@media print {
+/* ---------- second-wave magic: star border, click sparks, hover system ---------- */
+.star-border-beam {
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    transparent 0 70%,
+    var(--primary) 82%,
+    #6d28d9 88%,
+    transparent 96%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 1.5px;
+  animation: star-orbit 5s linear infinite;
+  pointer-events: none;
+}
+@keyframes star-orbit {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+
+.click-spark {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+.click-spark i {
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  width: 2px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--spark, var(--primary));
+  transform: rotate(var(--a)) translateY(0);
+  animation: spark-fly 0.5s var(--ease-decelerate, ease-out) forwards;
+}
+@keyframes spark-fly {
+  to {
+    transform: rotate(var(--a)) translateY(-26px);
+    opacity: 0;
+  }
+}
+
+/* Hover system: one language for every interactive surface. */
+.lift {
+  transition: transform var(--dur-standard) var(--ease-standard), box-shadow var(--dur-standard) var(--ease-standard), border-color var(--dur-standard) var(--ease-standard);
+}
+.lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+}
+.lift:active {
+  transform: translateY(-1px) scale(0.99);
+}
+.link-slide {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 2px;
+  background-repeat: no-repeat;
+  background-position: left calc(100% - 1px);
+  transition: background-size var(--dur-standard) var(--ease-standard);
+  padding-bottom: 1px;
+}
+.link-slide:hover {
+  background-size: 100% 2px;
+}
+.chip-hover {
+  transition: transform var(--dur-micro) var(--ease-standard), background var(--dur-micro) var(--ease-standard), border-color var(--dur-micro) var(--ease-standard);
+}
+.chip-hover:hover {
+  transform: translateY(-1px);
+  border-color: var(--acc);
+}
+.icon-hover {
+  transition: transform var(--dur-micro) var(--ease-standard), background var(--dur-micro) var(--ease-standard), color var(--dur-micro) var(--ease-standard);
+}
+.icon-hover:hover {
+  transform: translateY(-1px);
+}
+kbd.kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  border: 1px solid var(--line2);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  padding: 1px 6px;
+  background: var(--bg2);
+  color: var(--mut);
+  white-space: nowrap;
+}
+
+/* Print styles for study guides and results review. */@media print {
   nav, aside, footer, .no-print {
     display: none !important;
   }

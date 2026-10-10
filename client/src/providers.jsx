@@ -157,41 +157,36 @@ export function TermsProvider({ children }) {
 }
 
 // ---------- resource opener (grant flow) ----------
+// Terms are accepted FIRST, in this tab — only then is the file opened.
+// No about:blank pre-open, no placeholder tabs. If the browser still blocks
+// the new tab, the granted URL is handed back as a real link (never a dead end).
 export function useOpener() {
   const { ensure } = useTerms();
   const toast = useToast();
   return useCallback(
-    async (id) => {
-      let w = null;
-      try {
-        w = window.open('about:blank', '_blank');
-      } catch {
-        w = null;
-      }
-      if (!w) toast('Popup blocked — allow popups for this site, then try again');
-      else {
-        try {
-          w.document.write(
-            '<!DOCTYPE html><title>Opening…</title><body style="font-family:sans-serif;background:#0b1220;color:#e8edf5;display:grid;place-items:center;height:100vh;margin:0"><p>Opening your file…</p></body>'
-          );
-          w.document.close();
-        } catch {
-          /* noop */
-        }
-      }
+    async (id, { newTab = true } = {}) => {
       try {
         const ok = await ensure();
-        if (!ok) {
-          if (w) w.close();
-          return;
-        }
+        if (!ok) return null;
         const j = await api.access(id);
-        if (j.openUrl && w) w.location.replace(j.openUrl);
-        else if (j.openUrl && !w) window.location.href = j.openUrl;
-        else if (w) w.close();
+        if (!j.openUrl) {
+          toast('Could not open resource');
+          return null;
+        }
+        if (!newTab) {
+          window.location.href = j.openUrl;
+          return j.openUrl;
+        }
+        const w = window.open(j.openUrl, '_blank', 'noopener');
+        if (!w) {
+          // Blocked — hand the granted URL back so the caller renders a real link.
+          toast('Popup blocked — your file is ready below');
+          return { url: j.openUrl, blocked: true };
+        }
+        return { url: j.openUrl, blocked: false };
       } catch (e) {
-        if (w) w.close();
         toast(e.status === 410 ? 'This resource is temporarily unavailable' : e.message || 'Could not open resource');
+        return null;
       }
     },
     [ensure, toast]

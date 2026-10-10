@@ -276,7 +276,7 @@ export default function Search() {
         {!!chips.length && (
           <div className="mb-3 flex flex-wrap items-center gap-1.5" aria-live="polite" aria-label="Active filters">
             {chips.map((c, idx) => (
-              <span key={idx} className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+              <span key={idx} className="chip-hover inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
                 {c.label}
                 <button onClick={() => dropChip(c)} aria-label={'Remove filter ' + c.label} className="grid h-6 w-6 place-items-center rounded-full" style={{ color: 'var(--mut)' }}>✕</button>
               </span>

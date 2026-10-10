@@ -1,8 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { cn } from './cn';
+import { readMotionSetting } from '../lib/motion';
+
+function motionOk() {
+  try {
+    const s = readMotionSetting();
+    if (s !== 'full') return false;
+    return !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
+function finePointer() {
+  try {
+    return window.matchMedia?.('(pointer: fine)').matches ?? false;
+  } catch {
+    return false;
+  }
+}
 
 // ---------- AnimatedGrid (auto-animate list transitions) ----------
 export function AnimatedGrid({ children, className }) {
@@ -381,4 +399,405 @@ export function Empty({ title, msg, children }) {
       {children}
     </div>
   );
+}
+
+// ============================================================================
+// Second-wave magic: Magic UI + Aceternity UI + React Bits patterns,
+// re-implemented on this repo's tokens + motion system (docs/MOTION.md).
+// Every effect below renders statically when motion is Reduced/Off.
+// ============================================================================
+
+// ---------- SpotlightCard (Aceternity Spotlight + MagicUI MagicCard) ----------
+// Cursor-following radial highlight + border glow. Desktop pointers only.
+export function SpotlightCard({ children, className, spotlight = 'rgba(56,189,248,0.14)', ...props }) {
+  const ref = useRef(null);
+  const mx = useMotionValue(0.5);
+  const my = useMotionValue(0.5);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    if (!finePointer() || !motionOk()) return;
+    setOn(true);
+  }, []);
+  const onMove = useCallback(
+    (e) => {
+      const el = ref.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      mx.set((e.clientX - r.left) / Math.max(1, r.width));
+      my.set((e.clientY - r.top) / Math.max(1, r.height));
+    },
+    [mx, my]
+  );
+  const bg = useTransform([mx, my], ([x, y]) => `radial-gradient(420px circle at ${x * 100}% ${y * 100}%, ${spotlight}, transparent 65%)`);
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={on ? onMove : undefined}
+      whileHover={on ? { y: -3 } : undefined}
+      transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+      className={cn('relative overflow-hidden', className)}
+      {...props}
+    >
+      {on && <motion.span aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ background: bg }} />}
+      {children}
+    </motion.div>
+  );
+}
+
+// ---------- StarBorder / ShineBorder (MagicUI + React Bits) ----------
+// Animated conic-gradient border for one featured surface per screen, max.
+export function StarBorder({ children, className, speed = 5 }) {
+  const [animate, setAnimate] = useState(false);
+  useEffect(() => {
+    setAnimate(motionOk());
+  }, []);
+  return (
+    <div className={cn('relative rounded-2xl p-[1.5px]', className)} style={{ background: 'var(--line)' }}>
+      {animate && (
+        <span
+          aria-hidden="true"
+          className="star-border-beam absolute inset-[-1.5px] rounded-2xl"
+          style={{ animationDuration: `${speed}s` }}
+        />
+      )}
+      <div className="relative rounded-2xl" style={{ background: 'var(--panel)' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ---------- TextGenerate (Aceternity TextGenerateEffect) ----------
+// Word-by-word blur + rise on first view. Marketing/hero surfaces only.
+export function TextGenerate({ words, className, stagger = 0.05 }) {
+  const text = Array.isArray(words) ? words.join(' ') : String(words || '');
+  const parts = text.split(' ');
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-40px' });
+  const [animate, setAnimate] = useState(false);
+  useEffect(() => {
+    setAnimate(motionOk());
+  }, []);
+  if (!animate) return <span className={className}>{text}</span>;
+  return (
+    <span ref={ref} className={className} aria-label={text}>
+      {parts.map((w, i) => (
+        <motion.span
+          key={i}
+          aria-hidden="true"
+          className="inline-block"
+          initial={{ opacity: 0, filter: 'blur(8px)', y: 8 }}
+          animate={inView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
+          transition={{ duration: 0.45, delay: i * stagger, ease: [0, 0, 0.2, 1] }}
+        >
+          {w}
+          {i < parts.length - 1 ? ' ' : ''}
+        </motion.span>
+      ))}
+    </span>
+  );
+}
+
+// ---------- BlurText (React Bits) ----------
+// Scroll-linked word blur reveal for section headings. Once only.
+export function BlurText({ children, className, as: Tag = 'h2', stagger = 0.04 }) {
+  const text = typeof children === 'string' ? children : '';
+  const words = text.split(' ');
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: '-60px' });
+  const [animate, setAnimate] = useState(false);
+  useEffect(() => {
+    setAnimate(motionOk());
+  }, []);
+  if (!animate || !text) return <Tag className={className}>{children}</Tag>;
+  return (
+    <Tag ref={ref} className={className} aria-label={text}>
+      {words.map((w, i) => (
+        <motion.span
+          key={i}
+          aria-hidden="true"
+          className="inline-block"
+          initial={{ opacity: 0.15, filter: 'blur(6px)' }}
+          animate={inView ? { opacity: 1, filter: 'blur(0px)' } : {}}
+          transition={{ duration: 0.4, delay: i * stagger }}
+        >
+          {w}
+          {i < words.length - 1 ? ' ' : ''}
+        </motion.span>
+      ))}
+    </Tag>
+  );
+}
+
+// ---------- Magnet (React Bits) ----------
+// Gentle pull toward the cursor; springs back on leave. pointer:fine only.
+export function Magnet({ children, strength = 18, className }) {
+  const ref = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 250, damping: 18, mass: 0.6 });
+  const sy = useSpring(y, { stiffness: 250, damping: 18, mass: 0.6 });
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    if (finePointer() && motionOk()) setOn(true);
+  }, []);
+  if (!on) return <span className={cn('inline-block', className)}>{children}</span>;
+  return (
+    <motion.span
+      ref={ref}
+      className={cn('inline-block', className)}
+      style={{ x: sx, y: sy }}
+      onMouseMove={(e) => {
+        const r = ref.current?.getBoundingClientRect();
+        if (!r) return;
+        x.set(((e.clientX - (r.left + r.width / 2)) / r.width) * strength);
+        y.set(((e.clientY - (r.top + r.height / 2)) / r.height) * strength);
+      }}
+      onMouseLeave={() => {
+        x.set(0);
+        y.set(0);
+      }}
+    >
+      {children}
+    </motion.span>
+  );
+}
+
+// ---------- ClickSpark (React Bits) ----------
+// Brief spark burst on click. Marketing buttons only — never exam/viewer.
+export function ClickSpark({ children, className, onClick, color = 'var(--primary)' }) {
+  const [sparks, setSparks] = useState([]);
+  const id = useRef(0);
+  const fire = useCallback(
+    (e) => {
+      if (motionOk() && finePointer()) {
+        const r = e.currentTarget.getBoundingClientRect();
+        const s = { id: ++id.current, x: e.clientX - r.left, y: e.clientY - r.top };
+        setSparks((p) => [...p.slice(-11), s]);
+        setTimeout(() => setSparks((p) => p.filter((q) => q.id !== s.id)), 550);
+      }
+      onClick?.(e);
+    },
+    [onClick]
+  );
+  return (
+    <span className={cn('relative inline-block overflow-visible', className)} onClick={fire}>
+      {children}
+      {sparks.map((s) => (
+        <span key={s.id} aria-hidden="true" className="click-spark" style={{ left: s.x, top: s.y, '--spark': color }}>
+          {Array.from({ length: 8 }, (_, k) => (
+            <i key={k} style={{ '--a': `${k * 45}deg` }} />
+          ))}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+// ---------- AnimatedTabs (Aceternity Tabs) ----------
+// Sliding-pill tab list with shared layout indicator.
+export function AnimatedTabs({ tabs, value, onChange, label }) {
+  return (
+    <div className="inline-flex gap-0.5 rounded-full border p-1" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }} role="tablist" aria-label={label}>
+      {tabs.map((t) => {
+        const active = t.id === value;
+        return (
+          <button
+            key={t.id}
+            role="tab"
+            aria-selected={active}
+            onClick={() => onChange(t.id)}
+            className="relative min-h-[38px] rounded-full px-3.5 text-[13px] font-bold transition-colors"
+            style={{ color: active ? 'var(--primary-foreground)' : 'var(--mut)' }}
+          >
+            {active && (
+              <motion.span
+                layoutId={label ? `tab-pill-${label}` : 'tab-pill'}
+                className="absolute inset-0 rounded-full"
+                style={{ background: 'var(--primary)' }}
+                transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+              />
+            )}
+            <span className="relative">{t.label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---------- AnimatedTooltip (Aceternity) ----------
+// Cursor-lifting tooltip with optional kbd shortcut hint. For icon buttons.
+export function AnimatedTooltip({ tip, shortcut, children }) {
+  const [show, setShow] = useState(false);
+  const [above, setAbove] = useState(true);
+  const ref = useRef(null);
+  const [animate, setAnimate] = useState(false);
+  useEffect(() => {
+    setAnimate(motionOk());
+  }, []);
+  return (
+    <span
+      ref={ref}
+      className="relative inline-flex"
+      onMouseEnter={() => {
+        const r = ref.current?.getBoundingClientRect();
+        setAbove((r?.top ?? 200) > 120);
+        setShow(true);
+      }}
+      onMouseLeave={() => setShow(false)}
+      onFocus={() => setShow(true)}
+      onBlur={() => setShow(false)}
+    >
+      {children}
+      {show && tip && (
+        <motion.span
+          role="tooltip"
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 z-50 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-lg border px-2.5 py-1.5 text-xs font-semibold shadow-lg"
+          style={{
+            background: 'var(--toast-bg)',
+            color: 'var(--toast-fg)',
+            borderColor: 'var(--line2)',
+            ...(above ? { bottom: 'calc(100% + 8px)' } : { top: 'calc(100% + 8px)' }),
+          }}
+          initial={animate ? { opacity: 0, y: above ? 4 : -4 } : false}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.15 }}
+        >
+          {tip}
+          {shortcut && (
+            <kbd className="rounded border px-1 font-mono text-[10px]" style={{ borderColor: 'currentColor', opacity: 0.8 }}>
+              {shortcut}
+            </kbd>
+          )}
+        </motion.span>
+      )}
+    </span>
+  );
+}
+
+// ---------- DotPattern / GridPattern (MagicUI) ----------
+// Subtle SVG backgrounds with radial fade. Decorative only (aria-hidden).
+export function DotPattern({ className, dot = 'var(--line2)' }) {
+  return (
+    <svg aria-hidden="true" className={cn('pointer-events-none absolute inset-0 h-full w-full', className)}>
+      <defs>
+        <pattern id="sehs-dots" width="26" height="26" patternUnits="userSpaceOnUse">
+          <circle cx="1.5" cy="1.5" r="1.5" fill={dot} opacity="0.55" />
+        </pattern>
+        <radialGradient id="sehs-dotfade">
+          <stop offset="35%" stopColor="black" />
+          <stop offset="100%" stopColor="transparent" />
+        </radialGradient>
+        <mask id="sehs-dotmask">
+          <rect width="100%" height="100%" fill="url(#sehs-dotfade)" />
+        </mask>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#sehs-dots)" mask="url(#sehs-dotmask)" />
+    </svg>
+  );
+}
+
+export function GridPattern({ className, line = 'var(--line)' }) {
+  return (
+    <svg aria-hidden="true" className={cn('pointer-events-none absolute inset-0 h-full w-full', className)}>
+      <defs>
+        <pattern id="sehs-grid" width="44" height="44" patternUnits="userSpaceOnUse">
+          <path d="M 44 0 L 0 0 0 44" fill="none" stroke={line} strokeWidth="1" opacity="0.6" />
+        </pattern>
+        <radialGradient id="sehs-gridfade">
+          <stop offset="30%" stopColor="black" />
+          <stop offset="100%" stopColor="transparent" />
+        </radialGradient>
+        <mask id="sehs-gridmask">
+          <rect width="100%" height="100%" fill="url(#sehs-gridfade)" />
+        </mask>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#sehs-grid)" mask="url(#sehs-gridmask)" />
+    </svg>
+  );
+}
+
+// ---------- Tilt (subtle 3D hover; desktop only) ----------
+export function Tilt({ children, className, max = 6 }) {
+  const ref = useRef(null);
+  const rx = useMotionValue(0);
+  const ry = useMotionValue(0);
+  const srx = useSpring(rx, { stiffness: 260, damping: 20 });
+  const sry = useSpring(ry, { stiffness: 260, damping: 20 });
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    if (finePointer() && motionOk()) setOn(true);
+  }, []);
+  if (!on) return <div className={className}>{children}</div>;
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      style={{ rotateX: srx, rotateY: sry, transformPerspective: 900 }}
+      onMouseMove={(e) => {
+        const r = ref.current?.getBoundingClientRect();
+        if (!r) return;
+        ry.set(((e.clientX - r.left) / r.width - 0.5) * max * 2);
+        rx.set(-((e.clientY - r.top) / r.height - 0.5) * max * 2);
+      }}
+      onMouseLeave={() => {
+        rx.set(0);
+        ry.set(0);
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// ---------- Confetti (restrained: perfect-score reward only) ----------
+// Lightweight canvas burst, self-cleaning. Never renders under reduced motion.
+export function Confetti({ fire }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!fire || !motionOk()) return;
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W = (canvas.width = Math.min(560, window.innerWidth));
+    const H = (canvas.height = 320);
+    const colors = ['#38BDF8', '#10B981', '#FDE68A', '#F59E0B', '#5b8cff'];
+    const parts = Array.from({ length: 90 }, () => ({
+      x: W / 2 + (Math.random() - 0.5) * 60,
+      y: H * 0.35,
+      vx: (Math.random() - 0.5) * 9,
+      vy: -Math.random() * 8 - 2,
+      s: Math.random() * 6 + 3,
+      r: Math.random() * Math.PI,
+      vr: (Math.random() - 0.5) * 0.3,
+      c: colors[Math.floor(Math.random() * colors.length)],
+    }));
+    let raf;
+    let frames = 0;
+    const tick = () => {
+      frames++;
+      ctx.clearRect(0, 0, W, H);
+      for (const p of parts) {
+        p.vy += 0.22;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.r += p.vr;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.r);
+        ctx.fillStyle = p.c;
+        ctx.globalAlpha = Math.max(0, 1 - frames / 110);
+        ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * 0.6);
+        ctx.restore();
+      }
+      if (frames < 110) raf = requestAnimationFrame(tick);
+      else ctx.clearRect(0, 0, W, H);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [fire]);
+  if (!fire) return null;
+  return <canvas ref={ref} aria-hidden="true" className="pointer-events-none mx-auto block" style={{ maxWidth: 560 }} />;
 }

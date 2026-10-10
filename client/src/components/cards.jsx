@@ -52,14 +52,14 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
   const { saved, toggle } = useSaved();
   const displayTitle = title || v.displayTitle || v.title;
   const subj = v.subject ? pretty(v.subject) : pretty(v.category);
-  const isPdf = v.fileType === 'pdf';
+  const readable = v.fileType === 'pdf' || v.fileType === 'image';
 
   return (
     <article data-result-id={v.id} className="glare flex gap-3.5 rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg" style={{ background: 'var(--card)', borderColor: 'var(--line)' }}>
       <FileIcon type={v.fileType} />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <h3 className="text-[15.5px] font-bold leading-snug">
-          <Link data-result-link to={'/r/' + v.id} className="transition-colors hover:text-[var(--acc)] hover:underline">
+          <Link data-result-link to={'/r/' + v.id} className="link-slide transition-colors hover:text-[var(--acc)]">
             {highlight(displayTitle, tokens)}
           </Link>
         </h3>
@@ -101,10 +101,24 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
             <Button size="sm" variant="secondary" onClick={() => navigate('/r/' + v.id)}>
               Details
             </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => open(v.id)}
+                  aria-label="Open original in a new tab"
+                  className="h-9 w-9 p-0"
+                >
+                  <span aria-hidden="true">↗</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Open original</TooltipContent>
+            </Tooltip>
           </span>
         </div>
-        <Button variant="default" size="sm" onClick={() => open(v.id)} className="w-full">
-          {isPdf ? 'Open PDF →' : 'Open resource →'}
+        <Button variant="default" size="sm" onClick={() => navigate('/r/' + v.id)} className="w-full">
+          {readable ? 'Read here →' : 'Details →'}
         </Button>
       </div>
     </article>

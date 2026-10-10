@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api, pretty } from '../lib/api';
 import { keys } from '../lib/store';
 import { Button } from '../components/ui/button';
-import { AuroraText, BlurFade, DeckCard, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText } from '../components/magic';
+import { AuroraText, BlurFade, DeckCard, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText, DotPattern, Magnet, ClickSpark, SpotlightCard, Tilt, StarBorder, TextGenerate, BlurText } from '../components/magic';
 import { ResourceCard } from '../components/cards';
 
 function useApi(fn, deps) {
@@ -26,7 +26,8 @@ function Hero() {
   const navigate = useNavigate();
   const [q, setQ] = useState('');
   return (
-    <section className="mhero relative" aria-label="Search" style={{ padding: '56px 24px 10px', maxWidth: 1060 }}>
+    <section className="mhero relative overflow-hidden" aria-label="Search" style={{ padding: '56px 24px 10px', maxWidth: 1060 }}>
+      <DotPattern />
       <Particles />
       <Meteors count={5} />
       <div className="mhero-inner relative">
@@ -50,14 +51,20 @@ function Hero() {
         </BlurFade>
         <BlurFade delay={0.22}>
           <div className="mhero-ctas" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 26 }}>
-            <ShimmerButton onClick={() => navigate('/study')}>Start studying →</ShimmerButton>
-            <Link
-              to="/mocks"
-              className="inline-flex min-h-[42px] items-center rounded-xl border px-5 py-2.5 text-sm font-bold transition-all hover:-translate-y-px"
-              style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
-            >
-              Take a timed mock
-            </Link>
+            <Magnet>
+              <ClickSpark>
+                <ShimmerButton onClick={() => navigate('/study')}>Start studying →</ShimmerButton>
+              </ClickSpark>
+            </Magnet>
+            <Magnet strength={12}>
+              <Link
+                to="/mocks"
+                className="lift inline-flex min-h-[42px] items-center rounded-xl border px-5 py-2.5 text-sm font-bold"
+                style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
+              >
+                Take a timed mock
+              </Link>
+            </Magnet>
           </div>
         </BlurFade>
         <BlurFade delay={0.28}>
@@ -320,16 +327,20 @@ export default function Home() {
         </>
       )}
 
-      <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Study modes</h2>
+      <BlurText as="h2" className="mb-3 mt-7 font-display text-[22px] font-bold">Study modes</BlurText>
       <div className="bento grid grid-cols-2 gap-3.5 lg:grid-cols-4">
-        <Link to="/mocks" className="bento-card beam-card span-2 col-span-2">
-          <span className="bico">◷</span>
-          <h3>Timed mocks</h3>
-          <p>Full-length blocks with real timing, instant scoring and explanations. Fresh questions every attempt.</p>
-          <span className="text-[13.5px] font-bold" style={{ color: 'var(--acc)' }}>
-            Generate a mock →
-          </span>
-        </Link>
+        <StarBorder className="col-span-2">
+          <SpotlightCard className="h-full">
+            <Link to="/mocks" className="bento-card beam-card span-2 col-span-2 border-0 shadow-none">
+              <span className="bico">◷</span>
+              <h3>Timed mocks</h3>
+              <p>Full-length blocks with real timing, instant scoring and explanations. Fresh questions every attempt.</p>
+              <span className="text-[13.5px] font-bold" style={{ color: 'var(--acc)' }}>
+                Generate a mock →
+              </span>
+            </Link>
+          </SpotlightCard>
+        </StarBorder>
         <Link to="/study" className="bento-card">
           <span className="bico">▢</span>
           <h3>Flashcards</h3>
@@ -379,7 +390,7 @@ export default function Home() {
       </h2>
       <LearnPreview />
 
-      <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">New arrivals</h2>
+      <BlurText as="h2" className="mb-3 mt-7 font-display text-[22px] font-bold">New arrivals</BlurText>
       {!fresh ? (
         <div className="grid gap-3.5 sm:grid-cols-2">
           <Skeleton />
@@ -404,7 +415,7 @@ export default function Home() {
         </>
       )}
 
-      <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Practice tests</h2>
+      <BlurText as="h2" className="mb-3 mt-7 font-display text-[22px] font-bold">Practice tests</BlurText>
       {!search ? (
         <div className="grid gap-3.5 sm:grid-cols-2">
           <Skeleton />

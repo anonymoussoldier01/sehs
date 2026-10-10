@@ -7,6 +7,7 @@ import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { Checkbox } from '../components/ui/checkbox';
 import { Progress } from '../components/ui/progress';
+import { SpotlightCard, StarBorder, TextGenerate, BlurText, Magnet, ClickSpark, AnimatedTabs, AnimatedTooltip, DotPattern, GridPattern, Tilt, Confetti } from '../components/magic';
 import { useMotionProfile, dur } from '../lib/motion';
 
 function Swatch({ name, css, text = '#fff' }) {
@@ -32,6 +33,8 @@ function Row({ label, children }) {
 export default function Design() {
   const motion = useMotionProfile('standard');
   const [tab, setTab] = useState(0);
+  const [specTab, setSpecTab] = useState('one');
+  const [boom, setBoom] = useState(false);
   useEffect(() => {
     document.title = 'Design system — SEHS Study (internal)';
     const meta = document.createElement('meta');
@@ -125,6 +128,42 @@ export default function Design() {
         <Button variant="default" onClick={() => motion.setSetting(motion.setting === 'full' ? 'off' : 'full')}>
           Motion: {motion.setting} (toggle full/off)
         </Button>
+      </Row>
+
+      <Row label="Second-wave magic — Magic UI · Aceternity · React Bits (all gated by the motion setting)">
+        <div className="grid w-full gap-2.5 sm:grid-cols-2">
+          <SpotlightCard className="rounded-2xl border p-4" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
+            <p className="text-sm font-bold">SpotlightCard</p>
+            <p className="text-[13px]" style={{ color: 'var(--mut)' }}>Hover to move the spotlight. Desktop pointers only.</p>
+          </SpotlightCard>
+          <StarBorder>
+            <div className="p-4">
+              <p className="text-sm font-bold">StarBorder</p>
+              <p className="text-[13px]" style={{ color: 'var(--mut)' }}>One featured surface per screen, max.</p>
+            </div>
+          </StarBorder>
+        </div>
+        <div className="w-full rounded-2xl border p-4" style={{ borderColor: 'var(--line)' }}>
+          <p className="text-sm font-bold">TextGenerate — <TextGenerate words="Practise with precision, calmly." /></p>
+          <BlurText as="p" className="mt-1 text-sm font-bold">BlurText reveals headings word by word on scroll.</BlurText>
+        </div>
+        <Magnet><Button variant="default">Magnet button</Button></Magnet>
+        <ClickSpark><Button variant="secondary">ClickSpark button</Button></ClickSpark>
+        <AnimatedTabs label="design-spec" tabs={[{ id: 'one', label: 'One' }, { id: 'two', label: 'Two' }]} value={specTab} onChange={setSpecTab} />
+        <AnimatedTooltip tip="Shortcut included" shortcut="S"><Button size="sm" variant="secondary">Hover me</Button></AnimatedTooltip>
+        <Tilt className="rounded-2xl border px-4 py-3 text-sm font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+          Tilt card — hover to tilt
+        </Tilt>
+        <div className="relative h-24 w-full overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--line)' }}>
+          <DotPattern />
+        </div>
+        <div className="relative h-24 w-full overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--line)' }}>
+          <GridPattern />
+        </div>
+        <div className="w-full text-center">
+          <Button size="sm" variant="secondary" onClick={() => { setBoom(false); setTimeout(() => setBoom(true), 30); }}>Fire restrained confetti</Button>
+          <Confetti fire={boom} />
+        </div>
       </Row>
 
       <Row label="States — loading, empty, error, offline">

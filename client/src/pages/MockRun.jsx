@@ -13,7 +13,7 @@ import { keys, recordMistake } from '../lib/store';
 import { repo } from '../lib/repo';
 import { useToast } from '../providers';
 import { useMotionProfile } from '../lib/motion';
-import { Skeleton } from '../components/magic';
+import { Skeleton, AnimatedTooltip, AnimatedTabs, Confetti } from '../components/magic';
 import {
   scoreAttempt, seededShuffle, seedToInt, startTimer, remainingMs, isExpired,
   formatMMSS, recordReview, applyAccommodations,
@@ -298,6 +298,7 @@ export default function MockRun() {
               : misses.length ? `Review the ${misses.length} question${misses.length === 1 ? '' : 's'} below, starting with the flagged ones.`
               : 'Review below, then retry with a fresh seed.'}
           </p>
+          {perfect && <Confetti fire />}
           <p className="mt-3 flex justify-center gap-2">
             <Button size="sm" variant="default" onClick={() => navigate('/mocks')}>All mocks</Button>
             <Button size="sm" variant="secondary" onClick={() => navigate(`/mocks/${id}?seed=${id}-${Date.now().toString(36)}`)}>Retry with fresh questions</Button>
@@ -390,15 +391,21 @@ export default function MockRun() {
           Q{i + 1}/{qs.length} · {q.strand} · {q.verification === 'verified' ? 'verified' : 'draft sample'}
         </span>
         <span className="ml-auto flex flex-wrap gap-1.5">
-          <Button size="sm" variant={flags[i] ? 'primary' : 'secondary'} onClick={() => setFlags((f) => ({ ...f, [i]: !f[i] }))} aria-pressed={String(!!flags[i])}>
-            ⚑ {flags[i] ? 'Flagged' : 'Flag'}
-          </Button>
-          <Button size="sm" variant="secondary" onClick={() => { setAnswers((a) => { const n = [...a]; n[i] = -1; return n; }); setI((v) => Math.min(v + 1, qs.length - 1)); }}>
-            Skip →
-          </Button>
+          <AnimatedTooltip tip="Flag for review" shortcut="F">
+            <Button size="sm" variant={flags[i] ? 'primary' : 'secondary'} onClick={() => setFlags((f) => ({ ...f, [i]: !f[i] }))} aria-pressed={String(!!flags[i])}>
+              ⚑ {flags[i] ? 'Flagged' : 'Flag'}
+            </Button>
+          </AnimatedTooltip>
+          <AnimatedTooltip tip="Skip and come back" shortcut="→">
+            <Button size="sm" variant="secondary" onClick={() => { setAnswers((a) => { const n = [...a]; n[i] = -1; return n; }); setI((v) => Math.min(v + 1, qs.length - 1)); }}>
+              Skip →
+            </Button>
+          </AnimatedTooltip>
           <Button size="sm" variant="secondary" onClick={() => setShowAcc(true)}>Access</Button>
           <Button size="sm" variant="secondary" onClick={() => setReview(true)}>Review</Button>
-          <Button size="sm" variant="secondary" onClick={() => setShowHelp(true)} aria-label="Keyboard shortcuts">?</Button>
+          <AnimatedTooltip tip="Keyboard shortcuts" shortcut="?">
+            <Button size="sm" variant="secondary" onClick={() => setShowHelp(true)} aria-label="Keyboard shortcuts">?</Button>
+          </AnimatedTooltip>
         </span>
       </div>
       <Progress value={i} max={qs.length} aria-label="Mock progress" className="mb-1 mt-2.5" />
@@ -578,13 +585,12 @@ function ResultsReview({ qs, answers, times }) {
         <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>Not enough data for a topic breakdown yet — finish a full mock to unlock it.</p>
       )}
       <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Filter review">
-        {[['all', 'All'], ['incorrect', 'Incorrect'], ['skipped', 'Skipped'], ['flagged', 'Flagged']].map(([v, l]) => (
-          <button key={v} onClick={() => setFilter(v)} aria-pressed={String(filter === v)}
-            className="min-h-[38px] rounded-full border px-3.5 text-[13px] font-bold"
-            style={filter === v ? { background: 'var(--txt)', color: 'var(--bg)', borderColor: 'var(--txt)' } : { borderColor: 'var(--line2)', color: 'var(--mut)' }}>
-            {l}
-          </button>
-        ))}
+        <AnimatedTabs
+          label="review-filter"
+          tabs={[{ id: 'all', label: 'All' }, { id: 'incorrect', label: 'Incorrect' }, { id: 'skipped', label: 'Skipped' }, { id: 'flagged', label: 'Flagged' }]}
+          value={filter}
+          onChange={setFilter}
+        />
       </div>
       {filter === 'flagged' ? (
         <p className="mt-2 text-sm" style={{ color: 'var(--mut)' }}>Flags are for during the mock — they clear on submit. Use Incorrect or Skipped to revise.</p>
