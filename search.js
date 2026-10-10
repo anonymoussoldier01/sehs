@@ -3,9 +3,9 @@
 // Works in the browser (ES module) and in Node (for tests).
 // NEVER mutates the source dataset: builds a derived index, keeps originals.
 
-export const PROVIDERS = ['acer', 'edutest', 'jac', 'spectrum', 'hendersons', 'edukingdom', 'pearson', 'vsse', 'vssa', 'deepti', 'mornington', 'whitman', 'capricorn'];
-export const TYPES = ['pdf', 'docx', 'doc', 'image', 'folder', 'archive', 'zip', 'webpage', 'code', 'other'];
-export const CATS = ['exam-prep', 'maths', 'english', 'reading', 'writing', 'verbal-reasoning', 'quantitative', 'past-paper', 'practice-test', 'study-guide', 'reference', 'tutorial', 'tool', 'document', 'folder', 'other'];
+export const PROVIDERS = ['acer', 'edutest', 'jac', 'spectrum', 'hendersons', 'edukingdom', 'pearson', 'vsse', 'vssa', 'deepti', 'mornington', 'whitman', 'capricorn', 'native'];
+export const TYPES = ['pdf', 'docx', 'doc', 'image', 'archive', 'zip', 'webpage', 'code', 'other'];
+export const CATS = ['exam-prep', 'maths', 'english', 'reading', 'writing', 'verbal-reasoning', 'numerical-reasoning', 'quantitative', 'past-paper', 'practice-test', 'study-guide', 'reference', 'tutorial', 'tool', 'document', 'other'];
 
 // Zero-discrimination metadata: present on (nearly) every record.
 const STOP_TAGS = new Set(['google-drive', 'drive-folder']);
@@ -45,6 +45,9 @@ const CONCEPT = {
   fraction: ['maths'], decimal: ['maths'], probability: ['maths'], statistic: ['maths'],
   physics: ['science'], chemistry: ['science'], biology: ['science'],
   essay: ['writing'], vocabulary: ['english'], vocab: ['english'], grammar: ['english'],
+  analogy: ['verbal'], analogies: ['verbal'], synonym: ['verbal'], antonym: ['verbal'],
+  passage: ['reading'], prompt: ['writing'], sequence: ['quantitative'], series: ['quantitative'],
+  matrix: ['quantitative'], cipher: ['verbal'], codebreaking: ['verbal'],
 };
 
 // ---- normalisation -------------------------------------------------------

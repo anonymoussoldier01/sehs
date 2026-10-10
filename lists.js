@@ -79,7 +79,9 @@
         '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
         '<button class="btn small secondary" data-sharelist="' + i + '">Share link</button>' +
         '<button class="btn small secondary" data-openlist="' + i + '">Open as search</button>' +
-        '<button class="btn small secondary" data-dellist="' + i + '">Delete</button></div></div>';
+        '<button class="btn small secondary" data-quizlist="' + i + '" title="AI quiz from this list">✦ Quiz me</button>' +
+        '<button class="btn small secondary" data-dellist="' + i + '">Delete</button></div>' +
+        '<div class="list-quiz" hidden style="margin-top:8px"></div></div>';
     }).join('') : '<p style="color:var(--mut)">No lists yet — tap “List +” on any resource, or create one below.</p>';
   }
   document.addEventListener('click', function (e) {
@@ -105,6 +107,40 @@
       ls.splice(Number(dl.getAttribute('data-dellist')), 1);
       save(ls);
       paintHub();
+      return;
+    }
+    var qz = e.target.closest && e.target.closest('[data-quizlist]');
+    if (qz) {
+      (async function () {
+        var tile = qz.closest('.disc-tile');
+        var box = tile.querySelector('.list-quiz');
+        var l3 = load()[Number(qz.getAttribute('data-quizlist'))];
+        if (!l3) return;
+        box.hidden = false;
+        box.innerHTML = '<p style="color:var(--mut)">Writing a quiz from "' + esc(l3.name) + '"…</p>';
+        try {
+          const r = await fetch('/api/ai/questions', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'fetch' }, body: JSON.stringify({ strand: 'verbal', topic: l3.name.slice(0, 100), n: 4 }) });
+          const j = await r.json();
+          if (!r.ok || !j.ok) throw new Error(j.error || 'failed');
+          box.innerHTML = j.questions.map(function (q, i) {
+            return '<div class="disc-tile" style="margin-top:8px"><p><strong>Q' + (i + 1) + '</strong> ' + esc(q.stem) + '</p>' +
+              '<div style="display:grid;gap:6px">' + q.options.map(function (o, k) { return '<button class="btn secondary small" data-lqopt="' + i + ':' + k + '">' + esc(o) + '</button>'; }).join('') + '</div>' +
+              '<p class="lqfb" style="font-size:13px" hidden></p></div>';
+          }).join('');
+          var vqs = j.questions;
+          box.querySelectorAll('[data-lqopt]').forEach(function (b) {
+            b.addEventListener('click', function () {
+              var parts = b.getAttribute('data-lqopt').split(':');
+              var q = vqs[Number(parts[0])], picked = Number(parts[1]);
+              var fb = b.closest('.disc-tile').querySelector('.lqfb');
+              fb.hidden = false;
+              var ok = picked === q.answer;
+              fb.textContent = (ok ? '✓ Correct. ' : '✗ Correct: ' + q.options[q.answer] + '. ') + q.explain;
+              fb.style.color = ok ? 'var(--ok)' : 'var(--bad)';
+            });
+          });
+        } catch (err) { box.innerHTML = '<p>AI unavailable: ' + esc(err.message) + '</p>'; }
+      })();
       return;
     }
   });

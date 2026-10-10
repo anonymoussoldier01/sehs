@@ -54,14 +54,14 @@ async function main() {
       return 'cached-drive';
     }
     if (drive && /drive\.google\.com\/drive\/folders\//.test(url)) {
+      // Files-only: folder URLs are excluded from fetch (children already expanded).
       items[h] = {
-        url, status: 'active', httpStatus: 200,
-        pageTitle: drive.driveName && !drive.driveName.startsWith('(folder') ? drive.driveName : `Drive folder ${drive.driveId}`,
-        driveName: drive.driveName, mimeType: drive.mimeType,
-        note: 'drive-folder placeholder',
+        url, status: 'excluded', httpStatus: 0,
+        pageTitle: undefined, driveName: drive.driveName, mimeType: drive.mimeType,
+        note: 'excluded: folder placeholder (files-only)',
         updatedAt: new Date().toISOString()
       };
-      return 'cached-folder';
+      return 'excluded-folder';
     }
     try {
       const r = await fetchPageMeta(url, { timeoutMs });

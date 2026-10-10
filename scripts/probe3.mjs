@@ -1,0 +1,10 @@
+import { openDb } from '../server/db.mjs';
+const db = openDb();
+const row = db.prepare("SELECT public_id FROM resources WHERE file_type = 'folder' OR category = 'folder' LIMIT 1").get();
+console.log('folder id:', row.public_id);
+const r = await fetch('http://localhost:8080/r/' + row.public_id);
+console.log('folder page status (want 404):', r.status);
+const r2 = await fetch('http://localhost:8080/api/search?q=folders&type=folder');
+const j = await r2.json();
+console.log('type:folder search total (want 0):', j.total, 'mode:', j.mode);
+db.close();

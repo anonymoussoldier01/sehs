@@ -307,6 +307,50 @@ table.grid-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .stat-lbl { font-size: var(--fs-micro); text-transform: uppercase; letter-spacing: .08em; opacity: .85; }
 .hero-stats { display: flex; gap: var(--sp-2); flex-wrap: wrap; }
 
+/* ---------- v3: Premium exam OS layer (calm · dense · Inter-only display) ---------- */
+:root {
+  --disp: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --r-s: 8px; --r-m: 10px; --r-l: 14px;
+  --fs-display: clamp(26px, 3.4vw, 32px);
+  --ai-acc: #7c3aed;
+}
+h1, h2, h3 { letter-spacing: -.02em; }
+/* tabular numerals anywhere timers/scores appear */
+.tnum, #mock-timer, #write-timer, #read-score, #mock-area, #drill-q, #drill-a, #word-count { font-variant-numeric: tabular-nums; }
+/* denser, quieter cards */
+.card { box-shadow: var(--shadow-sm); }
+.card h3 { font-size: 15.5px; }
+.disc-tile { box-shadow: var(--shadow-sm); }
+/* shared AI treatment */
+.ai-thinking { color: var(--mut); position: relative; }
+.ai-thinking::after { content: "…"; animation: aiblink 1s steps(2) infinite; }
+@keyframes aiblink { 50% { opacity: .25; } }
+.ai-note { color: var(--faint); font-size: 12px; }
+.ai-tag { font-size: 11px; font-weight: 700; color: var(--ai-acc); border: 1px solid var(--acc-line); border-radius: var(--r-xs); padding: 1px 6px; white-space: nowrap; }
+/* grade bars */
+.gbar { display: flex; gap: 8px; align-items: center; margin: 4px 0; }
+.gbar > span:first-child { width: 110px; font-size: 13px; flex: none; }
+.gbar-track { flex: 1; background: var(--bg2); border-radius: 6px; height: 10px; }
+.gbar-fill { display: block; height: 10px; background: var(--acc); border-radius: 6px; }
+.gbar > span:last-child { font-size: 13px; width: 24px; text-align: right; flex: none; }
+/* header "Library" menu */
+.moremenu { position: relative; }
+.moremenu summary { list-style: none; cursor: pointer; color: var(--mut); font-size: var(--fs-body); font-weight: 600; padding: var(--sp-2) var(--sp-3); border-radius: var(--r-s); }
+.moremenu summary::-webkit-details-marker { display: none; }
+.moremenu summary:hover { color: var(--acc); background: var(--acc-soft); }
+.moremenu .moremenu-body { position: absolute; right: 0; top: calc(100% + 6px); background: var(--panel); border: 1px solid var(--line2); border-radius: var(--r-m); box-shadow: var(--shadow-lg); padding: 6px; min-width: 190px; z-index: 40; display: flex; flex-direction: column; }
+.moremenu:not([open]) .moremenu-body { display: none; }
+.moremenu .moremenu-body a { color: var(--txt); text-decoration: none; font-size: var(--fs-body); font-weight: 600; padding: var(--sp-2) var(--sp-3); border-radius: var(--r-s); }
+.moremenu .moremenu-body a:hover, .moremenu .moremenu-body a.on { color: var(--acc); background: var(--acc-soft); }
+/* exam-runner calm mode */
+.exam-rail { position: sticky; top: 64px; }
+/* print: clean study output */
+@media print {
+  .top-actions, .disc-tile button, .btn, #mock-area button, #read-area button, #drill-card button, .seg { display: none !important; }
+  body { background: #fff; color: #000; }
+  .card, .disc-tile { box-shadow: none; border: 1px solid #ccc; break-inside: avoid; }
+}
+
 /* ---------- responsive ---------- */
 @media (max-width: 960px) {
   .topnav { display: none; }

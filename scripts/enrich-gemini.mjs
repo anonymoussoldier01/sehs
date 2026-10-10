@@ -84,7 +84,8 @@ function toRecord({ url, drive, fetched, g, domain }) {
   const clean = (v, max = 500) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, max) : undefined);
   const title = clean(g.title, 200) || clean(fetched.pageTitle, 200) || clean(fetched.ogTitle, 200) || clean(drive.driveName, 200) || url;
   const description = clean(g.description, 600) || clean(fetched.metaDescription, 600) || clean(fetched.ogDescription, 600) || undefined;
-  const category = normalizeCategory(g.category) || (drive.mimeType === 'application/vnd.google-apps.folder' ? 'folder' : 'other');
+  const category = normalizeCategory(g.category) || 'other';
+  // Files-only: folder mime never produces a record (dropped by caller).
   const rec = {
     id: stableHash(url),
     url,
@@ -126,11 +127,12 @@ function toRecord({ url, drive, fetched, g, domain }) {
 }
 
 function fallbackRecord({ url, drive, fetched, domain }) {
+  // Files-only: folders fall back to 'other' and are dropped upstream.
   const title = (fetched.pageTitle || drive.driveName || url).toString().slice(0, 200);
   return {
     id: stableHash(url), url, title,
     description: fetched.metaDescription || fetched.ogDescription || undefined,
-    category: drive.mimeType === 'application/vnd.google-apps.folder' ? 'folder' : 'other',
+    category: 'other',
     tags: [],
     keywords: [],
     domain,
@@ -146,11 +148,10 @@ function fallbackRecord({ url, drive, fetched, domain }) {
 
 function guessContentType(mime, url) {
   if (!mime) {
-    if (/\/folders\//.test(url)) return 'folder';
     if (/\.(pdf)(\?|$)/i.test(url)) return 'pdf';
     return undefined;
   }
-  if (mime.includes('folder')) return 'folder';
+  if (mime.includes('folder')) return undefined;
   if (mime.includes('pdf')) return 'pdf';
   if (mime.includes('document')) return 'docx';
   if (mime.includes('spreadsheet')) return 'spreadsheet';

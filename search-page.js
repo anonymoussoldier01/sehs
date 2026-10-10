@@ -41,4 +41,18 @@
     var open = f.classList.toggle('open');
     ft.setAttribute('aria-expanded', String(open));
   });
+  /* ---------- AI: explain these results ---------- */
+  var exBtn = document.getElementById('explain-results');
+  if (exBtn) exBtn.addEventListener('click', async function () {
+    var out = document.getElementById('explain-out');
+    out.hidden = false;
+    out.textContent = 'Reading the results…';
+    var titles = Array.from(document.querySelectorAll('#grid .card h3')).slice(0, 8).map(function (h) { return h.textContent.trim(); });
+    var q = new URLSearchParams(location.search).get('q') || '(browsing)';
+    try {
+      out.textContent = await window.SEHS_AI.chat('tutor',
+        'A student searched SEHS resources for "' + q + '". Top hits: ' + titles.join(' | ') +
+        '. In 3 short lines: what these cover, who they suit, and one better next search. Under 120 words.');
+    } catch (e) { out.textContent = 'AI unavailable: ' + e.message; }
+  });
 })();

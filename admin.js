@@ -222,6 +222,11 @@
       document.getElementById('dash-zero').innerHTML = s.zeroQueries.length
         ? s.zeroQueries.map(function (q) { return '<a class="quick-chip" href="/search?q=' + encodeURIComponent(q.key) + '">' + escH(q.key) + ' · ' + q.count + '</a>'; }).join(' ')
         : '<p>None recorded.</p>';
+      document.getElementById('dash-ai').innerHTML =
+        '<p><strong>' + (s.aiToday || 0) + '</strong> AI calls today · <strong>' + (s.aiCached || 0) + '</strong> cached answers</p>' +
+        ((s.aiModes && s.aiModes.length)
+          ? '<table class="grid-table"><tbody>' + s.aiModes.map(function (m) { return '<tr><td>' + escH(m.key) + '</td><td style="text-align:right">' + m.c + '</td></tr>'; }).join('') + '</tbody></table>'
+          : '<p>No AI usage yet.</p>');
       return call('GET', '/api/admin/health');
     }).then(function (h) {
       document.getElementById('dash-health').innerHTML =

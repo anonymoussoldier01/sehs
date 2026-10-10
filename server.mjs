@@ -1,10 +1,13 @@
-// SEHS platform server (zero deps): static UI + pages + JSON API + access gateway.
+// SEHS platform server: static UI + pages + JSON API + access gateway.
+// Runs two ways: `node server.mjs` (local, long-lived) and `api/index.js`
+// (Vercel serverless). All database access is async via the unified interface
+// (SQLite locally, Postgres when DATABASE_URL is set).
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { openDb, getMeta, setMeta, dbPath } from './server/db.mjs';
+import { openDatabase, openDb, getMeta, setMeta, dbPath } from './server/db.mjs';
 import {
   hashPassword, verifyPassword, newToken, tokenHash,
   rateLimiter, lockoutTracker, ipHash, uaFamily,
@@ -13,7 +16,7 @@ import { buildIndexes, forRole, loadRows, publicView } from './server/content.mj
 import { autoDecks, adminDecks, deckCards } from './server/decks.mjs';
 import { search, suggest } from './search.js';
 import { layout, esc } from './server/templates.mjs';
-import { landing, searchPage, resourcePage, taxonomyPage, aboutPage, unlockPage, savedPage, sharedListPage, studyHubPage, studyDeckPage, requestPage, parseSearchParams } from './server/pages.mjs';
+import { landing, searchPage, resourcePage, taxonomyPage, aboutPage, unlockPage, savedPage, sharedListPage, studyHubPage, studyDeckPage, requestPage, parseSearchParams, examGuidePage, mocksPage, mockRunnerPage, writingPage, drillsPage, readingPage } from './server/pages.mjs';
 import {
   adminMissing, apiAdminStats, adminDashboard, adminResources, adminAudit, adminTriage, adminSettings,
   apiResourceUpdate, apiResourceCreate, apiResourceDelete, apiBulkImport, runPurge,
@@ -22,12 +25,51 @@ import {
 const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir);
 const PORT = Number(process.env.PORT || 8080);
-const SECURE = process.env.APP_SECURE === '1';
+const SECURE = process.env.APP_SECURE === '1' || Boolean(process.env.VERCEL);
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
 
-const db = openDb();
-let indexes = buildIndexes(db);
-export function rebuildIndexes() { indexes = buildIndexes(db); }
+// Lazy async boot shared by long-lived and serverless runtimes.
+let db = null;
+let indexes = null;
+let initPromise = null;
+function validateEnv() {
+  if (process.env.VERCEL && !process.env.DATABASE_URL) {
+    throw new Error('DATABASE_URL is required on Vercel (Vercel Postgres / Neon).');
+  }
+}
+async function ensureSeeded() {
+  const n = (await db.prepare('SELECT COUNT(*) AS n FROM resources').get()).n;
+  if (n > 0) return;
+  const pw = process.env.SEHS_ADMIN_PASSWORD;
+  // Seeding a production DB without a known admin password would lock everyone out.
+  if (!pw) throw new Error('Refusing to seed: SEHS_ADMIN_PASSWORD is not set.');
+  const { hashPassword } = await import('./server/crypto.mjs');
+  const { hash, salt } = hashPassword(pw);
+  await db.prepare('INSERT INTO passwords(role, hash, salt, created_at) VALUES (?, ?, ?, ?)')
+    .run('admin', hash, salt, new Date().toISOString());
+  console.log('seeded fresh database (resources + admin password from env)');
+}
+async function ready() {
+  if (indexes) return;
+  if (!initPromise) {
+    initPromise = (async () => {
+      validateEnv();
+      // Local dev uses the synchronous SQLite handle: every call site in
+      // server/content/pages/admin/decks is sync-style, and `await v` on a
+      // plain value is a no-op, so sync works for awaited callers too.
+      // Only the Postgres (Vercel) branch uses the async interface.
+      if (process.env.DATABASE_URL) {
+        db = await openDatabase();
+      } else {
+        db = openDb();
+      }
+      await ensureSeeded();
+      indexes = await buildIndexes(db);
+    })().catch((e) => { initPromise = null; throw e; });
+  }
+  await initPromise;
+}
+export async function rebuildIndexes() { indexes = await buildIndexes(db); }
 
 // ---- helpers ---------------------------------------------------------------
 const nowIso = () => new Date().toISOString();
@@ -56,24 +98,24 @@ function clientIp(req) {  const fwd = req.headers['x-forwarded-for'];
   const ip = (typeof fwd === 'string' ? fwd.split(',')[0] : req.socket.remoteAddress) || 'unknown';
   return ip.trim().slice(0, 80);
 }
-function saltForIp() {
+async function saltForIp() {
   const month = nowIso().slice(0, 7);
-  if (getMeta(db, 'ip_salt_month') !== month) {
-    setMeta(db, 'ip_salt', crypto.randomBytes(16).toString('hex'));
-    setMeta(db, 'ip_salt_month', month);
+  if (await getMeta(db, 'ip_salt_month') !== month) {
+    await setMeta(db, 'ip_salt', crypto.randomBytes(16).toString('hex'));
+    await setMeta(db, 'ip_salt_month', month);
   }
   return getMeta(db, 'ip_salt');
 }
-function logEvent(type, { sessionHash = null, resourceId = null, data = {} } = {}) {
+async function logEvent(type, { sessionHash = null, resourceId = null, data = {} } = {}) {
   try {
     const now = nowIso();
-    db.prepare('INSERT INTO events(day, type, session_hash, resource_id, data, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+    await db.prepare('INSERT INTO events(day, type, session_hash, resource_id, data, created_at) VALUES (?, ?, ?, ?, ?, ?)')
       .run(now.slice(0, 10), type, sessionHash, resourceId, JSON.stringify(data), now);
   } catch { /* logging must never break requests */ }
 }
-function bumpAggregate(day, kind, key) {
+async function bumpAggregate(day, kind, key) {
   try {
-    db.prepare(`INSERT INTO daily_aggregates(day, kind, key, count) VALUES (?, ?, ?, 1)
+    await db.prepare(`INSERT INTO daily_aggregates(day, kind, key, count) VALUES (?, ?, ?, 1)
       ON CONFLICT(day, kind, key) DO UPDATE SET count = count + 1`).run(day, kind, String(key).slice(0, 200));
   } catch { /* noop */ }
 }
@@ -106,6 +148,7 @@ const rlUnlock = rateLimiter({ capacity: 10, refillPerSec: 10 / 60 });
 const rlAccess = rateLimiter({ capacity: 30, refillPerSec: 0.5 });
 const rlSuggest = rateLimiter({ capacity: 60, refillPerSec: 1 });
 const rlReport = rateLimiter({ capacity: 5, refillPerSec: 5 / 3600 }); // 5 per hour per IP
+const rlAi = rateLimiter({ capacity: 3, refillPerSec: 3 / 60 }); // ~1 AI request per 20s per IP
 const unlockLockouts = lockoutTracker({});
 
 // ---- static ----------------------------------------------------------------------
@@ -210,8 +253,8 @@ async function apiAccess(req, res, ip, publicId) {
   const rl = rlAccess.allow('a:' + ip);
   if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Too many requests. Slow down.' });
   const row = findResource(publicId);
-  // Everything is public; only visibility/status gate access. Uniform 404 otherwise.
-  if (!row || !row.visibility) {
+  // Files-only: folders never resolve. Uniform 404 otherwise.
+  if (!row || !row.visibility || row.file_type === 'folder' || row.category === 'folder') {
     logEvent('open_denied', { data: {} });
     return apiMissing(res);
   }
@@ -235,14 +278,12 @@ function openGrant(_req, res, token) {
   const now = nowIso();
   if (!g || g.used_at || g.expires_at < now) return apiMissing(res);
   const row = db.prepare('SELECT * FROM resources WHERE id = ?').get(g.resource_id);
-  if (!row || !row.visibility) return apiMissing(res);
+  if (!row || !row.visibility || row.file_type === 'folder' || row.category === 'folder') return apiMissing(res);
   const src = db.prepare('SELECT * FROM resource_sources WHERE resource_id = ?').get(row.id);
   db.prepare('UPDATE grants SET used_at = ? WHERE token = ?').run(now, token);
   logEvent('open_redeemed', { resourceId: row.id, data: {} });
   if (!src || !src.provider_file_id) return apiMissing(res);
-  const dest = row.category === 'folder'
-    ? `https://drive.google.com/drive/folders/${src.provider_file_id}`
-    : `https://drive.google.com/file/d/${src.provider_file_id}/view`;
+  const dest = `https://drive.google.com/file/d/${src.provider_file_id}/view`;
   // Pre-lockdown: files are still link-shared; redirect works and is logged.
   // Post-lockdown (service account): this becomes a Drive API-mediated fetch.
   secureHeaders(res);
@@ -324,7 +365,7 @@ function apiTrending(_req, res) {
   const docById = new Map(index.docs.map(d => [d.rec.id, d]));
   const items = [];
   for (const r of rows) {
-    const row = db.prepare('SELECT * FROM resources WHERE public_id = ? AND visibility = 1').get(r.key);
+    const row = db.prepare(`SELECT * FROM resources WHERE public_id = ? AND visibility = 1 AND file_type != 'folder' AND category != 'folder'`).get(r.key);
     if (!row) continue;
     const d = docById.get(r.key);
     items.push({ ...publicView(row), displayTitle: d ? d.displayTitle : row.title, opens: r.c });
@@ -340,10 +381,9 @@ function apiSuggest(_req, res, sp) {
 }
 
 // Saved/recents hydration: order-preserving, hard-capped (everything public).
-function apiByIds(_req, res, sp) {
-  const ids = (sp.get('ids') || '').split(',').map(s => s.trim()).filter(s => /^[0-9a-f]{32}$/.test(s)).slice(0, 100);
+function apiByIds(_req, res, sp) {  const ids = (sp.get('ids') || '').split(',').map(s => s.trim()).filter(s => /^[0-9a-f]{32}$/.test(s)).slice(0, 100);
   if (!ids.length) return sendJson(res, 200, { ok: true, results: [] });
-  const where = `visibility = 1`;
+  const where = `visibility = 1 AND file_type != 'folder' AND category != 'folder'`;
   const placeholders = ids.map(() => '?').join(',');
   const rows = db.prepare(`SELECT * FROM resources WHERE ${where} AND public_id IN (${placeholders})`).all(...ids);
   const byId = new Map(rows.map(r => [r.public_id, r]));
@@ -358,11 +398,435 @@ function apiByIds(_req, res, sp) {
   return sendJson(res, 200, { ok: true, results });
 }
 
+// ---- native SEHS banks (static JSON, no DB, same privacy: localStorage only) ----
+const nativeCache = new Map();
+function nativeJson(name) {
+  if (nativeCache.has(name)) return nativeCache.get(name);
+  try {
+    const j = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'native', name), 'utf8'));
+    nativeCache.set(name, j);
+    return j;
+  } catch { return null; }
+}
+function apiMocks(_req, res) {
+  const j = nativeJson('mocks.json');
+  if (!j) return sendJson(res, 500, { ok: false, error: 'unavailable' });
+  return sendJson(res, 200, { ok: true, mocks: j.mocks.map(m => ({ id: m.id, title: m.title, minutes: m.minutes, strands: m.strands, count: m.questions.length })) });
+}
+function apiMockById(_req, res, id) {
+  const j = nativeJson('mocks.json');
+  const m = j?.mocks.find(x => x.id === String(id).slice(0, 40));
+  if (!m) return sendJson(res, 404, { ok: false, error: 'Not found.' });
+  return sendJson(res, 200, { ok: true, mock: m });
+}
+function apiWriting(_req, res) {
+  const j = nativeJson('writing.json');
+  if (!j) return sendJson(res, 500, { ok: false, error: 'unavailable' });
+  return sendJson(res, 200, { ok: true, prompts: j.prompts });
+}
+function apiReading(_req, res) {
+  const j = nativeJson('reading.json');
+  if (!j) return sendJson(res, 500, { ok: false, error: 'unavailable' });
+  return sendJson(res, 200, { ok: true, passages: j.passages });
+}
+function apiGuides(_req, res) {
+  const j = nativeJson('guides.json');
+  if (!j) return sendJson(res, 500, { ok: false, error: 'unavailable' });
+  return sendJson(res, 200, { ok: true, guides: j });
+}
+function apiNativeStats(_req, res) {
+  const counts = {};
+  for (const [name, kind] of [['vocab.json', 'cards'], ['verbal.json', 'cards'], ['quant.json', 'cards'], ['maths.json', 'cards'], ['grammar.json', 'cards'], ['writing.json', 'prompts'], ['reading.json', 'passages'], ['mocks.json', 'mocks']]) {
+    const j = nativeJson(name);
+    counts[name.replace('.json', '')] = j ? (j[kind] || []).length : 0;
+  }
+  return sendJson(res, 200, { ok: true, counts });
+}
+
+// ---- free AI tutor (Pollinations anonymous tier: no key, no signup) ----
+// Server-side proxy so the browser never talks to a third party directly
+// (CSP stays `connect-src 'self'`) and one shared upstream quota is guarded:
+// per-IP cooldown + 16s shared throttle + persistent identical-prompt cache.
+// Privacy: prompt CONTENT is never logged — only mode + lengths in aggregate.
+import { aiText, aiCacheGet, aiCacheSet, aiCacheKey, extractJson } from './server/ai.mjs';
+const AI_SYSTEM = {
+  tutor: 'You are a friendly SEHS selective-entry tutor for Victorian Year 8 students (ACER exam: maths, quantitative reasoning, reading, verbal reasoning, writing). Explain simply in short steps. Never write a student\'s essay for them — coach instead. Under 150 words.',
+  writing: 'You are an SEHS writing coach. The student wrote a timed response (persuasive or creative). Give: 1 strength, 2 fixes (ideas/structure, sentences/vocab, spelling/punctuation), and one example rewrite of a weak sentence if shown. Under 150 words. Do not rewrite the whole piece.',
+  explain: 'You are an SEHS tutor. Explain why the correct MCQ answer is right and what trap the wrong options set, in 2-4 short sentences at Year-8 level.',
+};
+const AI_MAXLEN = { tutor: 800, writing: 3200, explain: 800 };
+
+function aiBusy(res, retryAfter = 16) {
+  return sendJson(res, 429, { ok: false, error: 'Shared AI is busy — try again in a few seconds.', retryAfter });
+}
+
+async function apiAiChat(req, res, ip) {
+  if (process.env.AI_ENABLED === '0') return sendJson(res, 503, { ok: false, error: 'AI is disabled on this server.' });
+  const rl = rlAi.allow('ai:' + ip);
+  if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Slow down — one AI request per ~20 seconds.', retryAfter: rl.retryAfter });
+  let body;
+  try { body = JSON.parse(await readBody(req, 10 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+  const mode = String(body.mode || '');
+  if (!AI_SYSTEM[mode]) return sendJson(res, 400, { ok: false, error: 'Unknown AI mode.' });
+  const input = String(body.input || '').trim().slice(0, AI_MAXLEN[mode]);
+  if (input.length < 2) return sendJson(res, 400, { ok: false, error: 'Write a little more first.' });
+  const key = aiCacheKey('chat:' + mode, input);
+  const hit = aiCacheGet(db, key);
+  if (hit) {
+    logEvent('ai', { data: { mode, cached: true } });
+    return sendJson(res, 200, { ok: true, text: hit, cached: true });
+  }
+  try {
+    const r = await aiText(
+      [{ role: 'system', content: AI_SYSTEM[mode] }, { role: 'user', content: input }],
+      { maxTokens: 400, temperature: 0.7, maxChars: 1500 });
+    aiCacheSet(db, key, 'chat:' + mode, r.text);
+    logEvent('ai', { data: { mode, inLen: input.length, via: r.via } });
+    bumpAggregate(nowIso().slice(0, 10), 'ai', mode);
+    return sendJson(res, 200, { ok: true, text: r.text });
+  } catch (e) {
+    if (e && e.status === 'busy') return aiBusy(res);
+    return sendJson(res, 502, { ok: false, error: 'AI is unavailable right now — the offline tools below still work.' });
+  }
+}
+
+// ---- AI grading: writing vs the 8-criteria rubric (JSON, heuristic-backed) ----
+const GRADE_CRITERIA = ['ideas', 'structure', 'devices', 'vocabulary', 'sentences', 'spelling'];
+function heuristicGrade(kind, essay) {
+  const words = (essay.match(/\S+/g) || []).length;
+  const sentences = essay.split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 1);
+  const paras = essay.split(/\n\s*\n/).filter(p => p.trim().length > 10);
+  const avgLen = sentences.length ? words / sentences.length : 0;
+  const uniqOpeners = new Set(sentences.map(s => (s.match(/^[A-Za-z']+/) || [''])[0].toLowerCase())).size;
+  const scores = {
+    ideas: words >= 250 ? 4 : words >= 150 ? 3 : words >= 60 ? 2 : 1,
+    structure: paras.length >= 4 ? 4 : paras.length >= 2 ? 3 : 2,
+    devices: /(because|for example|however|first|finally|imagine|picture)/i.test(essay) ? 3 : 2,
+    vocabulary: uniqOpeners >= 8 ? 4 : uniqOpeners >= 5 ? 3 : 2,
+    sentences: avgLen >= 8 && avgLen <= 25 && sentences.length >= 5 ? 4 : sentences.length >= 3 ? 3 : 2,
+    spelling: 3,
+  };
+  const overall = Math.round(Object.values(scores).reduce((a, b) => a + b, 0) / 6);
+  return { scores, overall, words, sentences: sentences.length, paras: paras.length, source: 'auto-checks' };
+}
+
+async function apiAiGrade(req, res, ip) {
+  if (process.env.AI_ENABLED === '0') return sendJson(res, 503, { ok: false, error: 'AI is disabled on this server.' });
+  const rl = rlAi.allow('ai:' + ip);
+  if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Slow down — one AI request per ~20 seconds.', retryAfter: rl.retryAfter });
+  let body;
+  try { body = JSON.parse(await readBody(req, 10 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+  const kind = body.kind === 'creative' ? 'creative' : 'persuasive';
+  const essay = String(body.essay || '').trim().slice(0, 3200);
+  if ((essay.match(/\S+/g) || []).length < 30) return sendJson(res, 400, { ok: false, error: 'Write at least ~30 words first.' });
+  const auto = heuristicGrade(kind, essay);
+  const key = aiCacheKey('grade:' + kind, essay);
+  const hit = aiCacheGet(db, key);
+  if (hit) {
+    try {
+      const j = JSON.parse(hit);
+      logEvent('ai', { data: { mode: 'grade', cached: true } });
+      return sendJson(res, 200, { ok: true, auto, ai: j, cached: true });
+    } catch { /* stale entry — regenerate */ }
+  }
+  try {
+    const r = await aiText([
+      { role: 'system', content: `You are an SEHS writing marker. Grade this Year-8 ${kind} response (target 250-350 words, ~20 min). Reply with ONLY valid JSON: {"scores":{"ideas":1-5,"structure":1-5,"devices":1-5,"vocabulary":1-5,"sentences":1-5,"spelling":1-5},"overall":1-5,"strength":"one line","fix1":"one line","fix2":"one line"}. No other text.` },
+      { role: 'user', content: essay },
+    ], { maxTokens: 500, temperature: 0.4, maxChars: 1200, json: true });
+    const j = extractJson(r.text);
+    if (!j || typeof j !== 'object' || !j.scores) throw { status: 'down' };
+    for (const c of GRADE_CRITERIA) j.scores[c] = Math.min(5, Math.max(1, Number(j.scores[c]) || 3));
+    j.overall = Math.min(5, Math.max(1, Number(j.overall) || 3));
+    aiCacheSet(db, key, 'grade:' + kind, JSON.stringify(j));
+    logEvent('ai', { data: { mode: 'grade', inLen: essay.length, via: r.via } });
+    bumpAggregate(nowIso().slice(0, 10), 'ai', 'grade');
+    return sendJson(res, 200, { ok: true, auto, ai: j });
+  } catch (e) {
+    if (e && e.status === 'busy') return aiBusy(res);
+    // AI down: heuristic grade still answers.
+    logEvent('ai', { data: { mode: 'grade', fallback: true } });
+    return sendJson(res, 200, { ok: true, auto, ai: null, note: 'AI marker was busy — showing automatic checks only.' });
+  }
+}
+
+// ---- AI question generation: validated MCQ sets per strand ----
+const GEN_STRANDS = ['verbal', 'quant', 'maths', 'reading', 'vocab', 'grammar'];
+const GEN_BRIEF = {
+  verbal: 'verbal reasoning (analogy, synonym, odd-one-out, code, or deduction)',
+  quant: 'quantitative reasoning (number series, matrix, arithmetic, or Venn logic)',
+  maths: 'Year-8 maths (fraction, percent, algebra, angle, or BODMAS)',
+  reading: 'reading comprehension inference from a 2-sentence micro-passage you invent',
+  vocab: 'vocabulary-in-context (word meaning via a sentence)',
+  grammar: 'grammar (spelling, punctuation, or sentence fix)',
+};
+function cleanGenSet(arr) {
+  const out = [];
+  for (const q of (Array.isArray(arr) ? arr : [])) {
+    if (!q || typeof q.stem !== 'string') continue;
+    const options = Array.isArray(q.options) ? q.options.map(String).filter(s => s.trim()).slice(0, 4) : [];
+    const answer = Number(q.answer);
+    const explain = String(q.explain || '').slice(0, 300);
+    if (!q.stem.trim() || options.length !== 4 || !(answer >= 0 && answer < 4) || !explain.trim()) continue;
+    out.push({ stem: q.stem.trim().slice(0, 300), options, answer, explain });
+    if (out.length >= 10) break;
+  }
+  return out;
+}
+
+async function apiAiQuestions(req, res, ip) {
+  if (process.env.AI_ENABLED === '0') return sendJson(res, 503, { ok: false, error: 'AI is disabled on this server.' });
+  const rl = rlAi.allow('ai:' + ip);
+  if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Slow down — one AI request per ~20 seconds.', retryAfter: rl.retryAfter });
+  let body;
+  try { body = JSON.parse(await readBody(req, 10 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+  const strand = String(body.strand || '');
+  if (!GEN_STRANDS.includes(strand)) return sendJson(res, 400, { ok: false, error: 'Unknown strand.' });
+  const topic = String(body.topic || '').trim().slice(0, 120) || 'mixed practice';
+  const n = Math.min(8, Math.max(3, Number(body.n) || 5));
+  const key = aiCacheKey('gen:' + strand, topic + '|' + n);
+  const hit = aiCacheGet(db, key);
+  if (hit) {
+    try {
+      const arr = cleanGenSet(JSON.parse(hit));
+      if (arr.length >= 3) {
+        logEvent('ai', { data: { mode: 'gen', cached: true } });
+        return sendJson(res, 200, { ok: true, strand, questions: arr, cached: true });
+      }
+    } catch { /* regenerate */ }
+  }
+  try {
+    const r = await aiText([
+      { role: 'system', content: `Write ${n} SEHS ${GEN_BRIEF[strand]} multiple-choice questions on "${topic}" for Year-8 level. Reply with ONLY a valid JSON array, no other text. Each item: {"stem":"...","options":["a","b","c","d"],"answer":0-3,"explain":"one line why"}. Vary correct positions.` },
+      { role: 'user', content: `Topic: ${topic}. ${n} questions.` },
+    ], { maxTokens: 900, temperature: 0.8, maxChars: 4000, json: true });
+    const arr = cleanGenSet(extractJson(r.text));
+    if (arr.length < 3) throw { status: 'down' };
+    aiCacheSet(db, key, 'gen:' + strand, JSON.stringify(arr));
+    logEvent('ai', { data: { mode: 'gen', strand, via: r.via } });
+    bumpAggregate(nowIso().slice(0, 10), 'ai', 'gen-' + strand);
+    return sendJson(res, 200, { ok: true, strand, questions: arr });
+  } catch (e) {
+    if (e && e.status === 'busy') return aiBusy(res);
+    return sendJson(res, 502, { ok: false, error: 'AI question writer is unavailable — try the built-in banks and drills instead.' });
+  }
+}
+
+// ---- AI flashcards: topic → cards saved by the browser into personal decks ----
+async function apiAiFlashcards(req, res, ip) {
+  if (process.env.AI_ENABLED === '0') return sendJson(res, 503, { ok: false, error: 'AI is disabled on this server.' });
+  const rl = rlAi.allow('ai:' + ip);
+  if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Slow down — one AI request per ~20 seconds.', retryAfter: rl.retryAfter });
+  let body;
+  try { body = JSON.parse(await readBody(req, 10 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+  const topic = String(body.topic || '').trim().slice(0, 120);
+  if (topic.length < 3) return sendJson(res, 400, { ok: false, error: 'Name a topic (3+ characters).' });
+  const key = aiCacheKey('cards', topic);
+  const hit = aiCacheGet(db, key);
+  if (hit) {
+    try {
+      const arr = JSON.parse(hit);
+      if (Array.isArray(arr) && arr.length >= 4) {
+        logEvent('ai', { data: { mode: 'cards', cached: true } });
+        return sendJson(res, 200, { ok: true, topic, cards: arr, cached: true });
+      }
+    } catch { /* regenerate */ }
+  }
+  try {
+    const r = await aiText([
+      { role: 'system', content: `Make 10 flashcards for SEHS Year-8 study of "${topic}". Reply with ONLY a valid JSON array, no other text. Each item: {"front":"short prompt","back":"answer + one-line note"}. Keep fronts under 120 characters.` },
+      { role: 'user', content: `Topic: ${topic}` },
+    ], { maxTokens: 900, temperature: 0.7, maxChars: 4000, json: true });
+    let arr = extractJson(r.text);
+    if (!Array.isArray(arr)) arr = [];
+    arr = arr.filter(c => c && typeof c.front === 'string' && typeof c.back === 'string' && c.front.trim() && c.back.trim())
+      .slice(0, 12).map(c => ({ front: c.front.trim().slice(0, 200), back: c.back.trim().slice(0, 500) }));
+    if (arr.length < 4) throw { status: 'down' };
+    aiCacheSet(db, key, 'cards', JSON.stringify(arr));
+    logEvent('ai', { data: { mode: 'cards', via: r.via } });
+    bumpAggregate(nowIso().slice(0, 10), 'ai', 'cards');
+    return sendJson(res, 200, { ok: true, topic, cards: arr });
+  } catch (e) {
+    if (e && e.status === 'busy') return aiBusy(res);
+    return sendJson(res, 502, { ok: false, error: 'AI card writer is unavailable — try the built-in decks instead.' });
+  }
+}
+
+// ---- AI reading passage: genre-rotated passage + questions ----
+const PASSAGE_GENRES = ['fiction', 'nonfiction', 'opinion', 'poetry', 'informational'];
+function cleanPassageQs(arr) {
+  const out = [];
+  for (const q of (Array.isArray(arr) ? arr : [])) {
+    if (!q || typeof q.stem !== 'string') continue;
+    const options = Array.isArray(q.options) ? q.options.map(String).filter(s => s.trim()).slice(0, 4) : [];
+    const answer = Number(q.answer);
+    const explain = String(q.explain || '').slice(0, 300);
+    if (!q.stem.trim() || options.length !== 4 || !(answer >= 0 && answer < 4) || !explain.trim()) continue;
+    out.push({ stem: q.stem.trim().slice(0, 300), options, answer, explain });
+    if (out.length >= 5) break;
+  }
+  return out;
+}
+async function apiAiPassage(req, res, ip) {
+  if (process.env.AI_ENABLED === '0') return sendJson(res, 503, { ok: false, error: 'AI is disabled on this server.' });
+  const rl = rlAi.allow('ai:' + ip);
+  if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Slow down — one AI request per ~20 seconds.', retryAfter: rl.retryAfter });
+  let body;
+  try { body = JSON.parse(await readBody(req, 10 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+  const genre = PASSAGE_GENRES.includes(body.genre) ? body.genre : PASSAGE_GENRES[Math.floor(Math.random() * PASSAGE_GENRES.length)];
+  const seed = String(body.seed || '').trim().slice(0, 60) || 'everyday life';
+  const key = aiCacheKey('passage', genre + '|' + seed);
+  const hit = aiCacheGet(db, key);
+  if (hit) {
+    try {
+      const j = JSON.parse(hit);
+      if (j && j.text && Array.isArray(j.questions) && j.questions.length >= 3) {
+        logEvent('ai', { data: { mode: 'passage', cached: true } });
+        return sendJson(res, 200, { ok: true, genre, passage: j, cached: true });
+      }
+    } catch { /* regenerate */ }
+  }
+  try {
+    const r = await aiText([
+      { role: 'system', content: `Write a Year-8 reading-comprehension exercise: a ${genre} passage (300-450 words, about "${seed}") then 4 multiple-choice questions (main idea, inference, vocab-in-context, tone/purpose) with exact-phrase evidence. Reply with ONLY valid JSON, no other text: {"title":"...","text":"...","questions":[{"stem":"...","options":["a","b","c","d"],"answer":0-3,"explain":"..."}]}. Vary correct positions.` },
+      { role: 'user', content: `Genre: ${genre}. Theme: ${seed}.` },
+    ], { maxTokens: 1400, temperature: 0.8, maxChars: 6000, json: true });
+    const j = extractJson(r.text);
+    const questions = cleanPassageQs(j && j.questions);
+    const text = String((j && (j.text || j.passage)) || '').trim().slice(0, 4000);
+    if (!text || questions.length < 3) throw { status: 'down' };
+    const out = { title: String((j && j.title) || 'Practice passage').slice(0, 120), text, questions };
+    aiCacheSet(db, key, 'passage', JSON.stringify(out));
+    logEvent('ai', { data: { mode: 'passage', genre, via: r.via } });
+    bumpAggregate(nowIso().slice(0, 10), 'ai', 'passage');
+    return sendJson(res, 200, { ok: true, genre, passage: out });
+  } catch (e) {
+    if (e && e.status === 'busy') return aiBusy(res);
+    return sendJson(res, 502, { ok: false, error: 'AI passage writer is unavailable — try the built-in passages instead.' });
+  }
+}
+
+// ---- AI writing prompt: unlimited persuasive/creative prompts ----
+async function apiAiPrompt(req, res, ip) {
+  if (process.env.AI_ENABLED === '0') return sendJson(res, 503, { ok: false, error: 'AI is disabled on this server.' });
+  const rl = rlAi.allow('ai:' + ip);
+  if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Slow down — one AI request per ~20 seconds.', retryAfter: rl.retryAfter });
+  let body;
+  try { body = JSON.parse(await readBody(req, 10 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+  const kind = body.kind === 'creative' ? 'creative' : 'persuasive';
+  const theme = String(body.theme || '').trim().slice(0, 80) || 'school life';
+  const key = aiCacheKey('prompt:' + kind, theme);
+  const hit = aiCacheGet(db, key);
+  if (hit) {
+    try {
+      const j = JSON.parse(hit);
+      if (j && j.prompt) {
+        logEvent('ai', { data: { mode: 'prompt', cached: true } });
+        return sendJson(res, 200, { ok: true, kind, prompt: j, cached: true });
+      }
+    } catch { /* regenerate */ }
+  }
+  try {
+    const r = await aiText([
+      { role: 'system', content: `Create one SEHS exam-style ${kind} writing prompt for a Year-8 student (theme: "${theme}"). Reply with ONLY valid JSON, no other text: {"prompt":"the prompt in one line","stimulus":"one-sentence stimulus","plan":["step 1","step 2","step 3","step 4"]}.` },
+      { role: 'user', content: `Kind: ${kind}. Theme: ${theme}.` },
+    ], { maxTokens: 300, temperature: 0.9, maxChars: 1000, json: true });
+    const j = extractJson(r.text);
+    if (!j || !j.prompt) throw { status: 'down' };
+    const out = {
+      prompt: String(j.prompt).slice(0, 200),
+      stimulus: String(j.stimulus || '').slice(0, 300),
+      plan: Array.isArray(j.plan) ? j.plan.map(String).filter(Boolean).slice(0, 5) : [],
+    };
+    aiCacheSet(db, key, 'prompt:' + kind, JSON.stringify(out));
+    logEvent('ai', { data: { mode: 'prompt', via: r.via } });
+    bumpAggregate(nowIso().slice(0, 10), 'ai', 'prompt');
+    return sendJson(res, 200, { ok: true, kind, prompt: out });
+  } catch (e) {
+    if (e && e.status === 'busy') return aiBusy(res);
+    return sendJson(res, 502, { ok: false, error: 'AI prompt writer is unavailable — try the built-in prompts instead.' });
+  }
+}
+
+// ---- AI study plan: week-by-week schedule from local stats (counts only) ----
+async function apiAiPlan(req, res, ip) {
+  if (process.env.AI_ENABLED === '0') return sendJson(res, 503, { ok: false, error: 'AI is disabled on this server.' });
+  const rl = rlAi.allow('ai:' + ip);
+  if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Slow down — one AI request per ~20 seconds.', retryAfter: rl.retryAfter });
+  let body;
+  try { body = JSON.parse(await readBody(req, 10 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+  const weeks = Math.min(16, Math.max(2, Number(body.weeks) || 8));
+  const weak = (Array.isArray(body.weak) ? body.weak : []).map(String).filter(s => /^[a-z-]{2,30}$/.test(s)).slice(0, 6);
+  const strong = (Array.isArray(body.strong) ? body.strong : []).map(String).filter(s => /^[a-z-]{2,30}$/.test(s)).slice(0, 6);
+  const mins = Math.min(180, Math.max(15, Number(body.minsPerDay) || 45));
+  const key = aiCacheKey('plan', weeks + '|' + weak.join(',') + '|' + strong.join(',') + '|' + mins);
+  const hit = aiCacheGet(db, key);
+  if (hit) {
+    logEvent('ai', { data: { mode: 'plan', cached: true } });
+    return sendJson(res, 200, { ok: true, plan: hit, cached: true });
+  }
+  try {
+    const r = await aiText([
+      { role: 'system', content: `You are an SEHS study planner. The student has ${weeks} weeks until the ACER exam, ${mins} min/day. Weak strands: ${weak.join(', ') || 'unknown'}. Strong strands: ${strong.join(', ') || 'unknown'}. Write a practical week-by-week plan naming concrete activities (timed blocks 60/55/40, VR/QR builders, vocab tiers, writing 2x/week, full mocks in final weeks, taper week). Plain text, short lines, under 1200 characters. No preamble.` },
+      { role: 'user', content: `Plan for ${weeks} weeks, ${mins} min/day.` },
+    ], { maxTokens: 700, temperature: 0.6, maxChars: 2500 });
+    aiCacheSet(db, key, 'plan', r.text);
+    logEvent('ai', { data: { mode: 'plan', via: r.via } });
+    bumpAggregate(nowIso().slice(0, 10), 'ai', 'plan');
+    return sendJson(res, 200, { ok: true, plan: r.text });
+  } catch (e) {
+    if (e && e.status === 'busy') return aiBusy(res);
+    return sendJson(res, 502, { ok: false, error: 'AI planner is unavailable — follow the 12-week plan in the exam guide instead.' });
+  }
+}
+
+// ---- AI variants: fresh questions targeting the student's own misses ----
+async function apiAiVariants(req, res, ip) {
+  if (process.env.AI_ENABLED === '0') return sendJson(res, 503, { ok: false, error: 'AI is disabled on this server.' });
+  const rl = rlAi.allow('ai:' + ip);
+  if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Slow down — one AI request per ~20 seconds.', retryAfter: rl.retryAfter });
+  let body;
+  try { body = JSON.parse(await readBody(req, 10 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
+  const misses = (Array.isArray(body.misses) ? body.misses : []).slice(0, 5).map(m => ({
+    stem: String((m && m.stem) || '').slice(0, 200),
+    strand: String((m && m.strand) || '').slice(0, 20),
+  })).filter(m => m.stem.length > 3);
+  if (!misses.length) return sendJson(res, 400, { ok: false, error: 'Send 1-5 missed questions to vary.' });
+  const key = aiCacheKey('variants', JSON.stringify(misses));
+  const hit = aiCacheGet(db, key);
+  if (hit) {
+    try {
+      const arr = cleanGenSet(JSON.parse(hit));
+      if (arr.length >= 1) {
+        logEvent('ai', { data: { mode: 'variants', cached: true } });
+        return sendJson(res, 200, { ok: true, questions: arr, cached: true });
+      }
+    } catch { /* regenerate */ }
+  }
+  const brief = misses.map((m, i) => `${i + 1}. [${m.strand}] ${m.stem}`).join('\n');
+  try {
+    const r = await aiText([
+      { role: 'system', content: `The student missed these SEHS questions. Write ONE fresh variant per miss testing the SAME skill with different numbers/words (never repeat stems). Reply with ONLY a valid JSON array, no other text. Each item: {"stem":"...","options":["a","b","c","d"],"answer":0-3,"explain":"one line"}. Vary correct positions.` },
+      { role: 'user', content: brief },
+    ], { maxTokens: 800, temperature: 0.8, maxChars: 3500, json: true });
+    const arr = cleanGenSet(extractJson(r.text));
+    if (!arr.length) throw { status: 'down' };
+    aiCacheSet(db, key, 'variants', JSON.stringify(arr));
+    logEvent('ai', { data: { mode: 'variants', via: r.via } });
+    bumpAggregate(nowIso().slice(0, 10), 'ai', 'variants');
+    return sendJson(res, 200, { ok: true, questions: arr });
+  } catch (e) {
+    if (e && e.status === 'busy') return aiBusy(res);
+    return sendJson(res, 502, { ok: false, error: 'AI variant writer is unavailable — retry the built-in decks instead.' });
+  }
+}
+
 // ---- router ----------------------------------------------------------------------
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://x');
   const ip = clientIp(req);
   try {
+    await ready();
     // public API with global rate limit
     if (url.pathname.startsWith('/api/')) {
       if (!rlApi.allow('g:' + ip).ok) return sendJson(res, 429, { ok: false, error: 'Too many requests.' });
@@ -374,7 +838,7 @@ const server = http.createServer(async (req, res) => {
       const session = null; // public API is stateless (IP rate limits); admin uses bearer tokens
       if (url.pathname === '/api/health') return sendJson(res, 200, { ok: true });
       if (url.pathname === '/api/stats') {
-        const total = db.prepare(`SELECT COUNT(*) AS n FROM resources WHERE visibility = 1`).get().n;
+        const total = db.prepare(`SELECT COUNT(*) AS n FROM resources WHERE visibility = 1 AND file_type != 'folder' AND category != 'folder'`).get().n;
         return sendJson(res, 200, { ok: true, publicResources: total });
       }
       if (url.pathname === '/api/me') {
@@ -396,7 +860,7 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, { ok: true, body: row?.body || null });
       }
       if (url.pathname === '/api/new' && req.method === 'GET') {
-        const rows = db.prepare('SELECT * FROM resources WHERE visibility = 1 ORDER BY id DESC LIMIT 6').all();
+        const rows = db.prepare(`SELECT * FROM resources WHERE visibility = 1 AND file_type != 'folder' AND category != 'folder' ORDER BY id DESC LIMIT 6`).all();
         const index = forRole(indexes);
         const docById = new Map(index.docs.map(d => [d.rec.id, d]));
         return sendJson(res, 200, {
@@ -445,6 +909,19 @@ const server = http.createServer(async (req, res) => {
             .map(d => ({ id: d.id, source: d.source, title: d.title, description: d.description, count: d.count })),
         });
       }
+      if (url.pathname === '/api/mocks' && req.method === 'GET') return apiMocks(req, res);
+      if (url.pathname === '/api/writing' && req.method === 'GET') return apiWriting(req, res);
+      if (url.pathname === '/api/reading' && req.method === 'GET') return apiReading(req, res);
+      if (url.pathname === '/api/guides' && req.method === 'GET') return apiGuides(req, res);
+      if (url.pathname === '/api/native-stats' && req.method === 'GET') return apiNativeStats(req, res);
+      if (url.pathname === '/api/ai/chat' && req.method === 'POST') return apiAiChat(req, res, ip);
+      if (url.pathname === '/api/ai/grade' && req.method === 'POST') return apiAiGrade(req, res, ip);
+      if (url.pathname === '/api/ai/questions' && req.method === 'POST') return apiAiQuestions(req, res, ip);
+      if (url.pathname === '/api/ai/flashcards' && req.method === 'POST') return apiAiFlashcards(req, res, ip);
+      if (url.pathname === '/api/ai/passage' && req.method === 'POST') return apiAiPassage(req, res, ip);
+      if (url.pathname === '/api/ai/prompt' && req.method === 'POST') return apiAiPrompt(req, res, ip);
+      if (url.pathname === '/api/ai/plan' && req.method === 'POST') return apiAiPlan(req, res, ip);
+      if (url.pathname === '/api/ai/variants' && req.method === 'POST') return apiAiVariants(req, res, ip);
       const dm = url.pathname.match(/^\/api\/decks\/([A-Za-z0-9-]{1,40})$/);
       if (dm && req.method === 'GET') {
         const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
@@ -456,6 +933,8 @@ const server = http.createServer(async (req, res) => {
       if (url.pathname === '/api/unlock' && req.method === 'POST') return apiUnlock(req, res, ip);
       if (url.pathname === '/api/logout' && req.method === 'POST') return apiLogout(req, res);
       if (url.pathname === '/api/terms' && req.method === 'GET') return apiTerms(req, res);
+      const mmm = url.pathname.match(/^\/api\/mocks\/([A-Za-z0-9-]{1,40})$/);
+      if (mmm && req.method === 'GET') return apiMockById(req, res, mmm[1]);
       const m = url.pathname.match(/^\/api\/access\/([A-Za-z0-9_-]{1,64})$/);
       if (m && req.method === 'POST') return apiAccess(req, res, ip, m[1]);
       // ---- admin API (bearer-gated, uniform 404 otherwise) ----
@@ -775,7 +1254,7 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/about') return html(200, aboutPage(ctx));
     if (url.pathname === '/saved') return html(200, savedPage(ctx));
     if (url.pathname === '/feed.xml' && req.method === 'GET') {
-      const rows = db.prepare('SELECT * FROM resources WHERE visibility = 1 ORDER BY id DESC LIMIT 30').all();
+      const rows = db.prepare(`SELECT * FROM resources WHERE visibility = 1 AND file_type != 'folder' AND category != 'folder' ORDER BY id DESC LIMIT 30`).all();
       const items = rows.map(r => {
         const t = String(r.title).replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
         return `<item><title>${t}</title><link>https://sehs.directory/r/${r.public_id}</link><guid>https://sehs.directory/r/${r.public_id}</guid><pubDate>${new Date(r.created_at).toUTCString()}</pubDate></item>`;
@@ -799,6 +1278,13 @@ const server = http.createServer(async (req, res) => {
     if (url.pathname === '/study') return html(200, studyHubPage(ctx));
     const sm = url.pathname.match(/^\/study\/([A-Za-z0-9-]{1,40})$/);
     if (sm) return html(200, studyDeckPage(ctx, sm[1]));
+    if (url.pathname === '/exam-guide') return html(200, examGuidePage(ctx));
+    if (url.pathname === '/mocks') return html(200, mocksPage(ctx));
+    const mm = url.pathname.match(/^\/mocks\/([A-Za-z0-9-]{1,40})$/);
+    if (mm) return html(200, mockRunnerPage(ctx, mm[1]));
+    if (url.pathname === '/writing') return html(200, writingPage(ctx));
+    if (url.pathname === '/reading') return html(200, readingPage(ctx));
+    if (url.pathname === '/drills') return html(200, drillsPage(ctx));
     if (url.pathname === '/unlock') return html(200, unlockPage(ctx));
     // Admin pages serve inert shells to everyone; ALL data loads through
     // bearer-authed /api/admin/* calls (navigation requests can't carry headers).

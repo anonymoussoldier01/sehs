@@ -4,7 +4,7 @@ import { toRec, publicView, loadRows, forRole, fmtBytes } from './content.mjs';
 import { layout, esc, pretty, resultRow, pagerHtml, emptyBlock, highlight, QUICK } from './templates.mjs';
 
 function liteRows(db) {
-  const where = `visibility = 1`;
+  const where = `visibility = 1 AND file_type != 'folder' AND category != 'folder'`;
   return db.prepare(`SELECT category, file_type, tags, subject FROM resources WHERE ${where}`).all()
     .map(r => ({ category: r.category, contentType: r.file_type, tags: JSON.parse(r.tags || '[]'), subjects: r.subject ? [r.subject] : [] }));
 }
@@ -61,6 +61,17 @@ export function landing(ctx) {
   </section>
   <div class="wrap layout single" id="discovery">
     <main aria-label="Browse resources">
+      <section class="disc-section"><div class="disc-head"><h2>✦ Today</h2></div>
+        <div class="disc-grid">
+          <div class="disc-tile"><h3>Start today's session</h3><p id="home-next" style="color:var(--mut)">Picking your next best move…</p><p><a class="btn small" id="home-go" href="/study">Go →</a></p></div>
+          <div class="disc-tile"><h3>Question of the day</h3><p id="home-qotd" style="color:var(--mut)">Loading…</p><p id="home-qotd-a" hidden style="font-size:13.5px"></p><p><button class="btn small secondary" id="home-qotd-reveal" hidden>Reveal</button></p></div>
+        </div></section>      <section class="disc-section"><div class="disc-head"><h2>Native SEHS prep <small>built-in · no Drive needed</small></h2></div>
+        <div class="disc-grid">
+          <div class="disc-tile"><h3>Exam guide</h3><p>ACER 3-block format, pacing, schools, 12-week plan.</p><a class="btn small" href="/exam-guide">Open guide →</a></div>
+          <div class="disc-tile"><h3>Timed mocks</h3><p>Diagnostic + 60/55/40 min blocks with scoring.</p><a class="btn small" href="/mocks">Open mocks →</a></div>
+          <div class="disc-tile"><h3>Writing studio</h3><p>80 prompts, timer, word count, rubric.</p><a class="btn small" href="/writing">Open writing →</a></div>
+          <div class="disc-tile"><h3>Maths drills</h3><p>Infinite fractions, algebra, BODMAS.</p><a class="btn small" href="/drills">Open drills →</a></div>
+        </div></section>
       <section class="disc-section" id="recent-strip" hidden><div class="disc-head"><h2>Recently viewed</h2></div><div class="disc-grid" id="recent-grid"></div></section>
       <section class="disc-section" id="tuned-shelf" hidden><div class="disc-head"><h2>Tuned for you <small>based on what you open · stored only in this browser</small></h2></div><div class="disc-grid" id="tuned-grid"></div></section>
       <section class="disc-section"><div class="disc-head"><h2>New arrivals</h2><a class="link-btn" href="/feed.xml">RSS →</a></div><div class="disc-grid" id="new-grid"></div></section>
@@ -72,7 +83,9 @@ export function landing(ctx) {
       <section class="disc-section"><div class="disc-head"><h2>By subject</h2><a class="link-btn" href="/subjects">All subjects →</a></div>
         <div class="disc-sub">${topSubj.map(([s, c]) => `<div class="disc-tile"><h3>${esc(pretty(s))}</h3><p>${c.toLocaleString()} resources</p><a class="link-btn" href="/search?q=${encodeURIComponent(s)}">View all ${esc(pretty(s))} →</a></div>`).join('')}</div></section>
     </main>
-  </div>`;
+  </div>
+  <script src="/ai.js" defer></script>
+  <script src="/home.js" defer></script>`;
   return layout({ title: 'Find exactly what you need to study', desc: 'Search the SEHS resource collection across practice papers, notes, tests and more.', body, active: '/', session });
 }
 
@@ -213,6 +226,7 @@ export function searchPage(ctx, sp) {
         </div>
       </div>
       <div id="grid" class="grid${p.view === 'list' ? ' list' : ''}">${cards}</div>
+      ${total === 0 ? '' : `<section class="disc-section"><div class="disc-tile"><button class="btn small secondary" id="explain-results">✦ Explain these results</button> <span style="color:var(--faint);font-size:12px">What the top hits cover + what to search next</span><p id="explain-out" style="white-space:pre-wrap;font-size:13.5px" hidden></p></div></section>`}
       ${total === 0 ? emptyBlock({
         msg: p.q ? `Nothing matched “${p.q}” with the current filters.` : 'Nothing matched the current filters.',
         corrected: res.mode === 'none' ? res.corrected : null,
@@ -222,6 +236,7 @@ export function searchPage(ctx, sp) {
       ${pagerHtml(base, page, pages, total, p.per)}
     </main>
   </div>
+  <script src="/ai.js" defer></script>
   <script src="/search-page.js" defer></script>`;
   return layout({ title: p.q ? `Results for “${p.q}”` : 'Browse resources', body, active: '/search', session });
 }
@@ -232,6 +247,7 @@ export function resourcePage(ctx, publicId) {
   if (!/^[0-9a-f]{32}$/.test(publicId || '')) return notFound();
   const row = db.prepare('SELECT * FROM resources WHERE public_id = ?').get(publicId);
   if (!row || !row.visibility) return notFound();
+  if (row.file_type === 'folder' || row.category === 'folder') return notFound();
   if (row.status === 'unavailable') {
     return { code: 200, html: layout({ title: row.title, body: `<div class="wrap" style="padding:40px 20px">${emptyBlock({ title: 'Temporarily unavailable', msg: 'This resource is being verified. Please check back soon.', chips: QUICK })}</div>`, session }) };
   }
@@ -275,6 +291,10 @@ export function resourcePage(ctx, publicId) {
       <button class="btn secondary" data-copylink="/r/${esc(v.id)}">Copy link</button>
       <button class="btn secondary" data-report="${esc(v.id)}">Report issue</button>
     </div>
+    <div class="disc-tile" style="margin-bottom:28px"><h3 style="margin-top:0">✦ Study this with AI</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn small secondary" id="res-cards">Flashcards from this</button><button class="btn small secondary" id="res-quiz">Quiz me on this</button></div>
+      <div id="res-ai-out" hidden style="margin-top:8px"><div id="res-ai-body" style="font-size:14px"></div><p><button class="btn small secondary" id="res-ai-save" hidden>Save as personal deck</button></p></div>
+    </div>
     <div class="modal-backdrop" id="report-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="rep-title" style="max-width:480px">
       <button class="icon-btn modal-x" id="report-x" aria-label="Close">✕</button>
       <h2 id="rep-title">Report an issue</h2>
@@ -290,6 +310,7 @@ export function resourcePage(ctx, publicId) {
     </div></div>
     ${related ? `<section class="disc-section"><div class="disc-head"><h2>Related resources</h2></div><div class="disc-grid">${related}</div></section>` : ''}
   </div>
+  <script src="/ai.js" defer></script>
   <script src="/record.js" defer></script>`;
   return {
     code: 200,
@@ -355,6 +376,23 @@ export function studyHubPage(ctx) {
           <button class="btn small secondary" type="button" id="exam-clear">Clear</button>
         </form>
       </div></section>
+    <section class="disc-section"><div class="disc-head"><h2>Native SEHS prep</h2></div>
+      <div class="disc-grid">
+        <div class="disc-tile"><h3>Exam guide</h3><p>3 blocks, pacing, schools, plans.</p><a class="btn small" href="/exam-guide">Open guide →</a></div>
+        <div class="disc-tile"><h3>Timed mocks</h3><p>60 / 55 / 40 min blocks + diagnostic.</p><a class="btn small" href="/mocks">Open mocks →</a></div>
+        <div class="disc-tile"><h3>Writing studio</h3><p>80 prompts + timer + rubric.</p><a class="btn small" href="/writing">Open writing →</a></div>
+        <div class="disc-tile"><h3>Maths drills</h3><p>Infinite Year-8 drills.</p><a class="btn small" href="/drills">Open drills →</a></div>
+      </div></section>
+    <section class="disc-section"><div class="disc-head"><h2>✦ AI study tools</h2></div>
+      <div class="disc-grid">
+        <div class="disc-tile"><h3>Generate deck from topic</h3>
+          <div style="display:flex;gap:8px;margin-top:8px"><input id="ai-deck-topic" maxlength="120" placeholder="e.g. analogies, fractions…" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit" aria-label="Deck topic"><button class="btn small" id="ai-deck-go">Make deck</button></div>
+          <p id="ai-deck-msg" style="font-size:13px;color:var(--mut)"></p></div>
+        <div class="disc-tile"><h3>My study plan</h3>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><select id="ai-plan-weeks" aria-label="Weeks" style="padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit"><option value="4">4 weeks</option><option value="8" selected>8 weeks</option><option value="12">12 weeks</option></select><button class="btn small" id="ai-plan-go">Build my plan</button> <button class="btn small secondary" id="ai-coach-go">Coach my mistakes</button></div>
+          <p id="ai-plan-msg" style="font-size:13px;color:var(--mut)"></p></div>
+      </div>
+      <div class="disc-tile" id="ai-study-out" hidden style="margin-top:12px"><div id="ai-study-body" style="white-space:pre-wrap;font-size:14px"></div></div></section>
     <section class="disc-section"><div class="disc-head"><h2>Flashcard decks</h2></div>
       <div class="disc-grid" id="deck-grid"><div class="sk"><i style="height:16px;width:60%"></i></div></div></section>
     <section class="disc-section"><div class="disc-head"><h2>Your decks</h2>
@@ -373,6 +411,8 @@ export function studyHubPage(ctx) {
           <button class="btn small" type="submit">Add card</button>
         </form></div></section>
   </div>
+  <script src="/ai.js" defer></script>
+  <script src="/aistudy.js" defer></script>
   <script src="/study.js" defer></script>`;
   return layout({ title: 'Study hub', body, session });
 }
@@ -400,6 +440,7 @@ export function requestPage(ctx) {
     <p class="crumb"><a href="/">Home</a> › Request a resource</p>
     <h1 style="font-family:var(--disp)">Request a resource</h1>
     <p style="color:var(--mut)">Tell us what's missing — an administrator reviews every request. Please don't include personal details.</p>
+    <p style="color:var(--mut)">Tip: <a class="link-btn" href="/search">search the collection first</a> — your resource may already be here under a different title.</p>
     <form id="request-form" style="display:grid;gap:10px;margin-top:12px">
       <input id="req-title" required minlength="4" maxlength="200" placeholder="What are you looking for? (e.g. 2023 ACER verbal reasoning)" style="padding:11px;border-radius:10px;border:1px solid var(--line2);background:var(--panel);color:inherit;font-size:15px">
       <textarea id="req-detail" rows="4" maxlength="1000" placeholder="Extra detail (optional)" style="padding:11px;border-radius:10px;border:1px solid var(--line2);background:var(--panel);color:inherit"></textarea>
@@ -411,7 +452,7 @@ export function requestPage(ctx) {
 }
 
 export function taxonomyPage(ctx, kind) {  const { db, session } = ctx;
-  const where = `visibility = 1`;
+  const where = `visibility = 1 AND file_type != 'folder' AND category != 'folder'`;
   const isSubj = kind === 'subjects';
   const rows = isSubj
     ? db.prepare(`SELECT subject AS v, COUNT(*) AS c FROM resources WHERE ${where} AND subject <> '' GROUP BY subject ORDER BY c DESC`).all()
@@ -429,7 +470,7 @@ export function taxonomyPage(ctx, kind) {  const { db, session } = ctx;
 
 export function aboutPage(ctx) {
   const { db, session } = ctx;
-  const n = db.prepare(`SELECT COUNT(*) AS n FROM resources WHERE visibility = 1`).get().n;
+  const n = db.prepare(`SELECT COUNT(*) AS n FROM resources WHERE visibility = 1 AND file_type != 'folder' AND category != 'folder'`).get().n;
   const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:760px" id="main">
     <h1 style="font-family:var(--disp)">About this directory</h1>
     <p style="color:var(--mut)">A searchable collection of ${Number(n).toLocaleString()} SEHS selective-entry study resources — practice papers, notes, homework and tests. Search runs on our own index; opening a resource takes you to its hosted file.</p>
@@ -457,4 +498,151 @@ export function unlockPage(ctx) {
   </div>
   <script src="/unlock.js" defer></script>`;
   return layout({ title: 'Admin unlock', body, session });
+}
+
+// ---- native SEHS prep pages (server-only, files + native banks) ----
+export function examGuidePage(ctx) {
+  const { session } = ctx;
+  const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:860px" id="main">
+    <p class="crumb"><a href="/">Home</a> › Exam guide</p>
+    <h1 style="font-family:var(--disp)">SEHS exam guide (ACER 2026 format)</h1>
+    <p style="color:var(--mut)">Year 8 → Year 9 entry. Three timed blocks, 2h 35m of tasks, ~4h on the day. Year-8 curriculum cap, no calculator, paper booklets.</p>
+    <section class="disc-section"><div class="disc-head"><h2>The three blocks</h2></div>
+      <div class="disc-grid">
+        <div class="disc-tile"><h3>Block 1 — Maths + Quant (60 min)</h3><p>Curriculum maths (number, algebra, geometry, stats) + patterns, series, matrices, Venn, spatial. ~90s/Q. Two passes: easy first, mark-and-return.</p><a class="btn small" href="/mocks/maths-qr-60">Start block →</a></div>
+        <div class="disc-tile"><h3>Block 2 — Reading + Verbal (55 min)</h3><p>6-8 passages + analogies, synonyms, odd-one-out, codes, deductions. ~44s/Q in 2026 (75Q). Evidence-pointer for reading.</p><a class="btn small" href="/mocks/reading-vr-55">Start block →</a></div>
+        <div class="disc-tile"><h3>Block 3 — Writing (40 min)</h3><p>2 handwritten tasks (~20 min each), usually persuasive + narrative. 5 plan / 13 write / 2 check.</p><a class="btn small" href="/writing">Writing studio →</a></div>
+      </div></section>
+    <section class="disc-section"><div class="disc-head"><h2>Schools</h2></div>
+      <div class="disc-sub">
+        <div class="disc-tile"><h3>Melbourne High</h3><p>Boys, South Yarra.</p></div>
+        <div class="disc-tile"><h3>Mac.Robertson Girls'</h3><p>Girls, Melbourne.</p></div>
+        <div class="disc-tile"><h3>Nossal</h3><p>Co-ed, Berwick.</p></div>
+        <div class="disc-tile"><h3>Suzanne Cory</h3><p>Co-ed, Werribee.</p></div>
+      </div></section>
+    <section class="disc-section"><div class="disc-head"><h2>12-week plan</h2></div>
+      <div class="disc-tile"><p style="color:var(--mut)">Wk1-2: vocab foundation + maths facts + 1 diagnostic. Wk3-6: VR/QR one type per day + weekly mini. Wk7-10: full blocks timed + mistake bank. Wk11-12: 2 full mocks + writing 2×/week + taper. Crash (4wk): daily 30 vocab + 20 VR + 20 QR + 1 passage + 1 prompt plan.</p>
+      <p><a class="link-btn" href="/study">Open study hub →</a> <a class="link-btn" href="/drills">Maths drills →</a></p></div></section>
+    <section class="disc-section"><div class="disc-head"><h2>✦ Ask the tutor</h2></div>
+      <div class="disc-tile"><div style="display:flex;gap:8px"><input id="tutor-q" maxlength="800" placeholder="e.g. How do I pace the 55-min block?" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit" aria-label="Ask the tutor"><button class="btn small" id="tutor-go">Ask</button></div>
+      <p id="tutor-a" style="white-space:pre-wrap;font-size:14px" hidden></p></div></section>
+    <section class="disc-section"><div class="disc-head"><h2>FAQ</h2></div>
+      <div class="disc-tile"><p><strong>Calculator?</strong> No.</p><p><strong>Question counts?</strong> ACER doesn't publish them — train to minutes, not counts.</p><p><strong>Writing?</strong> Usually 1 persuasive + 1 narrative in 40 min.</p><p><strong>Scoring?</strong> ~85% rank / 10% equity / 5% principal discretion.</p></div></section>
+  </div>
+  <script src="/ai.js" defer></script>
+  <script src="/tutor.js" defer></script>`;
+  return layout({ title: 'SEHS exam guide', desc: 'ACER 3-block format, pacing, schools, plans.', body, active: '/exam-guide', session });
+}
+
+export function mocksPage(ctx) {  const { session } = ctx;
+  const body = `<div class="wrap" style="padding:28px 20px 40px" id="main">
+    <p class="crumb"><a href="/">Home</a> › Mocks</p>
+    <h1 style="font-family:var(--disp)">Timed mocks</h1>
+    <p style="color:var(--mut)">Exact block timing. Flag, skip, review. Instant scoring with explanations. Best scores stay in this browser.</p>
+    <div class="disc-grid" id="mocks-grid"><div class="sk"><i style="height:16px;width:60%"></i></div></div>
+  </div>
+  <script src="/mocks.js" defer></script>`;
+  return layout({ title: 'Timed mocks', body, active: '/mocks', session });
+}
+
+export function mockRunnerPage(ctx, id) {
+  const { session } = ctx;
+  const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:860px" id="main" data-mock="${esc(id)}">
+    <p class="crumb"><a href="/mocks">Mocks</a> › <span id="mock-crumb">${esc(id)}</span></p>
+    <h1 id="mock-title" style="font-family:var(--disp)">Loading mock…</h1>
+    <p id="mock-desc" style="color:var(--mut)"></p>
+    <div id="mock-area"></div>
+  </div>
+  <script src="/ai.js" defer></script>
+  <script src="/mocks.js" defer></script>`;
+  return layout({ title: 'Mock', body, active: '/mocks', session });
+}
+
+export function writingPage(ctx) {
+  const { session } = ctx;
+  const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:860px" id="main">
+    <p class="crumb"><a href="/">Home</a> › Writing</p>
+    <h1 style="font-family:var(--disp)">Writing studio</h1>
+    <p style="color:var(--mut)">80 prompts (40 persuasive + 40 creative). 20:00 timer per task, word counter (target 250-350), 8-criteria self-rubric. Drafts stay in this browser.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0">
+      <button class="btn small" id="prompt-random">Random prompt</button>
+      <button class="btn small secondary" data-kind="persuasive">Persuasive</button>
+      <button class="btn small secondary" data-kind="creative">Creative</button>
+      <button class="btn small secondary" id="prompt-ai" title="Unlimited AI-written prompts">✦ New AI prompt</button>
+    </div>
+    <div class="disc-tile" id="prompt-card"><h3 id="prompt-title">Pick a prompt to start</h3><p id="prompt-stim" style="color:var(--mut)"></p><p id="prompt-plan" style="color:var(--faint);font-size:13px"></p></div>
+    <div style="display:flex;gap:12px;align-items:center;margin:14px 0;flex-wrap:wrap">
+      <div id="write-timer" style="font-family:var(--disp);font-size:28px;font-weight:800">20:00</div>
+      <button class="btn small secondary" id="timer-start">Start</button>
+      <button class="btn small secondary" id="timer-reset">Reset</button>
+      <span id="word-count" style="color:var(--mut)">0 words</span>
+    </div>
+    <textarea id="write-box" rows="12" placeholder="Write here…" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line2);background:var(--panel);color:inherit"></textarea>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center">
+      <button class="btn small" id="ai-feedback">Get AI feedback</button>
+      <button class="btn small secondary" id="ai-grade">Grade my writing</button>
+      <span style="color:var(--faint);font-size:12px">Optional · free shared AI · don't include your name · ~20s between requests</span>
+    </div>
+    <div class="disc-tile" id="ai-out" hidden style="margin-top:10px"><h3>AI feedback</h3><p id="ai-text" style="white-space:pre-wrap"></p></div>
+    <div class="disc-tile" id="grade-out" hidden style="margin-top:10px"><h3>Grade</h3><div id="grade-bars"></div><p id="grade-note" style="color:var(--mut);font-size:13px"></p></div>
+    <section class="disc-section"><div class="disc-head"><h2>Self-rubric (tick before you finish)</h2></div>
+      <div class="disc-tile" id="rubric">
+        <label class="check-row"><input type="checkbox"> <span>Clear position / story problem by line 5</span></label>
+        <label class="check-row"><input type="checkbox"> <span>Paragraphs: 1 idea each, linked</span></label>
+        <label class="check-row"><input type="checkbox"> <span>2+ persuasive devices / 3+ senses (creative)</span></label>
+        <label class="check-row"><input type="checkbox"> <span>Varied sentences (short punch + long flow)</span></label>
+        <label class="check-row"><input type="checkbox"> <span>Precise vocab (no repeats)</span></label>
+        <label class="check-row"><input type="checkbox"> <span>Spelling + punctuation checked</span></label>
+      </div></section>
+  </div>
+  <script src="/ai.js" defer></script>
+  <script src="/writing.js" defer></script>`;
+  return layout({ title: 'Writing studio', body, active: '/writing', session });
+}
+
+export function readingPage(ctx) {
+  const { session } = ctx;
+  const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:860px" id="main">
+    <p class="crumb"><a href="/">Home</a> › Reading</p>
+    <h1 style="font-family:var(--disp)">Reading studio</h1>
+    <p style="color:var(--mut)">Built-in passages plus unlimited AI-written passages with questions. <span id="read-score" style="font-weight:700">Session: 0/0</span></p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0" id="read-list"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;align-items:center">
+      <select id="read-genre" aria-label="Genre" style="padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit">
+        <option value="">Any genre (rotates)</option>
+        <option value="fiction">Fiction</option>
+        <option value="nonfiction">Non-fiction</option>
+        <option value="opinion">Opinion</option>
+        <option value="poetry">Poetry</option>
+        <option value="informational">Informational</option>
+      </select>
+      <button class="btn small" id="read-ai">✦ New AI passage</button>
+    </div>
+    <div id="read-area"></div>
+  </div>
+  <script src="/ai.js" defer></script>
+  <script src="/reading.js" defer></script>`;
+  return layout({ title: 'Reading studio', body, active: '/reading', session });
+}
+
+export function drillsPage(ctx) {  const { session } = ctx;
+  const body = `<div class="wrap" style="padding:28px 20px 40px;max-width:860px" id="main">
+    <p class="crumb"><a href="/">Home</a> › Drills</p>
+    <h1 style="font-family:var(--disp)">Maths drills (infinite)</h1>
+    <p style="color:var(--mut)">Generative Year-8 drills with instant working: fractions, %, algebra, angles, BODMAS, sequences. Streak stays in this browser.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0" id="drill-kinds">
+      <button class="btn small" data-drill="fraction">Fractions</button>
+      <button class="btn small secondary" data-drill="percent">Percent</button>
+      <button class="btn small secondary" data-drill="algebra">Algebra</button>
+      <button class="btn small secondary" data-drill="bodmas">BODMAS</button>
+      <button class="btn small secondary" data-drill="sequence">Sequences</button>
+      <button class="btn small secondary" id="drill-ai" title="Fresh AI-written set at your level">✦ AI set</button>
+    </div>
+    <div class="disc-tile" id="drill-card"><h3 id="drill-q">Pick a drill to start</h3><p id="drill-a" style="color:var(--mut)"></p>
+      <div style="display:flex;gap:8px;margin-top:10px"><input id="drill-in" placeholder="Your answer" style="flex:1;padding:9px;border-radius:8px;border:1px solid var(--line2);background:var(--panel);color:inherit"><button class="btn small" id="drill-check">Check</button><button class="btn small secondary" id="drill-next">Next</button></div>
+      <p id="drill-msg" style="font-size:13px"></p></div>
+  </div>
+  <script src="/ai.js" defer></script>
+  <script src="/drills.js" defer></script>`;
+  return layout({ title: 'Maths drills', body, active: '/drills', session });
 }

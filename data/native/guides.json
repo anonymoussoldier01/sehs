@@ -1,0 +1,83 @@
+{
+ "exam": {
+  "blocks": [
+   {
+    "name": "Mathematics + Quantitative Reasoning",
+    "minutes": 60,
+    "format": "MCQ, paper booklet, no calculator"
+   },
+   {
+    "name": "Reading + Verbal Reasoning",
+    "minutes": 55,
+    "format": "MCQ, ~75Q in 2026, paper booklet"
+   },
+   {
+    "name": "Writing",
+    "minutes": 40,
+    "format": "2 handwritten tasks (~20 min each)"
+   }
+  ],
+  "totalTasks": "2h 35m",
+  "dayLength": "~4h with registration + breaks",
+  "syllabusCap": "Year 8 curriculum only",
+  "selection": "85% rank / 10% equity / 5% principal"
+ },
+ "schools": [
+  {
+   "name": "Melbourne High School",
+   "note": "Boys, South Yarra. Year 9 entry via exam."
+  },
+  {
+   "name": "Mac.Robertson Girls' High School",
+   "note": "Girls, Melbourne. Year 9 entry via exam."
+  },
+  {
+   "name": "Nossal High School",
+   "note": "Co-ed, Berwick."
+  },
+  {
+   "name": "Suzanne Cory High School",
+   "note": "Co-ed, Werribee."
+  }
+ ],
+ "pacing": {
+  "mathsQR": "~90s per Q: 2 passes (easy first, mark-and-return).",
+  "readingVR": "~44s per Q: don't linger; evidence-pointer for reading.",
+  "writing": "5 plan / 13 write / 2 check per task."
+ },
+ "plans": {
+  "twelveWeek": [
+   "Wk1-2: vocab T1 + maths facts + 1 diagnostic",
+   "Wk3-6: VR/QR builders one type/day + weekly mini",
+   "Wk7-10: full blocks timed + mistake bank",
+   "Wk11-12: 2 full mocks + writing 2x/week + taper"
+  ],
+  "crash4Week": [
+   "Daily: 30 vocab + 20 VR + 20 QR + 1 passage + 1 prompt plan"
+  ]
+ },
+ "faq": [
+  {
+   "q": "Calculator?",
+   "a": "No."
+  },
+  {
+   "q": "How many questions?",
+   "a": "ACER doesn't publish counts. Train to minutes."
+  },
+  {
+   "q": "Writing types?",
+   "a": "Usually 1 persuasive + 1 narrative/creative in 40 min."
+  }
+ ],
+ "glossary": [
+  {
+   "term": "Analogies",
+   "def": "A:B :: C:? \u2014 match the relationship."
+  },
+  {
+   "term": "BODMAS",
+   "def": "Brackets, Orders, Division/Multiplication, Addition/Subtraction."
+  }
+ ]
+}

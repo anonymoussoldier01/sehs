@@ -52,8 +52,8 @@ async function main() {
   const uniq = [...seen.values()];
   log('info', `unique drive ids: ${uniq.length}`, { invalid: invalid.length });
 
-  const records = []; // one per file + folder placeholders
-  const stats = { folders: 0, files: 0, failed: [], empty: [] };
+  const records = []; // files-only: folder placeholders are never emitted
+  const stats = { folders: 0, files: 0, failed: [], empty: [], skippedFolders: 0 };
 
   for (const t of uniq) {
     log('info', `expanding ${t.kind} ${t.id} from ${t.source.slice(0, 80)}`);
@@ -72,30 +72,27 @@ async function main() {
         } catch (e) {
           stats.failed.push({ id: t.id, error: String(e.message).slice(0, 300), source: t.source });
           log('warn', `folder ${t.id} failed: ${e.message}`);
-          // preserve folder itself as record with unknown status
-          records.push({
-            driveId: t.id, driveName: `(unexpanded folder ${t.id})`,
-            mimeType: 'application/vnd.google-apps.folder',
-            url: `https://drive.google.com/drive/folders/${t.id}`,
-            source: t.source, status: 'unknown', _expandError: String(e.message).slice(0, 300)
-          });
+          // Files-only: do NOT preserve unexpanded folders as records.
+          // Queue for retry instead (state/folders-retry.json).
+          try {
+            const fs = await import('node:fs');
+            const retryPath = path.join(ROOT, 'state', 'folders-retry.json');
+            let cur = [];
+            try { cur = JSON.parse(fs.readFileSync(retryPath, 'utf8')); } catch { cur = []; }
+            if (!cur.find(x => x.id === t.id)) cur.push({ id: t.id, source: t.source, error: String(e.message).slice(0, 300), at: new Date().toISOString() });
+            fs.mkdirSync(path.dirname(retryPath), { recursive: true });
+            fs.writeFileSync(retryPath, JSON.stringify(cur, null, 2));
+          } catch { /* retry queue best-effort */ }
           continue;
         }
         stats.folders++;
-        // folder placeholder
-        records.push({
-          driveId: t.id, driveName: `(folder ${t.id})`, mimeType: 'application/vnd.google-apps.folder',
-          url: `https://drive.google.com/drive/folders/${t.id}`, source: t.source, status: 'active',
-          childCount: children.filter(c => !c._isFolder).length
-        });
+        // Files-only: skip folder placeholder itself, keep children only.
         if (!children.length) stats.empty.push(t.id);
         for (const c of children) {
           if (c._isFolder) {
-            records.push({
-              driveId: c.id, driveName: c.name, mimeType: c.mimeType,
-              url: `https://drive.google.com/drive/folders/${c.id}`,
-              source: t.source, status: 'active', parentHint: t.id
-            });
+            // Nested folder: count but do not emit (its children were already
+            // recursed into expandFolderRecursive output as files).
+            stats.skippedFolders++;
           } else {
             records.push(toRecord(c, t));
             stats.files++;

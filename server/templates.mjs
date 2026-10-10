@@ -5,7 +5,8 @@ export function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-const NAV = [['/', 'Home'], ['/search', 'Browse'], ['/study', 'Study'], ['/subjects', 'Subjects'], ['/providers', 'Providers'], ['/about', 'About']];
+const NAV_MAIN = [['/', 'Home'], ['/study', 'Study'], ['/mocks', 'Mocks'], ['/exam-guide', 'Guide']];
+const NAV_MORE = [['/search', 'Browse'], ['/writing', 'Writing'], ['/drills', 'Drills'], ['/reading', 'Reading'], ['/subjects', 'Subjects'], ['/providers', 'Providers'], ['/saved', 'Saved'], ['/about', 'About']];
 
 export function layout({ title, desc = '', body, active = '', session = null, extraHead = '' }) {
   // No per-visitor state on the server (no cookies): the header always shows
@@ -24,7 +25,7 @@ ${desc ? `<meta name="description" content="${esc(desc)}">` : ''}
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
 ${extraHead}
 </head>
@@ -34,10 +35,13 @@ ${extraHead}
   <div class="wrap topbar-inner">
     <a class="brand" href="/" aria-label="SEHS Study Directory home">
       <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="28" height="28"><rect x="2" y="2" width="28" height="28" rx="8" fill="#4f46e5"/><path d="M10 12.5A6 6 0 0 1 22 12.5c0 4-4.5 4.5-4.5 8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="17.5" cy="23.5" r="1.6" fill="#fff"/></svg></span>
-      <span class="brand-text"><strong>SEHS Study Directory</strong><small>Practice papers · notes · study resources</small></span>
+      <span class="brand-text"><strong>SEHS Study Directory</strong><small>Study resources · mocks · AI tutor</small></span>
     </a>
     <nav class="topnav" aria-label="Sections">
-      ${NAV.map(([h, l]) => `<a href="${h}"${active === h ? ' aria-current="page" class="on"' : ''}>${l}</a>`).join('')}
+      ${NAV_MAIN.map(([h, l]) => `<a href="${h}"${active === h ? ' aria-current="page" class="on"' : ''}>${l}</a>`).join('')}
+      <details class="moremenu"${NAV_MORE.some(([h]) => active === h) ? ' open' : ''}><summary aria-label="More sections">Library ▾</summary>
+        <span class="moremenu-body">${NAV_MORE.map(([h, l]) => `<a href="${h}"${active === h ? ' aria-current="page" class="on"' : ''}>${l}</a>`).join('')}</span>
+      </details>
     </nav>
     <div class="top-actions">
       <button id="filters-toggle" class="btn secondary only-mobile" aria-expanded="false" aria-controls="filters" hidden>Filters</button>
@@ -98,11 +102,11 @@ export function pretty(s) {
   return String(s || '').split(/[-_\s]/).filter(Boolean).map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
 }
 
-const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', folder: 'Folder', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
-const TYPE_CLASS = { pdf: 'fi-pdf', docx: 'fi-docx', image: 'fi-image', folder: 'fi-folder', archive: 'fi-archive', webpage: 'fi-webpage', code: 'fi-code', other: 'fi-other' };
+const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
+const TYPE_CLASS = { pdf: 'fi-pdf', docx: 'fi-docx', image: 'fi-image', archive: 'fi-archive', webpage: 'fi-webpage', code: 'fi-code', other: 'fi-other' };
 
 export function typeTile(t) {
-  const abbr = { pdf: 'PDF', docx: 'DOC', image: 'IMG', folder: 'DIR', archive: 'ZIP', webpage: 'WEB', code: 'CODE', other: 'FILE' }[t] || 'FILE';
+  const abbr = { pdf: 'PDF', docx: 'DOC', image: 'IMG', archive: 'ZIP', webpage: 'WEB', code: 'CODE', other: 'FILE' }[t] || 'FILE';
   return `<div class="file-ico ${TYPE_CLASS[t] || 'fi-other'}" aria-hidden="true">${abbr}</div>`;
 }
 
@@ -178,4 +182,4 @@ export function emptyBlock({ title = 'No exact matches', msg = '', corrected = n
   </div>`;
 }
 
-export const QUICK = [['vsse', 'VSSE'], ['maths answers', 'Maths + answers'], ['numerical reasoning', 'Numerical'], ['reading comprehension', 'Reading'], ['capricorn practice paper', 'Capricorn papers']];
+export const QUICK = [['vsse', 'VSSE'], ['maths answers', 'Maths + answers'], ['numerical reasoning', 'Numerical'], ['reading comprehension', 'Reading'], ['verbal reasoning analogy', 'Verbal'], ['writing prompt', 'Writing'], ['exam guide', 'Exam guide'], ['vocab', 'Vocab']];

@@ -11,7 +11,7 @@ const __dir = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dir, '..');
 setLogFile(path.join(ROOT, 'logs', `local-${Date.now()}.log`));
 
-const PROVIDERS = ['acer', 'edutest', 'jac', 'spectrum', 'hendersons', 'edukingdom', 'pearson', 'vsse', 'deepti', 'mornington', 'whitman', 'capricorn', 'vssa'];
+const PROVIDERS = ['acer', 'edutest', 'jac', 'spectrum', 'hendersons', 'edukingdom', 'pearson', 'vsse', 'deepti', 'mornington', 'whitman', 'capricorn', 'vssa', 'native'];
 const SUBJECT_RULES = [
   { re: /numeric(al)?[\s_\-]*reason/i, subject: 'numerical-reasoning', category: 'quantitative' },
   { re: /quantitative|QR\b/i, subject: 'quantitative', category: 'quantitative' },
@@ -71,7 +71,7 @@ function classify(name, mime, url) {
   if (/homework/i.test(name)) { tags.add('homework'); subcategory = subcategory || 'homework'; }
   if (/practice[\s_\-]*exam[\s_\-]*pack/i.test(name)) { category = 'practice-test'; tags.add('practice-exam-pack'); }
   else if (isPaper && category === 'other' && contentType !== 'folder' && contentType !== 'image') category = 'practice-test';
-  if (contentType === 'folder') category = 'folder';
+  // Files-only: folders never become a category (dropped upstream).
 
   // set/paper numbers — explicit
   const setM = name.match(/set[\s_\-]*(\d+)/i) || name.match(/\bW(\d{1,2})\b/) || name.match(/test[\s_\-]*(\d+)/i) || name.match(/paper[\s_\-]*(\d*)/i);
@@ -108,8 +108,10 @@ async function main() {
   for (const [h, v] of Object.entries(prevGemini)) if (v && v.ok && v.record && v.record.metadataSource !== 'fallback') geminiOk.set(h, v);
 
   const records = {};
-  let n = 0;
+  let n = 0, skippedFolders = 0;
   for (const d of driveData.records || []) {
+    // Files-only: drop any folder record that slipped through (legacy data).
+    if ((d.mimeType || '').includes('folder') || (d.url || '').includes('/drive/folders/')) { skippedFolders++; continue; }
     const url = d.url;
     const h = stableHash(url);
     if (geminiOk.has(h)) { records[h] = geminiOk.get(h); continue; }

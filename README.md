@@ -78,6 +78,8 @@ Open `http://localhost:8080`, search, open `/unlock` for admin. Re-running
 - `/api/search`, `/api/suggest`, `/api/by-ids`, `/api/decks`, `/api/trending`,
   `/api/new`, `/api/announcement`, `/api/me`, `/api/stats`
 - `/api/unlock`, `/api/logout`, `/api/terms`, `/api/access/:id` → `/open/:token`
+- `/api/ai/chat` (free AI tutor via Pollinations anonymous tier — no key; per-IP + shared throttles, prompts never logged)
+- `/api/ai/grade` (writing band + auto-checks), `/api/ai/questions` (validated MCQ sets), `/api/ai/flashcards` (topic → cards), `/api/ai/passage` (reading passage + Qs), `/api/ai/prompt` (writing prompts), `/api/ai/plan` (study plan from local stats), `/api/ai/variants` (fresh variants of misses)
 - `/api/reports`, `/api/requests`
 - `/admin`, `/admin/resources`, `/admin/triage`, `/admin/audit`,
   `/admin/settings` + `/api/admin/*` (bearer-gated, uniform 404 otherwise)

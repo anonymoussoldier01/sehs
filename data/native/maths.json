@@ -1,0 +1,607 @@
+{
+ "deck": "sehs-maths-core",
+ "title": "Maths Core (Year 8)",
+ "description": "Fractions, %, algebra, geometry, BODMAS, word problems.",
+ "cards": [
+  {
+   "front": "Simplify 12/18",
+   "back": "2/3. \u00f76",
+   "tag": "maths"
+  },
+  {
+   "front": "3/4 + 1/8",
+   "back": "7/8. common denominator 8",
+   "tag": "maths"
+  },
+  {
+   "front": "25% of 80",
+   "back": "20. quarter",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 2x+5=17",
+   "back": "x=6. \u22125 then \u00f72",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 3x\u22127=11",
+   "back": "x=6. +7 then \u00f73",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles on a straight line sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles in a triangle sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Area of rectangle 6\u00d74",
+   "back": "24.",
+   "tag": "maths"
+  },
+  {
+   "front": "7\u00b2 = ?",
+   "back": "49.",
+   "tag": "maths"
+  },
+  {
+   "front": "\u221a64 = ?",
+   "back": "8.",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: 6+3\u00d74",
+   "back": "18. \u00d7 before +",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: (6+3)\u00d74",
+   "back": "36. brackets first",
+   "tag": "maths"
+  },
+  {
+   "front": "Ratio 2:3, total 25. Shares?",
+   "back": "10 and 15. 2+3=5 parts",
+   "tag": "maths"
+  },
+  {
+   "front": "1/2 as %",
+   "back": "50%.",
+   "tag": "maths"
+  },
+  {
+   "front": "0.75 as fraction",
+   "back": "3/4.",
+   "tag": "maths"
+  },
+  {
+   "front": "Simplify 12/18",
+   "back": "2/3. \u00f76",
+   "tag": "maths"
+  },
+  {
+   "front": "3/4 + 1/8",
+   "back": "7/8. common denominator 8",
+   "tag": "maths"
+  },
+  {
+   "front": "25% of 80",
+   "back": "20. quarter",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 2x+5=17",
+   "back": "x=6. \u22125 then \u00f72",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 3x\u22127=11",
+   "back": "x=6. +7 then \u00f73",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles on a straight line sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles in a triangle sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Area of rectangle 6\u00d74",
+   "back": "24.",
+   "tag": "maths"
+  },
+  {
+   "front": "7\u00b2 = ?",
+   "back": "49.",
+   "tag": "maths"
+  },
+  {
+   "front": "\u221a64 = ?",
+   "back": "8.",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: 6+3\u00d74",
+   "back": "18. \u00d7 before +",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: (6+3)\u00d74",
+   "back": "36. brackets first",
+   "tag": "maths"
+  },
+  {
+   "front": "Ratio 2:3, total 25. Shares?",
+   "back": "10 and 15. 2+3=5 parts",
+   "tag": "maths"
+  },
+  {
+   "front": "1/2 as %",
+   "back": "50%.",
+   "tag": "maths"
+  },
+  {
+   "front": "0.75 as fraction",
+   "back": "3/4.",
+   "tag": "maths"
+  },
+  {
+   "front": "Simplify 12/18",
+   "back": "2/3. \u00f76",
+   "tag": "maths"
+  },
+  {
+   "front": "3/4 + 1/8",
+   "back": "7/8. common denominator 8",
+   "tag": "maths"
+  },
+  {
+   "front": "25% of 80",
+   "back": "20. quarter",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 2x+5=17",
+   "back": "x=6. \u22125 then \u00f72",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 3x\u22127=11",
+   "back": "x=6. +7 then \u00f73",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles on a straight line sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles in a triangle sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Area of rectangle 6\u00d74",
+   "back": "24.",
+   "tag": "maths"
+  },
+  {
+   "front": "7\u00b2 = ?",
+   "back": "49.",
+   "tag": "maths"
+  },
+  {
+   "front": "\u221a64 = ?",
+   "back": "8.",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: 6+3\u00d74",
+   "back": "18. \u00d7 before +",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: (6+3)\u00d74",
+   "back": "36. brackets first",
+   "tag": "maths"
+  },
+  {
+   "front": "Ratio 2:3, total 25. Shares?",
+   "back": "10 and 15. 2+3=5 parts",
+   "tag": "maths"
+  },
+  {
+   "front": "1/2 as %",
+   "back": "50%.",
+   "tag": "maths"
+  },
+  {
+   "front": "0.75 as fraction",
+   "back": "3/4.",
+   "tag": "maths"
+  },
+  {
+   "front": "Simplify 12/18",
+   "back": "2/3. \u00f76",
+   "tag": "maths"
+  },
+  {
+   "front": "3/4 + 1/8",
+   "back": "7/8. common denominator 8",
+   "tag": "maths"
+  },
+  {
+   "front": "25% of 80",
+   "back": "20. quarter",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 2x+5=17",
+   "back": "x=6. \u22125 then \u00f72",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 3x\u22127=11",
+   "back": "x=6. +7 then \u00f73",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles on a straight line sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles in a triangle sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Area of rectangle 6\u00d74",
+   "back": "24.",
+   "tag": "maths"
+  },
+  {
+   "front": "7\u00b2 = ?",
+   "back": "49.",
+   "tag": "maths"
+  },
+  {
+   "front": "\u221a64 = ?",
+   "back": "8.",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: 6+3\u00d74",
+   "back": "18. \u00d7 before +",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: (6+3)\u00d74",
+   "back": "36. brackets first",
+   "tag": "maths"
+  },
+  {
+   "front": "Ratio 2:3, total 25. Shares?",
+   "back": "10 and 15. 2+3=5 parts",
+   "tag": "maths"
+  },
+  {
+   "front": "1/2 as %",
+   "back": "50%.",
+   "tag": "maths"
+  },
+  {
+   "front": "0.75 as fraction",
+   "back": "3/4.",
+   "tag": "maths"
+  },
+  {
+   "front": "Simplify 12/18",
+   "back": "2/3. \u00f76",
+   "tag": "maths"
+  },
+  {
+   "front": "3/4 + 1/8",
+   "back": "7/8. common denominator 8",
+   "tag": "maths"
+  },
+  {
+   "front": "25% of 80",
+   "back": "20. quarter",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 2x+5=17",
+   "back": "x=6. \u22125 then \u00f72",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 3x\u22127=11",
+   "back": "x=6. +7 then \u00f73",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles on a straight line sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles in a triangle sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Area of rectangle 6\u00d74",
+   "back": "24.",
+   "tag": "maths"
+  },
+  {
+   "front": "7\u00b2 = ?",
+   "back": "49.",
+   "tag": "maths"
+  },
+  {
+   "front": "\u221a64 = ?",
+   "back": "8.",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: 6+3\u00d74",
+   "back": "18. \u00d7 before +",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: (6+3)\u00d74",
+   "back": "36. brackets first",
+   "tag": "maths"
+  },
+  {
+   "front": "Ratio 2:3, total 25. Shares?",
+   "back": "10 and 15. 2+3=5 parts",
+   "tag": "maths"
+  },
+  {
+   "front": "1/2 as %",
+   "back": "50%.",
+   "tag": "maths"
+  },
+  {
+   "front": "0.75 as fraction",
+   "back": "3/4.",
+   "tag": "maths"
+  },
+  {
+   "front": "Simplify 12/18",
+   "back": "2/3. \u00f76",
+   "tag": "maths"
+  },
+  {
+   "front": "3/4 + 1/8",
+   "back": "7/8. common denominator 8",
+   "tag": "maths"
+  },
+  {
+   "front": "25% of 80",
+   "back": "20. quarter",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 2x+5=17",
+   "back": "x=6. \u22125 then \u00f72",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 3x\u22127=11",
+   "back": "x=6. +7 then \u00f73",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles on a straight line sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles in a triangle sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Area of rectangle 6\u00d74",
+   "back": "24.",
+   "tag": "maths"
+  },
+  {
+   "front": "7\u00b2 = ?",
+   "back": "49.",
+   "tag": "maths"
+  },
+  {
+   "front": "\u221a64 = ?",
+   "back": "8.",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: 6+3\u00d74",
+   "back": "18. \u00d7 before +",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: (6+3)\u00d74",
+   "back": "36. brackets first",
+   "tag": "maths"
+  },
+  {
+   "front": "Ratio 2:3, total 25. Shares?",
+   "back": "10 and 15. 2+3=5 parts",
+   "tag": "maths"
+  },
+  {
+   "front": "1/2 as %",
+   "back": "50%.",
+   "tag": "maths"
+  },
+  {
+   "front": "0.75 as fraction",
+   "back": "3/4.",
+   "tag": "maths"
+  },
+  {
+   "front": "Simplify 12/18",
+   "back": "2/3. \u00f76",
+   "tag": "maths"
+  },
+  {
+   "front": "3/4 + 1/8",
+   "back": "7/8. common denominator 8",
+   "tag": "maths"
+  },
+  {
+   "front": "25% of 80",
+   "back": "20. quarter",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 2x+5=17",
+   "back": "x=6. \u22125 then \u00f72",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 3x\u22127=11",
+   "back": "x=6. +7 then \u00f73",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles on a straight line sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles in a triangle sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Area of rectangle 6\u00d74",
+   "back": "24.",
+   "tag": "maths"
+  },
+  {
+   "front": "7\u00b2 = ?",
+   "back": "49.",
+   "tag": "maths"
+  },
+  {
+   "front": "\u221a64 = ?",
+   "back": "8.",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: 6+3\u00d74",
+   "back": "18. \u00d7 before +",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: (6+3)\u00d74",
+   "back": "36. brackets first",
+   "tag": "maths"
+  },
+  {
+   "front": "Ratio 2:3, total 25. Shares?",
+   "back": "10 and 15. 2+3=5 parts",
+   "tag": "maths"
+  },
+  {
+   "front": "1/2 as %",
+   "back": "50%.",
+   "tag": "maths"
+  },
+  {
+   "front": "0.75 as fraction",
+   "back": "3/4.",
+   "tag": "maths"
+  },
+  {
+   "front": "Simplify 12/18",
+   "back": "2/3. \u00f76",
+   "tag": "maths"
+  },
+  {
+   "front": "3/4 + 1/8",
+   "back": "7/8. common denominator 8",
+   "tag": "maths"
+  },
+  {
+   "front": "25% of 80",
+   "back": "20. quarter",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 2x+5=17",
+   "back": "x=6. \u22125 then \u00f72",
+   "tag": "maths"
+  },
+  {
+   "front": "Solve 3x\u22127=11",
+   "back": "x=6. +7 then \u00f73",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles on a straight line sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Angles in a triangle sum to?",
+   "back": "180\u00b0.",
+   "tag": "maths"
+  },
+  {
+   "front": "Area of rectangle 6\u00d74",
+   "back": "24.",
+   "tag": "maths"
+  },
+  {
+   "front": "7\u00b2 = ?",
+   "back": "49.",
+   "tag": "maths"
+  },
+  {
+   "front": "\u221a64 = ?",
+   "back": "8.",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: 6+3\u00d74",
+   "back": "18. \u00d7 before +",
+   "tag": "maths"
+  },
+  {
+   "front": "BODMAS: (6+3)\u00d74",
+   "back": "36. brackets first",
+   "tag": "maths"
+  },
+  {
+   "front": "Ratio 2:3, total 25. Shares?",
+   "back": "10 and 15. 2+3=5 parts",
+   "tag": "maths"
+  },
+  {
+   "front": "1/2 as %",
+   "back": "50%.",
+   "tag": "maths"
+  },
+  {
+   "front": "0.75 as fraction",
+   "back": "3/4.",
+   "tag": "maths"
+  }
+ ]
+}

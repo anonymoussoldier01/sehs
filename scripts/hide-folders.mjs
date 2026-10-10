@@ -1,0 +1,10 @@
+import { openDatabase } from '../server/db.mjs';
+const db = await openDatabase();
+const before = await db.prepare("SELECT COUNT(*) AS n FROM resources WHERE file_type = 'folder' OR category = 'folder'").get();
+console.log('folders before:', before.n);
+await db.prepare("UPDATE resources SET visibility = 0 WHERE file_type = 'folder' OR category = 'folder'").run();
+const after = await db.prepare("SELECT COUNT(*) AS n FROM resources WHERE visibility = 1 AND (file_type = 'folder' OR category = 'folder')").get();
+const vis = await db.prepare('SELECT COUNT(*) AS n FROM resources WHERE visibility = 1').get();
+const tot = await db.prepare('SELECT COUNT(*) AS n FROM resources').get();
+console.log('visible folders after:', after.n, 'visible total:', vis.n, 'db total:', tot.n);
+await db.close();

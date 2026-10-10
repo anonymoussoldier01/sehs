@@ -47,21 +47,22 @@ export function domainOf(u) {
 
 export const CATEGORY_VOCAB = [
   'exam-prep', 'maths', 'english', 'reading', 'writing', 'verbal-reasoning',
-  'quantitative', 'past-paper', 'practice-test', 'study-guide', 'reference',
-  'tutorial', 'tool', 'document', 'folder', 'other'
+  'numerical-reasoning', 'quantitative', 'past-paper', 'practice-test', 'study-guide', 'reference',
+  'tutorial', 'tool', 'document', 'other'
 ];
 
 export function normalizeCategory(c) {
   if (!c) return undefined;
   const s = String(c).toLowerCase().trim().replace(/[\s_]+/g, '-');
   if (CATEGORY_VOCAB.includes(s)) return s;
-  // map common Gemini variants
+  // map common Gemini variants (files-only: folder kinds collapse to 'other' and are dropped)
   const map = {
     'math': 'maths', 'mathematics': 'maths', 'quant': 'quantitative',
     'verbal': 'verbal-reasoning', 'comprehension': 'reading',
     'test': 'practice-test', 'tests': 'practice-test', 'exams': 'exam-prep',
     'exam': 'exam-prep', 'guide': 'study-guide', 'docs': 'document',
-    'drive-folder': 'folder', 'google-drive': 'folder'
+    'drive-folder': 'other', 'google-drive': 'other', 'folder': 'other',
+    'numerical': 'numerical-reasoning', 'numerical-reasoning': 'numerical-reasoning',
   };
   return map[s] || (CATEGORY_VOCAB.includes(s) ? s : 'other');
 }

@@ -1,0 +1,757 @@
+{
+ "deck": "sehs-quant-builder",
+ "title": "Quantitative Reasoning Builder",
+ "description": "Series, matrices, arithmetic, Venn, spatial.",
+ "cards": [
+  {
+   "front": "Next: 2, 4, 8, 16",
+   "back": "32. Rule: \u00d72",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 3, 6, 11, 18",
+   "back": "27. Rule: +3,+5,+7,+9 (odd numbers)",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 1, 1, 2, 3, 5, 8",
+   "back": "13. Rule: Fibonacci",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 100, 90, 81, 73",
+   "back": "66. Rule: \u221210,\u22129,\u22128,\u22127",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 5, 11, 23, 47",
+   "back": "95. Rule: \u00d72+1",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 2, 4, 8, 16",
+   "back": "32. Rule: \u00d72",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 3, 6, 11, 18",
+   "back": "27. Rule: +3,+5,+7,+9 (odd numbers)",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 1, 1, 2, 3, 5, 8",
+   "back": "13. Rule: Fibonacci",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 100, 90, 81, 73",
+   "back": "66. Rule: \u221210,\u22129,\u22128,\u22127",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 5, 11, 23, 47",
+   "back": "95. Rule: \u00d72+1",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 2, 4, 8, 16",
+   "back": "32. Rule: \u00d72",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 3, 6, 11, 18",
+   "back": "27. Rule: +3,+5,+7,+9 (odd numbers)",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 1, 1, 2, 3, 5, 8",
+   "back": "13. Rule: Fibonacci",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 100, 90, 81, 73",
+   "back": "66. Rule: \u221210,\u22129,\u22128,\u22127",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 5, 11, 23, 47",
+   "back": "95. Rule: \u00d72+1",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 2, 4, 8, 16",
+   "back": "32. Rule: \u00d72",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 3, 6, 11, 18",
+   "back": "27. Rule: +3,+5,+7,+9 (odd numbers)",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 1, 1, 2, 3, 5, 8",
+   "back": "13. Rule: Fibonacci",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 100, 90, 81, 73",
+   "back": "66. Rule: \u221210,\u22129,\u22128,\u22127",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 5, 11, 23, 47",
+   "back": "95. Rule: \u00d72+1",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 2, 4, 8, 16",
+   "back": "32. Rule: \u00d72",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 3, 6, 11, 18",
+   "back": "27. Rule: +3,+5,+7,+9 (odd numbers)",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 1, 1, 2, 3, 5, 8",
+   "back": "13. Rule: Fibonacci",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 100, 90, 81, 73",
+   "back": "66. Rule: \u221210,\u22129,\u22128,\u22127",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 5, 11, 23, 47",
+   "back": "95. Rule: \u00d72+1",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 2, 4, 8, 16",
+   "back": "32. Rule: \u00d72",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 3, 6, 11, 18",
+   "back": "27. Rule: +3,+5,+7,+9 (odd numbers)",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 1, 1, 2, 3, 5, 8",
+   "back": "13. Rule: Fibonacci",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 100, 90, 81, 73",
+   "back": "66. Rule: \u221210,\u22129,\u22128,\u22127",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 5, 11, 23, 47",
+   "back": "95. Rule: \u00d72+1",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 2, 4, 8, 16",
+   "back": "32. Rule: \u00d72",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 3, 6, 11, 18",
+   "back": "27. Rule: +3,+5,+7,+9 (odd numbers)",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 1, 1, 2, 3, 5, 8",
+   "back": "13. Rule: Fibonacci",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 100, 90, 81, 73",
+   "back": "66. Rule: \u221210,\u22129,\u22128,\u22127",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 5, 11, 23, 47",
+   "back": "95. Rule: \u00d72+1",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 2, 4, 8, 16",
+   "back": "32. Rule: \u00d72",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 3, 6, 11, 18",
+   "back": "27. Rule: +3,+5,+7,+9 (odd numbers)",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 1, 1, 2, 3, 5, 8",
+   "back": "13. Rule: Fibonacci",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 100, 90, 81, 73",
+   "back": "66. Rule: \u221210,\u22129,\u22128,\u22127",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 5, 11, 23, 47",
+   "back": "95. Rule: \u00d72+1",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 2, 4, 8, 16",
+   "back": "32. Rule: \u00d72",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 3, 6, 11, 18",
+   "back": "27. Rule: +3,+5,+7,+9 (odd numbers)",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 1, 1, 2, 3, 5, 8",
+   "back": "13. Rule: Fibonacci",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 100, 90, 81, 73",
+   "back": "66. Rule: \u221210,\u22129,\u22128,\u22127",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 5, 11, 23, 47",
+   "back": "95. Rule: \u00d72+1",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 2, 4, 8, 16",
+   "back": "32. Rule: \u00d72",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 3, 6, 11, 18",
+   "back": "27. Rule: +3,+5,+7,+9 (odd numbers)",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 1, 1, 2, 3, 5, 8",
+   "back": "13. Rule: Fibonacci",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 100, 90, 81, 73",
+   "back": "66. Rule: \u221210,\u22129,\u22128,\u22127",
+   "tag": "series"
+  },
+  {
+   "front": "Next: 5, 11, 23, 47",
+   "back": "95. Rule: \u00d72+1",
+   "tag": "series"
+  },
+  {
+   "front": "7 \u00d7 4 + 7 = ?",
+   "back": "35 (= 7\u00d7(4+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "8 \u00d7 12 + 8 = ?",
+   "back": "104 (= 8\u00d7(12+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "2 \u00d7 3 + 2 = ?",
+   "back": "8 (= 2\u00d7(3+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "10 \u00d7 3 + 10 = ?",
+   "back": "40 (= 10\u00d7(3+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "7 \u00d7 11 + 7 = ?",
+   "back": "84 (= 7\u00d7(11+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "2 \u00d7 10 + 2 = ?",
+   "back": "22 (= 2\u00d7(10+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "5 \u00d7 2 + 5 = ?",
+   "back": "15 (= 5\u00d7(2+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "3 \u00d7 8 + 3 = ?",
+   "back": "27 (= 3\u00d7(8+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "8 \u00d7 3 + 8 = ?",
+   "back": "32 (= 8\u00d7(3+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "5 \u00d7 3 + 5 = ?",
+   "back": "20 (= 5\u00d7(3+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "10 \u00d7 8 + 10 = ?",
+   "back": "90 (= 10\u00d7(8+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "2 \u00d7 11 + 2 = ?",
+   "back": "24 (= 2\u00d7(11+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "3 \u00d7 5 + 3 = ?",
+   "back": "18 (= 3\u00d7(5+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "12 \u00d7 12 + 12 = ?",
+   "back": "156 (= 12\u00d7(12+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "11 \u00d7 2 + 11 = ?",
+   "back": "33 (= 11\u00d7(2+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "11 \u00d7 11 + 11 = ?",
+   "back": "132 (= 11\u00d7(11+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "8 \u00d7 2 + 8 = ?",
+   "back": "24 (= 8\u00d7(2+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "5 \u00d7 2 + 5 = ?",
+   "back": "15 (= 5\u00d7(2+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "10 \u00d7 4 + 10 = ?",
+   "back": "50 (= 10\u00d7(4+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "6 \u00d7 8 + 6 = ?",
+   "back": "54 (= 6\u00d7(8+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "4 \u00d7 10 + 4 = ?",
+   "back": "44 (= 4\u00d7(10+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "3 \u00d7 11 + 3 = ?",
+   "back": "36 (= 3\u00d7(11+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "6 \u00d7 10 + 6 = ?",
+   "back": "66 (= 6\u00d7(10+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "12 \u00d7 4 + 12 = ?",
+   "back": "60 (= 12\u00d7(4+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "3 \u00d7 11 + 3 = ?",
+   "back": "36 (= 3\u00d7(11+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "11 \u00d7 12 + 11 = ?",
+   "back": "143 (= 11\u00d7(12+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "5 \u00d7 7 + 5 = ?",
+   "back": "40 (= 5\u00d7(7+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "3 \u00d7 10 + 3 = ?",
+   "back": "33 (= 3\u00d7(10+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "3 \u00d7 11 + 3 = ?",
+   "back": "36 (= 3\u00d7(11+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "2 \u00d7 11 + 2 = ?",
+   "back": "24 (= 2\u00d7(11+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "5 \u00d7 9 + 5 = ?",
+   "back": "50 (= 5\u00d7(9+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "12 \u00d7 10 + 12 = ?",
+   "back": "132 (= 12\u00d7(10+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "8 \u00d7 7 + 8 = ?",
+   "back": "64 (= 8\u00d7(7+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "9 \u00d7 11 + 9 = ?",
+   "back": "108 (= 9\u00d7(11+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "9 \u00d7 7 + 9 = ?",
+   "back": "72 (= 9\u00d7(7+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "6 \u00d7 5 + 6 = ?",
+   "back": "36 (= 6\u00d7(5+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "4 \u00d7 5 + 4 = ?",
+   "back": "24 (= 4\u00d7(5+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "3 \u00d7 11 + 3 = ?",
+   "back": "36 (= 3\u00d7(11+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "6 \u00d7 10 + 6 = ?",
+   "back": "66 (= 6\u00d7(10+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "9 \u00d7 7 + 9 = ?",
+   "back": "72 (= 9\u00d7(7+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "9 \u00d7 6 + 9 = ?",
+   "back": "63 (= 9\u00d7(6+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "11 \u00d7 3 + 11 = ?",
+   "back": "44 (= 11\u00d7(3+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "3 \u00d7 10 + 3 = ?",
+   "back": "33 (= 3\u00d7(10+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "8 \u00d7 4 + 8 = ?",
+   "back": "40 (= 8\u00d7(4+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "7 \u00d7 4 + 7 = ?",
+   "back": "35 (= 7\u00d7(4+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "9 \u00d7 8 + 9 = ?",
+   "back": "81 (= 9\u00d7(8+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "2 \u00d7 12 + 2 = ?",
+   "back": "26 (= 2\u00d7(12+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "3 \u00d7 10 + 3 = ?",
+   "back": "33 (= 3\u00d7(10+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "11 \u00d7 7 + 11 = ?",
+   "back": "88 (= 11\u00d7(7+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "7 \u00d7 7 + 7 = ?",
+   "back": "56 (= 7\u00d7(7+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "11 \u00d7 9 + 11 = ?",
+   "back": "110 (= 11\u00d7(9+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "11 \u00d7 9 + 11 = ?",
+   "back": "110 (= 11\u00d7(9+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "3 \u00d7 3 + 3 = ?",
+   "back": "12 (= 3\u00d7(3+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "6 \u00d7 9 + 6 = ?",
+   "back": "60 (= 6\u00d7(9+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "12 \u00d7 3 + 12 = ?",
+   "back": "48 (= 12\u00d7(3+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "2 \u00d7 6 + 2 = ?",
+   "back": "14 (= 2\u00d7(6+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "12 \u00d7 11 + 12 = ?",
+   "back": "144 (= 12\u00d7(11+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "12 \u00d7 9 + 12 = ?",
+   "back": "120 (= 12\u00d7(9+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "6 \u00d7 8 + 6 = ?",
+   "back": "54 (= 6\u00d7(8+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "12 \u00d7 7 + 12 = ?",
+   "back": "96 (= 12\u00d7(7+1))",
+   "tag": "arithmetic"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  },
+  {
+   "front": "Venn: 30 students. 18 like maths, 15 like science, 8 like both. Neither?",
+   "back": "30 \u2212 (18+15\u22128) = 5.",
+   "tag": "venn"
+  }
+ ]
+}

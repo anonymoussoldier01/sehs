@@ -16,7 +16,7 @@ function sampleBy(groupOf, docs, perGroup, groups) {
 }
 
 export function autoDecks(index, rowMap) {
-  const docs = index.docs.filter(d => rowMap.has(d.rec.id));
+  const docs = index.docs.filter(d => rowMap.has(d.rec.id) && d.rec.contentType !== 'folder' && d.rec.category !== 'folder');
   const card = (d, back) => ({
     front: d.displayTitle,
     back,

@@ -12,10 +12,10 @@ export function adminMissing(res, sendJson) {
   return sendJson(res, 404, { ok: false, error: 'Not found.' });
 }
 
-const FILE_TYPES = ['pdf', 'docx', 'image', 'folder', 'archive', 'webpage', 'code', 'other'];
+const FILE_TYPES = ['pdf', 'docx', 'image', 'archive', 'webpage', 'code', 'other'];
 const ACCESS = ['public', 'members'];
 const STATUS = ['available', 'unavailable', 'needs_verification'];
-const CATS = ['exam-prep', 'maths', 'english', 'reading', 'writing', 'verbal-reasoning', 'quantitative', 'past-paper', 'practice-test', 'study-guide', 'reference', 'tutorial', 'tool', 'document', 'folder', 'other'];
+const CATS = ['exam-prep', 'maths', 'english', 'reading', 'writing', 'verbal-reasoning', 'numerical-reasoning', 'quantitative', 'past-paper', 'practice-test', 'study-guide', 'reference', 'tutorial', 'tool', 'document', 'other'];
 
 function cleanStr(v, max) {
   if (v === undefined || v === null) return undefined;
@@ -111,7 +111,13 @@ export function adminStats(db) {
   const zeroQueries = [...zeroC.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10)
     .map(([key, count]) => ({ key, count }));
   const maxDay = Math.max(1, ...days.map(d => Math.max(d.opens, d.queries)));
-  return { total, members, sessions, opensToday, days, maxDay, topQueries, topRes, zeroQueries };
+  let aiToday = 0, aiModes = [], aiCached = 0;
+  try {
+    aiToday = db.prepare("SELECT COALESCE(SUM(count),0) s FROM daily_aggregates WHERE day = ? AND kind = 'ai'").get(today).s;
+    aiModes = db.prepare("SELECT key, SUM(count) c FROM daily_aggregates WHERE kind = 'ai' GROUP BY key ORDER BY c DESC LIMIT 12").all();
+    aiCached = db.prepare('SELECT COUNT(*) n FROM ai_cache').get().n;
+  } catch { /* ai tables predate schema — dashboard shows zeros */ }
+  return { total, members, sessions, opensToday, days, maxDay, topQueries, topRes, zeroQueries, aiToday, aiModes, aiCached };
 }
 
 // ---- pages -------------------------------------------------------------------------
@@ -135,6 +141,8 @@ export function adminDashboard(ctx) {
     </div>
     <section class="disc-section" style="margin-top:16px"><div class="disc-head"><h2>Zero-result queries (content gaps)</h2></div>
       <div class="disc-tile" id="dash-zero"><p style="color:var(--mut)">Loading…</p></div></section>
+    <section class="disc-section"><div class="disc-head"><h2>✦ AI usage</h2></div>
+      <div class="disc-tile" id="dash-ai"><p style="color:var(--mut)">Loading…</p></div></section>
     <section class="disc-section"><div class="disc-head"><h2>Server health</h2></div>
       <div class="disc-tile" id="dash-health"><p style="color:var(--mut)">Loading…</p></div></section>
   </div>

@@ -1,0 +1,1124 @@
+{
+ "prompts": [
+  {
+   "id": "pers-1",
+   "kind": "persuasive",
+   "prompt": "Should selective schools expand to more suburbs?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-2",
+   "kind": "persuasive",
+   "prompt": "Should phones be locked away during class?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-3",
+   "kind": "persuasive",
+   "prompt": "Should homework be capped at 30 minutes?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-4",
+   "kind": "persuasive",
+   "prompt": "Should public transport be free for students?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-5",
+   "kind": "persuasive",
+   "prompt": "Should zoos still exist?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-6",
+   "kind": "persuasive",
+   "prompt": "Should gaming time be limited by law?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-7",
+   "kind": "persuasive",
+   "prompt": "Should school start later?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-8",
+   "kind": "persuasive",
+   "prompt": "Should uniforms be abolished?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-9",
+   "kind": "persuasive",
+   "prompt": "Should AI helpers be allowed in homework?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-10",
+   "kind": "persuasive",
+   "prompt": "Should every suburb get a new library?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-11",
+   "kind": "persuasive",
+   "prompt": "Should selective schools expand to more suburbs?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-12",
+   "kind": "persuasive",
+   "prompt": "Should phones be locked away during class?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-13",
+   "kind": "persuasive",
+   "prompt": "Should homework be capped at 30 minutes?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-14",
+   "kind": "persuasive",
+   "prompt": "Should public transport be free for students?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-15",
+   "kind": "persuasive",
+   "prompt": "Should zoos still exist?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-16",
+   "kind": "persuasive",
+   "prompt": "Should gaming time be limited by law?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-17",
+   "kind": "persuasive",
+   "prompt": "Should school start later?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-18",
+   "kind": "persuasive",
+   "prompt": "Should uniforms be abolished?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-19",
+   "kind": "persuasive",
+   "prompt": "Should AI helpers be allowed in homework?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-20",
+   "kind": "persuasive",
+   "prompt": "Should every suburb get a new library?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-21",
+   "kind": "persuasive",
+   "prompt": "Should selective schools expand to more suburbs?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-22",
+   "kind": "persuasive",
+   "prompt": "Should phones be locked away during class?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-23",
+   "kind": "persuasive",
+   "prompt": "Should homework be capped at 30 minutes?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-24",
+   "kind": "persuasive",
+   "prompt": "Should public transport be free for students?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-25",
+   "kind": "persuasive",
+   "prompt": "Should zoos still exist?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-26",
+   "kind": "persuasive",
+   "prompt": "Should gaming time be limited by law?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-27",
+   "kind": "persuasive",
+   "prompt": "Should school start later?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-28",
+   "kind": "persuasive",
+   "prompt": "Should uniforms be abolished?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-29",
+   "kind": "persuasive",
+   "prompt": "Should AI helpers be allowed in homework?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-30",
+   "kind": "persuasive",
+   "prompt": "Should every suburb get a new library?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-31",
+   "kind": "persuasive",
+   "prompt": "Should selective schools expand to more suburbs?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-32",
+   "kind": "persuasive",
+   "prompt": "Should phones be locked away during class?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-33",
+   "kind": "persuasive",
+   "prompt": "Should homework be capped at 30 minutes?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-34",
+   "kind": "persuasive",
+   "prompt": "Should public transport be free for students?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-35",
+   "kind": "persuasive",
+   "prompt": "Should zoos still exist?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-36",
+   "kind": "persuasive",
+   "prompt": "Should gaming time be limited by law?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-37",
+   "kind": "persuasive",
+   "prompt": "Should school start later?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-38",
+   "kind": "persuasive",
+   "prompt": "Should uniforms be abolished?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-39",
+   "kind": "persuasive",
+   "prompt": "Should AI helpers be allowed in homework?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "pers-40",
+   "kind": "persuasive",
+   "prompt": "Should every suburb get a new library?",
+   "stimulus": "Take a clear position. Give 2-3 reasons with one example each.",
+   "plan": [
+    "Position in 1 line",
+    "2-3 reasons",
+    "Example per reason",
+    "Call to action"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-1",
+   "kind": "creative",
+   "prompt": "The door that only opened once.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-2",
+   "kind": "creative",
+   "prompt": "The night the lights went out across the street.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-3",
+   "kind": "creative",
+   "prompt": "A map found inside a library book.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-4",
+   "kind": "creative",
+   "prompt": "The last seat on the train.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-5",
+   "kind": "creative",
+   "prompt": "The garden behind the abandoned house.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-6",
+   "kind": "creative",
+   "prompt": "A message in a bottle with your name.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-7",
+   "kind": "creative",
+   "prompt": "The storm that arrived at lunchtime.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-8",
+   "kind": "creative",
+   "prompt": "The key that didn't fit any lock.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-9",
+   "kind": "creative",
+   "prompt": "A voice from the vents.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-10",
+   "kind": "creative",
+   "prompt": "The photograph that moved.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-11",
+   "kind": "creative",
+   "prompt": "The door that only opened once.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-12",
+   "kind": "creative",
+   "prompt": "The night the lights went out across the street.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-13",
+   "kind": "creative",
+   "prompt": "A map found inside a library book.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-14",
+   "kind": "creative",
+   "prompt": "The last seat on the train.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-15",
+   "kind": "creative",
+   "prompt": "The garden behind the abandoned house.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-16",
+   "kind": "creative",
+   "prompt": "A message in a bottle with your name.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-17",
+   "kind": "creative",
+   "prompt": "The storm that arrived at lunchtime.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-18",
+   "kind": "creative",
+   "prompt": "The key that didn't fit any lock.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-19",
+   "kind": "creative",
+   "prompt": "A voice from the vents.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-20",
+   "kind": "creative",
+   "prompt": "The photograph that moved.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-21",
+   "kind": "creative",
+   "prompt": "The door that only opened once.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-22",
+   "kind": "creative",
+   "prompt": "The night the lights went out across the street.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-23",
+   "kind": "creative",
+   "prompt": "A map found inside a library book.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-24",
+   "kind": "creative",
+   "prompt": "The last seat on the train.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-25",
+   "kind": "creative",
+   "prompt": "The garden behind the abandoned house.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-26",
+   "kind": "creative",
+   "prompt": "A message in a bottle with your name.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-27",
+   "kind": "creative",
+   "prompt": "The storm that arrived at lunchtime.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-28",
+   "kind": "creative",
+   "prompt": "The key that didn't fit any lock.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-29",
+   "kind": "creative",
+   "prompt": "A voice from the vents.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-30",
+   "kind": "creative",
+   "prompt": "The photograph that moved.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-31",
+   "kind": "creative",
+   "prompt": "The door that only opened once.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-32",
+   "kind": "creative",
+   "prompt": "The night the lights went out across the street.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-33",
+   "kind": "creative",
+   "prompt": "A map found inside a library book.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-34",
+   "kind": "creative",
+   "prompt": "The last seat on the train.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-35",
+   "kind": "creative",
+   "prompt": "The garden behind the abandoned house.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-36",
+   "kind": "creative",
+   "prompt": "A message in a bottle with your name.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-37",
+   "kind": "creative",
+   "prompt": "The storm that arrived at lunchtime.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-38",
+   "kind": "creative",
+   "prompt": "The key that didn't fit any lock.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-39",
+   "kind": "creative",
+   "prompt": "A voice from the vents.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  },
+  {
+   "id": "cre-40",
+   "kind": "creative",
+   "prompt": "The photograph that moved.",
+   "stimulus": "Show, don't just tell. Use one strong image per paragraph.",
+   "plan": [
+    "Who/where in line 1",
+    "Problem by line 5",
+    "Senses x3",
+    "Ending that echoes start"
+   ],
+   "targetWords": 300,
+   "minutes": 20
+  }
+ ]
+}

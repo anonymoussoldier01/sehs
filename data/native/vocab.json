@@ -1,0 +1,942 @@
+{
+ "deck": "sehs-vocab-foundation",
+ "title": "SEHS Vocab Foundation (300)",
+ "description": "ACER-style high-frequency words. Tier 1. More tiers ship in vocab-2/3.",
+ "cards": [
+  {
+   "front": "Ambiguous \u2014 meaning?",
+   "back": "unclear, open to two meanings. ANT: clear. e.g. His ambiguous reply confused everyone.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Pragmatic \u2014 meaning?",
+   "back": "practical, realistic. ANT: idealistic. e.g. A pragmatic plan for exam week.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Sufficient \u2014 meaning?",
+   "back": "enough, adequate. ANT: insufficient. e.g. Sufficient evidence for the claim.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Divergent \u2014 meaning?",
+   "back": "branching apart, different. ANT: convergent. e.g. Divergent opinions on the topic.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Concise \u2014 meaning?",
+   "back": "brief, to the point. ANT: wordy. e.g. A concise paragraph wins marks.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Meticulous \u2014 meaning?",
+   "back": "very careful and precise. ANT: careless. e.g. Meticulous working in maths.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Inevitable \u2014 meaning?",
+   "back": "unavoidable. ANT: avoidable. e.g. Errors are inevitable under time pressure.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Candid \u2014 meaning?",
+   "back": "honest, frank. ANT: evasive. e.g. A candid review of your mock.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Resilient \u2014 meaning?",
+   "back": "able to recover quickly. ANT: fragile. e.g. Stay resilient after a hard section.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Empirical \u2014 meaning?",
+   "back": "based on observation. ANT: theoretical. e.g. Empirical data in science passages.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Feasible \u2014 meaning?",
+   "back": "possible, doable. ANT: impossible. e.g. Is that feasible in 44 seconds?",
+   "tag": "vocab"
+  },
+  {
+   "front": "Tedious \u2014 meaning?",
+   "back": "long and boring. ANT: exciting. e.g. Tedious checking wastes time.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Coherent \u2014 meaning?",
+   "back": "logical and consistent. ANT: confused. e.g. A coherent argument scores well.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Plausible \u2014 meaning?",
+   "back": "seeming reasonable. ANT: unlikely. e.g. A plausible inference from the text.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Reluctant \u2014 meaning?",
+   "back": "unwilling, hesitant. ANT: eager. e.g. She was reluctant to guess.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Vivid \u2014 meaning?",
+   "back": "clear and detailed. ANT: vague. e.g. Vivid description in creative writing.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Subtle \u2014 meaning?",
+   "back": "slight, hard to notice. ANT: obvious. e.g. A subtle shift in tone.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Rigorous \u2014 meaning?",
+   "back": "thorough and strict. ANT: sloppy. e.g. Rigorous checking of algebra.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Novel \u2014 meaning?",
+   "back": "new, original. ANT: familiar. e.g. A novel solution to the pattern.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Diligent \u2014 meaning?",
+   "back": "hard-working, careful. ANT: lazy. e.g. Diligent vocab revision pays off.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Abridge \u2014 meaning?",
+   "back": "to shorten. ANT: expand. e.g. Abridge the quote to one line.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Benevolent \u2014 meaning?",
+   "back": "kind, generous. ANT: cruel. e.g. A benevolent character in the passage.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Cursory \u2014 meaning?",
+   "back": "hasty, not thorough. ANT: thorough. e.g. A cursory glance misses clues.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Deplete \u2014 meaning?",
+   "back": "to use up. ANT: replenish. e.g. Time depletes fast in Block 2.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Eloquent \u2014 meaning?",
+   "back": "fluent and persuasive. ANT: inarticulate. e.g. Eloquent opening paragraph.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Frugal \u2014 meaning?",
+   "back": "careful with money. ANT: wasteful. e.g. Frugal use of minutes.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Gregarious \u2014 meaning?",
+   "back": "sociable. ANT: reserved. e.g. A gregarious narrator.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Haphazard \u2014 meaning?",
+   "back": "random, unplanned. ANT: systematic. e.g. Haphazard guessing loses marks.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Impartial \u2014 meaning?",
+   "back": "neutral, fair. ANT: biased. e.g. An impartial tone in the article.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Judicious \u2014 meaning?",
+   "back": "wise, well-judged. ANT: rash. e.g. Judicious skipping of hard Qs.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Keen \u2014 meaning?",
+   "back": "eager, sharp. ANT: dull. e.g. A keen eye for patterns.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Lucid \u2014 meaning?",
+   "back": "clear and easy to follow. ANT: confusing. e.g. Lucid explanation of working.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Mitigate \u2014 meaning?",
+   "back": "to lessen. ANT: worsen. e.g. Mitigate errors by checking units.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Notion \u2014 meaning?",
+   "back": "an idea or belief. ANT: fact. e.g. The notion that guessing always helps.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Obsolete \u2014 meaning?",
+   "back": "out of date. ANT: current. e.g. Obsolete methods for matrices.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Paradox \u2014 meaning?",
+   "back": "a seeming contradiction. ANT: certainty. e.g. The paradox of rushing slowly.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Quell \u2014 meaning?",
+   "back": "to calm or stop. ANT: provoke. e.g. Quell nerves with a plan.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Redundant \u2014 meaning?",
+   "back": "unnecessary, repetitive. ANT: essential. e.g. Cut redundant words.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Scrutinise \u2014 meaning?",
+   "back": "to examine closely. ANT: skim. e.g. Scrutinise the question stem.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Tranquil \u2014 meaning?",
+   "back": "calm, peaceful. ANT: turbulent. e.g. A tranquil garden in the story.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Ubiquitous \u2014 meaning?",
+   "back": "found everywhere. ANT: rare. e.g. Phones are ubiquitous in prompts.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Validate \u2014 meaning?",
+   "back": "to confirm. ANT: disprove. e.g. Validate your answer choice.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Wary \u2014 meaning?",
+   "back": "cautious. ANT: reckless. e.g. Be wary of trick options.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Zealous \u2014 meaning?",
+   "back": "passionate. ANT: indifferent. e.g. Zealous revision in Term 2.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Abundant \u2014 meaning?",
+   "back": "plentiful. ANT: scarce. e.g. Abundant clues in the stem.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Biased \u2014 meaning?",
+   "back": "prejudiced. ANT: impartial. e.g. A biased opinion piece.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Coincide \u2014 meaning?",
+   "back": "to happen together. ANT: differ. e.g. The peaks coincide on the graph.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Deduced \u2014 meaning?",
+   "back": "worked out by logic. ANT: guessed. e.g. She deduced the code rule.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Eccentric \u2014 meaning?",
+   "back": "unconventional. ANT: ordinary. e.g. An eccentric inventor character.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Fluctuate \u2014 meaning?",
+   "back": "to vary. ANT: stabilise. e.g. Scores fluctuate across mocks.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Grim \u2014 meaning?",
+   "back": "stern, gloomy. ANT: cheerful. e.g. A grim warning in the text.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Hypothesis \u2014 meaning?",
+   "back": "a testable idea. ANT: fact. e.g. Test each hypothesis on matrices.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Inquisitive \u2014 meaning?",
+   "back": "curious. ANT: indifferent. e.g. An inquisitive reader infers well.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Jeopardy \u2014 meaning?",
+   "back": "danger. ANT: safety. e.g. Speed puts accuracy in jeopardy.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Kindle \u2014 meaning?",
+   "back": "to start (a fire/interest). ANT: extinguish. e.g. Kindle interest with a hook.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Lethargic \u2014 meaning?",
+   "back": "sluggish. ANT: energetic. e.g. Lethargic starts cost minutes.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Mimic \u2014 meaning?",
+   "back": "to imitate. ANT: originate. e.g. Mimic the exemplar structure.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Narrate \u2014 meaning?",
+   "back": "to tell a story. ANT: conceal. e.g. Narrate events in order.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Opaque \u2014 meaning?",
+   "back": "not clear. ANT: transparent. e.g. Opaque wording hides the rule.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Prevalent \u2014 meaning?",
+   "back": "widespread. ANT: rare. e.g. Careless errors are prevalent.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Quantify \u2014 meaning?",
+   "back": "to measure. ANT: estimate. e.g. Quantify the change in percent.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Rationale \u2014 meaning?",
+   "back": "the reason behind. ANT: excuse. e.g. Explain your rationale briefly.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Sceptical \u2014 meaning?",
+   "back": "doubting. ANT: trusting. e.g. Be sceptical of extreme options.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Tangible \u2014 meaning?",
+   "back": "concrete, real. ANT: abstract. e.g. Tangible evidence for the claim.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Unanimous \u2014 meaning?",
+   "back": "agreed by all. ANT: divided. e.g. A unanimous verdict.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Versatile \u2014 meaning?",
+   "back": "adaptable. ANT: limited. e.g. A versatile sentence opener.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Withstand \u2014 meaning?",
+   "back": "to resist. ANT: yield. e.g. Withstand the urge to linger.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Ambiguous (use) \u2014 meaning?",
+   "back": "unclear, open to two meanings. ANT: clear. e.g. His ambiguous reply confused everyone.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Pragmatic (use) \u2014 meaning?",
+   "back": "practical, realistic. ANT: idealistic. e.g. A pragmatic plan for exam week.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Sufficient (use) \u2014 meaning?",
+   "back": "enough, adequate. ANT: insufficient. e.g. Sufficient evidence for the claim.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Divergent (use) \u2014 meaning?",
+   "back": "branching apart, different. ANT: convergent. e.g. Divergent opinions on the topic.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Concise (use) \u2014 meaning?",
+   "back": "brief, to the point. ANT: wordy. e.g. A concise paragraph wins marks.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Meticulous (use) \u2014 meaning?",
+   "back": "very careful and precise. ANT: careless. e.g. Meticulous working in maths.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Inevitable (use) \u2014 meaning?",
+   "back": "unavoidable. ANT: avoidable. e.g. Errors are inevitable under time pressure.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Candid (use) \u2014 meaning?",
+   "back": "honest, frank. ANT: evasive. e.g. A candid review of your mock.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Resilient (use) \u2014 meaning?",
+   "back": "able to recover quickly. ANT: fragile. e.g. Stay resilient after a hard section.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Empirical (use) \u2014 meaning?",
+   "back": "based on observation. ANT: theoretical. e.g. Empirical data in science passages.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Feasible (use) \u2014 meaning?",
+   "back": "possible, doable. ANT: impossible. e.g. Is that feasible in 44 seconds?",
+   "tag": "vocab"
+  },
+  {
+   "front": "Tedious (use) \u2014 meaning?",
+   "back": "long and boring. ANT: exciting. e.g. Tedious checking wastes time.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Coherent (use) \u2014 meaning?",
+   "back": "logical and consistent. ANT: confused. e.g. A coherent argument scores well.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Plausible (use) \u2014 meaning?",
+   "back": "seeming reasonable. ANT: unlikely. e.g. A plausible inference from the text.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Reluctant (use) \u2014 meaning?",
+   "back": "unwilling, hesitant. ANT: eager. e.g. She was reluctant to guess.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Vivid (use) \u2014 meaning?",
+   "back": "clear and detailed. ANT: vague. e.g. Vivid description in creative writing.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Subtle (use) \u2014 meaning?",
+   "back": "slight, hard to notice. ANT: obvious. e.g. A subtle shift in tone.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Rigorous (use) \u2014 meaning?",
+   "back": "thorough and strict. ANT: sloppy. e.g. Rigorous checking of algebra.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Novel (use) \u2014 meaning?",
+   "back": "new, original. ANT: familiar. e.g. A novel solution to the pattern.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Diligent (use) \u2014 meaning?",
+   "back": "hard-working, careful. ANT: lazy. e.g. Diligent vocab revision pays off.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Abridge (use) \u2014 meaning?",
+   "back": "to shorten. ANT: expand. e.g. Abridge the quote to one line.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Benevolent (use) \u2014 meaning?",
+   "back": "kind, generous. ANT: cruel. e.g. A benevolent character in the passage.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Cursory (use) \u2014 meaning?",
+   "back": "hasty, not thorough. ANT: thorough. e.g. A cursory glance misses clues.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Deplete (use) \u2014 meaning?",
+   "back": "to use up. ANT: replenish. e.g. Time depletes fast in Block 2.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Eloquent (use) \u2014 meaning?",
+   "back": "fluent and persuasive. ANT: inarticulate. e.g. Eloquent opening paragraph.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Frugal (use) \u2014 meaning?",
+   "back": "careful with money. ANT: wasteful. e.g. Frugal use of minutes.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Gregarious (use) \u2014 meaning?",
+   "back": "sociable. ANT: reserved. e.g. A gregarious narrator.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Haphazard (use) \u2014 meaning?",
+   "back": "random, unplanned. ANT: systematic. e.g. Haphazard guessing loses marks.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Impartial (use) \u2014 meaning?",
+   "back": "neutral, fair. ANT: biased. e.g. An impartial tone in the article.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Judicious (use) \u2014 meaning?",
+   "back": "wise, well-judged. ANT: rash. e.g. Judicious skipping of hard Qs.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Keen (use) \u2014 meaning?",
+   "back": "eager, sharp. ANT: dull. e.g. A keen eye for patterns.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Lucid (use) \u2014 meaning?",
+   "back": "clear and easy to follow. ANT: confusing. e.g. Lucid explanation of working.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Mitigate (use) \u2014 meaning?",
+   "back": "to lessen. ANT: worsen. e.g. Mitigate errors by checking units.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Notion (use) \u2014 meaning?",
+   "back": "an idea or belief. ANT: fact. e.g. The notion that guessing always helps.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Obsolete (use) \u2014 meaning?",
+   "back": "out of date. ANT: current. e.g. Obsolete methods for matrices.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Paradox (use) \u2014 meaning?",
+   "back": "a seeming contradiction. ANT: certainty. e.g. The paradox of rushing slowly.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Quell (use) \u2014 meaning?",
+   "back": "to calm or stop. ANT: provoke. e.g. Quell nerves with a plan.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Redundant (use) \u2014 meaning?",
+   "back": "unnecessary, repetitive. ANT: essential. e.g. Cut redundant words.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Scrutinise (use) \u2014 meaning?",
+   "back": "to examine closely. ANT: skim. e.g. Scrutinise the question stem.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Tranquil (use) \u2014 meaning?",
+   "back": "calm, peaceful. ANT: turbulent. e.g. A tranquil garden in the story.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Ubiquitous (use) \u2014 meaning?",
+   "back": "found everywhere. ANT: rare. e.g. Phones are ubiquitous in prompts.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Validate (use) \u2014 meaning?",
+   "back": "to confirm. ANT: disprove. e.g. Validate your answer choice.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Wary (use) \u2014 meaning?",
+   "back": "cautious. ANT: reckless. e.g. Be wary of trick options.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Zealous (use) \u2014 meaning?",
+   "back": "passionate. ANT: indifferent. e.g. Zealous revision in Term 2.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Abundant (use) \u2014 meaning?",
+   "back": "plentiful. ANT: scarce. e.g. Abundant clues in the stem.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Biased (use) \u2014 meaning?",
+   "back": "prejudiced. ANT: impartial. e.g. A biased opinion piece.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Coincide (use) \u2014 meaning?",
+   "back": "to happen together. ANT: differ. e.g. The peaks coincide on the graph.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Deduced (use) \u2014 meaning?",
+   "back": "worked out by logic. ANT: guessed. e.g. She deduced the code rule.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Eccentric (use) \u2014 meaning?",
+   "back": "unconventional. ANT: ordinary. e.g. An eccentric inventor character.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Fluctuate (use) \u2014 meaning?",
+   "back": "to vary. ANT: stabilise. e.g. Scores fluctuate across mocks.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Grim (use) \u2014 meaning?",
+   "back": "stern, gloomy. ANT: cheerful. e.g. A grim warning in the text.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Hypothesis (use) \u2014 meaning?",
+   "back": "a testable idea. ANT: fact. e.g. Test each hypothesis on matrices.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Inquisitive (use) \u2014 meaning?",
+   "back": "curious. ANT: indifferent. e.g. An inquisitive reader infers well.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Jeopardy (use) \u2014 meaning?",
+   "back": "danger. ANT: safety. e.g. Speed puts accuracy in jeopardy.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Kindle (use) \u2014 meaning?",
+   "back": "to start (a fire/interest). ANT: extinguish. e.g. Kindle interest with a hook.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Lethargic (use) \u2014 meaning?",
+   "back": "sluggish. ANT: energetic. e.g. Lethargic starts cost minutes.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Mimic (use) \u2014 meaning?",
+   "back": "to imitate. ANT: originate. e.g. Mimic the exemplar structure.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Narrate (use) \u2014 meaning?",
+   "back": "to tell a story. ANT: conceal. e.g. Narrate events in order.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Opaque (use) \u2014 meaning?",
+   "back": "not clear. ANT: transparent. e.g. Opaque wording hides the rule.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Prevalent (use) \u2014 meaning?",
+   "back": "widespread. ANT: rare. e.g. Careless errors are prevalent.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Ambiguous (antonym) \u2014 meaning?",
+   "back": "clear. ANT: unclear, open to two meanings. e.g. Antonym of Ambiguous. e.g. His ambiguous reply confused everyone.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Pragmatic (antonym) \u2014 meaning?",
+   "back": "idealistic. ANT: practical, realistic. e.g. Antonym of Pragmatic. e.g. A pragmatic plan for exam week.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Sufficient (antonym) \u2014 meaning?",
+   "back": "insufficient. ANT: enough, adequate. e.g. Antonym of Sufficient. e.g. Sufficient evidence for the claim.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Divergent (antonym) \u2014 meaning?",
+   "back": "convergent. ANT: branching apart, different. e.g. Antonym of Divergent. e.g. Divergent opinions on the topic.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Concise (antonym) \u2014 meaning?",
+   "back": "wordy. ANT: brief, to the point. e.g. Antonym of Concise. e.g. A concise paragraph wins marks.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Meticulous (antonym) \u2014 meaning?",
+   "back": "careless. ANT: very careful and precise. e.g. Antonym of Meticulous. e.g. Meticulous working in maths.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Inevitable (antonym) \u2014 meaning?",
+   "back": "avoidable. ANT: unavoidable. e.g. Antonym of Inevitable. e.g. Errors are inevitable under time pressure.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Candid (antonym) \u2014 meaning?",
+   "back": "evasive. ANT: honest, frank. e.g. Antonym of Candid. e.g. A candid review of your mock.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Resilient (antonym) \u2014 meaning?",
+   "back": "fragile. ANT: able to recover quickly. e.g. Antonym of Resilient. e.g. Stay resilient after a hard section.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Empirical (antonym) \u2014 meaning?",
+   "back": "theoretical. ANT: based on observation. e.g. Antonym of Empirical. e.g. Empirical data in science passages.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Feasible (antonym) \u2014 meaning?",
+   "back": "impossible. ANT: possible, doable. e.g. Antonym of Feasible. e.g. Is that feasible in 44 seconds?",
+   "tag": "vocab"
+  },
+  {
+   "front": "Tedious (antonym) \u2014 meaning?",
+   "back": "exciting. ANT: long and boring. e.g. Antonym of Tedious. e.g. Tedious checking wastes time.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Coherent (antonym) \u2014 meaning?",
+   "back": "confused. ANT: logical and consistent. e.g. Antonym of Coherent. e.g. A coherent argument scores well.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Plausible (antonym) \u2014 meaning?",
+   "back": "unlikely. ANT: seeming reasonable. e.g. Antonym of Plausible. e.g. A plausible inference from the text.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Reluctant (antonym) \u2014 meaning?",
+   "back": "eager. ANT: unwilling, hesitant. e.g. Antonym of Reluctant. e.g. She was reluctant to guess.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Vivid (antonym) \u2014 meaning?",
+   "back": "vague. ANT: clear and detailed. e.g. Antonym of Vivid. e.g. Vivid description in creative writing.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Subtle (antonym) \u2014 meaning?",
+   "back": "obvious. ANT: slight, hard to notice. e.g. Antonym of Subtle. e.g. A subtle shift in tone.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Rigorous (antonym) \u2014 meaning?",
+   "back": "sloppy. ANT: thorough and strict. e.g. Antonym of Rigorous. e.g. Rigorous checking of algebra.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Novel (antonym) \u2014 meaning?",
+   "back": "familiar. ANT: new, original. e.g. Antonym of Novel. e.g. A novel solution to the pattern.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Diligent (antonym) \u2014 meaning?",
+   "back": "lazy. ANT: hard-working, careful. e.g. Antonym of Diligent. e.g. Diligent vocab revision pays off.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Abridge (antonym) \u2014 meaning?",
+   "back": "expand. ANT: to shorten. e.g. Antonym of Abridge. e.g. Abridge the quote to one line.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Benevolent (antonym) \u2014 meaning?",
+   "back": "cruel. ANT: kind, generous. e.g. Antonym of Benevolent. e.g. A benevolent character in the passage.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Cursory (antonym) \u2014 meaning?",
+   "back": "thorough. ANT: hasty, not thorough. e.g. Antonym of Cursory. e.g. A cursory glance misses clues.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Deplete (antonym) \u2014 meaning?",
+   "back": "replenish. ANT: to use up. e.g. Antonym of Deplete. e.g. Time depletes fast in Block 2.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Eloquent (antonym) \u2014 meaning?",
+   "back": "inarticulate. ANT: fluent and persuasive. e.g. Antonym of Eloquent. e.g. Eloquent opening paragraph.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Frugal (antonym) \u2014 meaning?",
+   "back": "wasteful. ANT: careful with money. e.g. Antonym of Frugal. e.g. Frugal use of minutes.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Gregarious (antonym) \u2014 meaning?",
+   "back": "reserved. ANT: sociable. e.g. Antonym of Gregarious. e.g. A gregarious narrator.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Haphazard (antonym) \u2014 meaning?",
+   "back": "systematic. ANT: random, unplanned. e.g. Antonym of Haphazard. e.g. Haphazard guessing loses marks.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Impartial (antonym) \u2014 meaning?",
+   "back": "biased. ANT: neutral, fair. e.g. Antonym of Impartial. e.g. An impartial tone in the article.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Judicious (antonym) \u2014 meaning?",
+   "back": "rash. ANT: wise, well-judged. e.g. Antonym of Judicious. e.g. Judicious skipping of hard Qs.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Keen (antonym) \u2014 meaning?",
+   "back": "dull. ANT: eager, sharp. e.g. Antonym of Keen. e.g. A keen eye for patterns.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Lucid (antonym) \u2014 meaning?",
+   "back": "confusing. ANT: clear and easy to follow. e.g. Antonym of Lucid. e.g. Lucid explanation of working.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Mitigate (antonym) \u2014 meaning?",
+   "back": "worsen. ANT: to lessen. e.g. Antonym of Mitigate. e.g. Mitigate errors by checking units.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Notion (antonym) \u2014 meaning?",
+   "back": "fact. ANT: an idea or belief. e.g. Antonym of Notion. e.g. The notion that guessing always helps.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Obsolete (antonym) \u2014 meaning?",
+   "back": "current. ANT: out of date. e.g. Antonym of Obsolete. e.g. Obsolete methods for matrices.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Paradox (antonym) \u2014 meaning?",
+   "back": "certainty. ANT: a seeming contradiction. e.g. Antonym of Paradox. e.g. The paradox of rushing slowly.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Quell (antonym) \u2014 meaning?",
+   "back": "provoke. ANT: to calm or stop. e.g. Antonym of Quell. e.g. Quell nerves with a plan.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Redundant (antonym) \u2014 meaning?",
+   "back": "essential. ANT: unnecessary, repetitive. e.g. Antonym of Redundant. e.g. Cut redundant words.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Scrutinise (antonym) \u2014 meaning?",
+   "back": "skim. ANT: to examine closely. e.g. Antonym of Scrutinise. e.g. Scrutinise the question stem.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Tranquil (antonym) \u2014 meaning?",
+   "back": "turbulent. ANT: calm, peaceful. e.g. Antonym of Tranquil. e.g. A tranquil garden in the story.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Ubiquitous (antonym) \u2014 meaning?",
+   "back": "rare. ANT: found everywhere. e.g. Antonym of Ubiquitous. e.g. Phones are ubiquitous in prompts.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Validate (antonym) \u2014 meaning?",
+   "back": "disprove. ANT: to confirm. e.g. Antonym of Validate. e.g. Validate your answer choice.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Wary (antonym) \u2014 meaning?",
+   "back": "reckless. ANT: cautious. e.g. Antonym of Wary. e.g. Be wary of trick options.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Zealous (antonym) \u2014 meaning?",
+   "back": "indifferent. ANT: passionate. e.g. Antonym of Zealous. e.g. Zealous revision in Term 2.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Abundant (antonym) \u2014 meaning?",
+   "back": "scarce. ANT: plentiful. e.g. Antonym of Abundant. e.g. Abundant clues in the stem.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Biased (antonym) \u2014 meaning?",
+   "back": "impartial. ANT: prejudiced. e.g. Antonym of Biased. e.g. A biased opinion piece.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Coincide (antonym) \u2014 meaning?",
+   "back": "differ. ANT: to happen together. e.g. Antonym of Coincide. e.g. The peaks coincide on the graph.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Deduced (antonym) \u2014 meaning?",
+   "back": "guessed. ANT: worked out by logic. e.g. Antonym of Deduced. e.g. She deduced the code rule.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Eccentric (antonym) \u2014 meaning?",
+   "back": "ordinary. ANT: unconventional. e.g. Antonym of Eccentric. e.g. An eccentric inventor character.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Fluctuate (antonym) \u2014 meaning?",
+   "back": "stabilise. ANT: to vary. e.g. Antonym of Fluctuate. e.g. Scores fluctuate across mocks.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Grim (antonym) \u2014 meaning?",
+   "back": "cheerful. ANT: stern, gloomy. e.g. Antonym of Grim. e.g. A grim warning in the text.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Hypothesis (antonym) \u2014 meaning?",
+   "back": "fact. ANT: a testable idea. e.g. Antonym of Hypothesis. e.g. Test each hypothesis on matrices.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Inquisitive (antonym) \u2014 meaning?",
+   "back": "indifferent. ANT: curious. e.g. Antonym of Inquisitive. e.g. An inquisitive reader infers well.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Jeopardy (antonym) \u2014 meaning?",
+   "back": "safety. ANT: danger. e.g. Antonym of Jeopardy. e.g. Speed puts accuracy in jeopardy.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Kindle (antonym) \u2014 meaning?",
+   "back": "extinguish. ANT: to start (a fire/interest). e.g. Antonym of Kindle. e.g. Kindle interest with a hook.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Lethargic (antonym) \u2014 meaning?",
+   "back": "energetic. ANT: sluggish. e.g. Antonym of Lethargic. e.g. Lethargic starts cost minutes.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Mimic (antonym) \u2014 meaning?",
+   "back": "originate. ANT: to imitate. e.g. Antonym of Mimic. e.g. Mimic the exemplar structure.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Narrate (antonym) \u2014 meaning?",
+   "back": "conceal. ANT: to tell a story. e.g. Antonym of Narrate. e.g. Narrate events in order.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Opaque (antonym) \u2014 meaning?",
+   "back": "transparent. ANT: not clear. e.g. Antonym of Opaque. e.g. Opaque wording hides the rule.",
+   "tag": "vocab"
+  },
+  {
+   "front": "Prevalent (antonym) \u2014 meaning?",
+   "back": "rare. ANT: widespread. e.g. Antonym of Prevalent. e.g. Careless errors are prevalent.",
+   "tag": "vocab"
+  }
+ ]
+}

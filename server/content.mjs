@@ -52,8 +52,10 @@ export function publicView(row) {
 }
 
 export function visibleWhere() {
-  // Everything is public; only the admin visibility flag hides rows.
-  return `visibility = 1`;
+  // Files-only: Drive folder placeholders are never public. Only the admin
+  // visibility flag + non-folder rows are visible. Children of folders were
+  // expanded at ingest time, so hiding folders loses no content.
+  return `visibility = 1 AND file_type != 'folder' AND category != 'folder'`;
 }
 
 export function loadRows(db) {

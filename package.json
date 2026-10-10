@@ -19,10 +19,16 @@
     "test": "node scripts/smoke.mjs",
     "relevance": "node scripts/relevance.mjs",
     "migrate": "node scripts/migrate.mjs",
+    "seed:native": "node scripts/seed-native.mjs",
+    "make:native": "python3 scripts/make-native.py && python3 scripts/make-native2.py",
     "server": "node server.mjs",
     "serve": "node scripts/serve.mjs",
     "deploy": "echo \"Push main branch; enable GitHub Pages on /(root) or use gh-pages branch\""
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "pg-mem": "^3.0.14"
+  }
 }

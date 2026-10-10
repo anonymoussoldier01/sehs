@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS meta (
   rotated_at TEXT
 );
 CREATE TABLE IF NOT EXISTS sessions (
-  token_hash BLOB PRIMARY KEY,
+  sid INTEGER PRIMARY KEY AUTOINCREMENT,
+  token_hash BLOB NOT NULL UNIQUE,
   role TEXT NOT NULL,              -- 'anon' | 'viewer' | 'admin'
   created_at TEXT NOT NULL,
   expires_at TEXT NOT NULL,
@@ -95,6 +96,14 @@ CREATE TABLE IF NOT EXISTS daily_aggregates (
   count INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (day, kind, key)
 );
+-- Native AI: persistent identical-prompt cache (shared quota saver). Prompts
+-- are keyed by hash only — no prompt content is stored anywhere else.
+CREATE TABLE IF NOT EXISTS ai_cache (
+  key TEXT PRIMARY KEY,
+  mode TEXT NOT NULL DEFAULT '',
+  text TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
 -- Phase D: study decks (admin-authored; auto + local decks live client-side)
 CREATE TABLE IF NOT EXISTS decks (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -145,6 +154,76 @@ export function openDb(p = dbPath()) {
   db.exec('PRAGMA journal_mode = WAL;');
   db.exec('PRAGMA foreign_keys = ON;');
   db.exec(SCHEMA);
+  return db;
+}
+
+// Async shim over node:sqlite so local dev shares the exact async interface
+// used by the Postgres backend. All methods return promises.
+class SqliteStmt {
+  constructor(stmt, opts = {}) {
+    this.stmt = stmt;
+    this.opts = opts;
+  }
+  async get(...params) {
+    return this.stmt.get(...params) ?? null;
+  }
+  async all(...params) {
+    return this.stmt.all(...params);
+  }
+  async run(...params) {
+    return this.stmt.run(...params);
+  }
+}
+class SqliteShim {
+  constructor(db) {
+    this.db = db;
+    this.kind = 'sqlite';
+  }
+  prepare(sql, opts) {
+    return new SqliteStmt(this.db.prepare(sql), opts);
+  }
+  async exec(sql) {
+    this.db.exec(sql);
+  }
+  async close() {
+    this.db.close();
+  }
+}
+
+// Backend switch: DATABASE_URL set → Postgres (Vercel/prod), else local SQLite.
+// Always returns the async interface; callers must await every query.
+export async function openDatabase() {
+  const url = process.env.DATABASE_URL;
+  if (url) {
+    const { openPostgres } = await import('./pg.mjs');
+    const db = await openPostgres(url);
+    db.kind = 'postgres';
+    return db;
+  }
+  const raw = openDb();
+  // Bring pre-sid dev databases forward: rebuild sessions with a sid PK.
+  try {
+    const cols = raw.prepare('PRAGMA table_info(sessions)').all().map(c => c.name);
+    if (!cols.includes('sid')) {
+      raw.exec(`CREATE TABLE sessions_new (
+        sid INTEGER PRIMARY KEY AUTOINCREMENT,
+        token_hash BLOB NOT NULL UNIQUE,
+        role TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        expires_at TEXT NOT NULL,
+        last_seen_at TEXT NOT NULL,
+        ip_hash TEXT NOT NULL,
+        ua_family TEXT NOT NULL DEFAULT '',
+        terms_version INTEGER NOT NULL DEFAULT 0
+      );
+      INSERT INTO sessions_new(token_hash, role, created_at, expires_at, last_seen_at, ip_hash, ua_family, terms_version)
+        SELECT token_hash, role, created_at, expires_at, last_seen_at, ip_hash, ua_family, terms_version FROM sessions;
+      DROP TABLE sessions;
+      ALTER TABLE sessions_new RENAME TO sessions;`);
+    }
+  } catch { /* fresh DBs already have it */ }
+  const db = new SqliteShim(raw);
+  db.kind = 'sqlite';
   return db;
 }
 
