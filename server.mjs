@@ -1428,6 +1428,17 @@ const server = http.createServer(async (req, res) => {
         const f = distFile(p);
         if (f) return sendFile(res, f);
       }
+      // Unknown app paths render the SPA's designed 404 page with a real 404
+      // status (no soft-404s). Never swallow API, admin, grants, feeds, or files.
+      const base = p.slice(p.lastIndexOf('/') + 1);
+      const reserved = p.startsWith('/api/') || p.startsWith('/admin') || p.startsWith('/open/') ||
+        p.startsWith('/embed/') || p === '/feed.xml' || p === '/robots.txt' || p === '/sitemap.xml';
+      if (!reserved && !base.includes('.')) {
+        secureHeaders(res);
+        res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+        fs.createReadStream(DIST_INDEX).pipe(res);
+        return;
+      }
     }
 
     if (req.method !== 'GET') { secureHeaders(res); res.writeHead(405); res.end('method not allowed'); return; }

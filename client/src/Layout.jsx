@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, ScrollRestoration } from 'react-router-dom';
 import { Palette, Sidebar, Topbar, useFolders } from './components/shell';
+import { StickyBanner } from './components/ace';
 import { Dock } from './components/magic';
 import { ThemeProvider, ToastProvider } from './providers';
 import { TermsProvider } from './providers';
@@ -61,11 +62,12 @@ function Announcement() {
   }, []);
   if (!body) return null;
   return (
-    <div
-      className="mx-5 mb-0 mt-3 flex items-center gap-3 rounded-2xl border p-3.5 text-sm shadow-sm"
-      style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }}
-      role="status"
-    >
+    <StickyBanner top={70}>
+      <div
+        className="mx-5 mb-0 mt-3 flex items-center gap-3 rounded-2xl border p-3.5 text-sm shadow-sm"
+        style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }}
+        role="status"
+      >
       <span className="flex-1">{body}</span>
       <button
         className="font-bold underline underline-offset-2"
@@ -80,8 +82,9 @@ function Announcement() {
         }}
       >
         Dismiss
-      </button>
-    </div>
+        </button>
+      </div>
+    </StickyBanner>
   );
 }
 
@@ -128,7 +131,7 @@ function Layout() {
               ['/request', 'Request'],
               ['/unlock', 'Admin'],
             ].map(([to, l]) => (
-              <Link key={to} to={to} className="min-h-[36px] px-2 py-2 text-[13.5px] font-bold underline underline-offset-[3px]" style={{ color: 'var(--acc)' }}>
+              <Link key={to} to={to} className="text-stroke-hover min-h-[36px] px-2 py-2 text-[13.5px] font-bold underline underline-offset-[3px]" style={{ color: 'var(--acc)' }}>
                 {l}
               </Link>
             ))}

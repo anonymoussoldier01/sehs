@@ -29,5 +29,14 @@ Log the smallest sensible change whenever a requirement conflicts with the archi
   - React Bits: BlurText → `BlurText` (section headings); Magnet → `Magnet` (marketing CTAs); ClickSpark → `ClickSpark` (marketing buttons; never exam/viewer); CountUp/RotatingText already existed as NumberTicker/WordRotate.
 - Rejected: heavy parallax, per-letter headline noise, confetti-everywhere, lamp/wavy backgrounds, cursor-following global effects (perf + calm-profile conflicts). Proxy + PDF.js re-confirmed dead by direct probe (Drive `uc` export → 303 → interstitial/garbage range bytes; no browser CORS) — embedded viewer stays (D1).
 
+## D8 — Aceternity/MagicUI/Bits full wave (user-directed, gzip budget lifted)
+- New files `components/ace.jsx` (BentoGrid + 6 live skeleton headers, ContainerScroll, TracingBeam, StickyScroll, Timeline, FocusCards, DirectionHover, LinkPreview [metadata-only, no external fetch], SnapCarousel, Evervault, WobbleCard, Lamp, AuroraBg, Beams, Faq, MultiStepLoader, StatefulButton, LinkArrow, GlowingCard, StickyBanner) and `components/bits.jsx` (BoxReveal, OrbitingCircles, SpinningText, VanishInput, Typewriter, TextReveal, HyperText, InteractiveHover, FlipTrue, ScrollVelocity, Ripple, Vortex, ShootingStars, FuzzyText).
+- Wired: hero (VanishInput, SpinningText, BoxReveal), velocity ribbon, live bento, scroll-unfolding viewer mockup, aurora CTA band, guide (Lamp, TextReveal, StickyScroll, TracingBeam, Timeline, Faq, Vortex CTA), subjects (FocusCards + DirectionHover A–Z), search hover LinkPreviews, home carousels, QOTD Evervault, mocks (Lamp + Spotlight + fresh-seed links), study hub (WobbleCards), deck flip shine, 404 (FuzzyText + ShootingStars), MultiStepLoader on mock assembly, condensing Topbar, hide-on-scroll announcement, footer text-stroke hover.
+- Rejected/skipped: Globe/WorldMap (irrelevant), Testimonials blocks (no fabricated social proof), pricing/auth blocks (non-goals), webcam/pixel shaders, compare/lens (iframe limits), parallax-scroll columns (perf), global cursor followers.
+- Exam + viewer stay Calm: no sparks/magnets/velocity/confetti there; confetti fires on perfect scores only.
+
+## D9 — Real 404 status with the SPA page
+- `server.mjs`: unknown extensionless non-reserved paths serve `client/dist/index.html` with HTTP 404 (no soft-404s). API/admin/grants/feeds/static untouched (verified live).
+
 ## D7 — Streaks kept neutral; no streak-shaming, urgency, locks, or peer comparison
 - The existing day-streak counter stays as a neutral fact ("3 days active") with no guilt copy, no artificial locks, no leaderboards.

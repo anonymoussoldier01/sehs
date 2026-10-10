@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { api, pretty } from '../lib/api';
 import { Skeleton, AnimatedGrid } from '../components/magic';
+import { FocusCards, DirectionHover } from '../components/ace';
+
+const GLYPHS = ['◈', '⬡', '⬢', '✦', '◉', '▣', '⬣', '❖', '◍', '⬔', '⬕', '⬘'];
 
 export default function Subjects({ subject }) {
   const [rows, setRows] = useState(null);
@@ -40,22 +42,32 @@ export default function Subjects({ subject }) {
           <Skeleton />
         </div>
       ) : (
-        <AnimatedGrid className="mt-4 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-          {rows.map(([name, c]) => {
-            const href = isSubj ? `/search?q=${encodeURIComponent(name)}` : `/search?provider=${encodeURIComponent(name)}`;
-            return (
-              <div key={name} className="rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-                <h3 className="font-display text-[15.5px] font-bold">{pretty(name)}</h3>
-                <p className="mb-2 text-[13px]" style={{ color: 'var(--mut)' }}>
-                  {Number(c).toLocaleString()} resources
-                </p>
-                <Link to={href} className="text-[13.5px] font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>
-                  Browse →
-                </Link>
-              </div>
-            );
-          })}
-        </AnimatedGrid>
+        <div className="mt-4">
+          <FocusCards
+            cards={rows.slice(0, 6).map(([name, c], k) => ({
+              to: isSubj ? `/search?q=${encodeURIComponent(name)}` : `/search?provider=${encodeURIComponent(name)}`,
+              glyph: GLYPHS[k % GLYPHS.length],
+              title: pretty(name),
+              sub: `${Number(c).toLocaleString()} resources`,
+            }))}
+          />
+          {rows.length > 6 && (
+            <>
+              <h2 className="mb-2 mt-8 font-display text-lg font-bold">Everything else A–Z</h2>
+              <AnimatedGrid className="grid gap-2.5 sm:grid-cols-2">
+                {rows.slice(6).map(([name, c]) => (
+                  <DirectionHover
+                    key={name}
+                    to={isSubj ? `/search?q=${encodeURIComponent(name)}` : `/search?provider=${encodeURIComponent(name)}`}
+                    title={pretty(name)}
+                    sub="Open in the library →"
+                    meta={`${Number(c).toLocaleString()} resources`}
+                  />
+                ))}
+              </AnimatedGrid>
+            </>
+          )}
+        </div>
       )}
     </div>
   );

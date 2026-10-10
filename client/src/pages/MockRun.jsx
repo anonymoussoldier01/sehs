@@ -14,6 +14,7 @@ import { repo } from '../lib/repo';
 import { useToast } from '../providers';
 import { useMotionProfile } from '../lib/motion';
 import { Skeleton, AnimatedTooltip, AnimatedTabs, Confetti } from '../components/magic';
+import { MultiStepLoader } from '../components/ace';
 import {
   scoreAttempt, seededShuffle, seedToInt, startTimer, remainingMs, isExpired,
   formatMMSS, recordReview, applyAccommodations,
@@ -253,7 +254,14 @@ export default function MockRun() {
   if (!mock || !order)
     return (
       <div className="mx-auto max-w-[860px] px-5 py-7">
-        <Skeleton />
+        {missing ? null : (
+          <MultiStepLoader
+            steps={['Finding your question pool…', 'Shuffling from the seed…', 'Starting the clock…']}
+          />
+        )}
+        <div className="mt-4">
+          <Skeleton />
+        </div>
       </div>
     );
 

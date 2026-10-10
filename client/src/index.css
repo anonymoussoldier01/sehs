@@ -368,6 +368,177 @@ kbd.kbd {
   white-space: nowrap;
 }
 
+/* ---------- aceternity/bits wave: orbits, spin, ripple, aurora, lamp, beams ---------- */
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.orbit-spin {
+  animation: orbit-spin 22s linear infinite;
+}
+@keyframes orbit-counter {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+.orbit-counter {
+  display: inline-block;
+  animation: orbit-counter 22s linear infinite;
+}
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin-slow {
+  animation: spin-slow 14s linear infinite;
+}
+.ripple-ring {
+  inset: 0;
+  animation: ripple-out 3.3s var(--ease-decelerate) infinite;
+}
+@keyframes ripple-out {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+.aurora-blob {
+  position: absolute;
+  width: 46%;
+  height: 120%;
+  filter: blur(70px);
+  opacity: 0.5;
+}
+.aurora-a {
+  left: -8%;
+  top: -30%;
+  background: radial-gradient(closest-side, #1d4ed8, transparent);
+  animation: aurora-drift 13s ease-in-out infinite alternate;
+}
+.aurora-b {
+  left: 30%;
+  top: -40%;
+  background: radial-gradient(closest-side, #6d28d9, transparent);
+  animation: aurora-drift 17s ease-in-out infinite alternate-reverse;
+}
+.aurora-c {
+  right: -10%;
+  top: -25%;
+  background: radial-gradient(closest-side, #0e7490, transparent);
+  animation: aurora-drift 15s ease-in-out infinite alternate;
+}
+@keyframes aurora-drift {
+  to {
+    transform: translate(9%, 22%) scale(1.15);
+  }
+}
+.lamp-glow {
+  background: conic-gradient(from 90deg at 50% 0%, transparent 38%, rgba(56, 189, 248, 0.28) 50%, transparent 62%);
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent);
+  mask-image: linear-gradient(to bottom, black 55%, transparent);
+}
+.beam-dash {
+  stroke-dashoffset: 234;
+  animation: beam-flow 5s linear infinite;
+}
+@keyframes beam-flow {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.bento-spot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(56, 189, 248, 0.12), transparent 65%);
+  opacity: 0;
+  transition: opacity var(--dur-standard) var(--ease-standard);
+  pointer-events: none;
+}
+.bento-spot:hover::before {
+  opacity: 1;
+}
+.ih-arrows {
+  display: inline-flex;
+  width: 1.1em;
+  overflow: hidden;
+}
+.ih-arrows span {
+  display: inline-block;
+  transition: transform var(--dur-standard) var(--ease-standard);
+}
+.ih-arrows span:last-child {
+  position: absolute;
+  transform: translateX(-100%);
+  opacity: 0;
+}
+.ih-btn {
+  position: relative;
+}
+.ih-btn:hover .ih-arrows span:first-child {
+  transform: translateX(100%);
+  opacity: 0;
+}
+.ih-btn:hover .ih-arrows span:last-child {
+  transform: translateX(0);
+  opacity: 1;
+}
+.flip-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.22) 50%, transparent 58%);
+  background-size: 250% 100%;
+  background-position: 120% 0;
+  transition: background-position 0.9s var(--ease-standard);
+  pointer-events: none;
+}
+.flip-shine:hover::after {
+  background-position: -120% 0;
+}
+.text-stroke-hover {
+  transition: color var(--dur-standard) var(--ease-standard), -webkit-text-stroke-color var(--dur-standard);
+}
+.text-stroke-hover:hover {
+  color: transparent;
+  -webkit-text-stroke: 1px var(--acc);
+}
+.hover-arrow {
+  position: relative;
+}
+.hover-arrow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(120deg, var(--primary), #6d28d9, var(--primary));
+  background-size: 200% 100%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--dur-standard) var(--ease-standard);
+  animation: arrow-pan 3s linear infinite;
+  pointer-events: none;
+}
+.hover-arrow:hover::before {
+  opacity: 1;
+}
+@keyframes arrow-pan {
+  to {
+    background-position: 200% 0;
+  }
+}
+
 /* Print styles for study guides and results review. */@media print {
   nav, aside, footer, .no-print {
     display: none !important;

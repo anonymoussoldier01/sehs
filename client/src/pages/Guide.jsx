@@ -1,17 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { TypingText } from '../components/magic';
+import { TextReveal, InteractiveHover, Vortex } from '../components/bits';
+import { TracingBeam, StickyScroll, Timeline, Faq, Lamp, MiniTimer, MiniLines, MiniPen } from '../components/ace';
 import { api } from '../lib/api';
 
 export default function Guide() {
   const [tq, setTq] = useState('');
   const [ta, setTa] = useState('');
   const [busy, setBusy] = useState(false);
-  useEffect(() => {
-    document.title = 'SEHS exam guide — SEHS Study';
-  }, []);
   const ask = async () => {
     if (tq.trim().length < 2) return;
     setBusy(true);
@@ -28,32 +27,47 @@ export default function Guide() {
       <p className="text-[13px] font-semibold" style={{ color: 'var(--mut)' }}>
         <Link to="/" className="hover:underline" style={{ color: 'var(--acc)' }}>Home</Link> › Exam guide
       </p>
-      <h1 className="mt-1 font-display text-3xl font-bold">SEHS exam guide (ACER format)</h1>
-      <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
-        Selective entry: three timed blocks, ~2h 35m of tasks. Year-8 curriculum cap, no calculator, paper booklets.
-      </p>
-      <h2 className="mb-3 mt-6 font-display text-xl font-bold">The three blocks</h2>
-      <div className="grid gap-3.5 sm:grid-cols-3">
-        {[
-          ['Block 1 — Maths + Quant (60 min)', 'Curriculum maths (number, algebra, geometry, stats) + patterns, series, matrices, Venn, spatial. ~90s/Q. Two passes: easy first, mark-and-return.', '/mocks/maths-qr-60', 'Start block →'],
-          ['Block 2 — Reading + Verbal (55 min)', '6-8 passages + analogies, synonyms, odd-one-out, codes, deductions. Evidence-pointer for reading.', '/mocks/reading-vr-55', 'Start block →'],
-          ['Block 3 — Writing (40 min)', '2 handwritten tasks (~20 min each), usually persuasive + narrative. 5 plan / 13 write / 2 check.', '/writing', 'Writing studio →'],
-        ].map(([t, p, to, l]) => (
-          <div key={to} className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-            <h3 className="font-display text-[15.5px] font-bold">{t}</h3>
-            <p className="mb-3 mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
-              {p}
-            </p>
-            <Link to={to} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
-              {l}
-            </Link>
-          </div>
-        ))}
-      </div>
-      <h2 className="mb-3 mt-6 font-display text-xl font-bold">Schools</h2>
+      <Lamp
+        kicker="ACER format · verified"
+        title="Three timed blocks. One calm plan."
+        sub="Maths + Quant 60 min · Reading + Verbal 55 min · Writing 40 min — 2 hours 35 minutes of tasks, Year-8 curriculum cap, paper booklets."
+      />
+      <TextReveal
+        className="mx-auto mt-6 max-w-[62ch] text-center font-display text-xl font-bold"
+        text="The exam rewards steady pacing over sprinting. Two passes through every block: easy marks first, then marked questions with fresh eyes."
+      />
+      <h2 className="mb-3 mt-8 font-display text-xl font-bold">The three blocks</h2>
+      <TracingBeam>
+        <StickyScroll
+          steps={[
+            {
+              kicker: 'Block 1 · 60 min',
+              title: 'Maths + Quantitative Reasoning',
+              desc: 'Curriculum maths (number, algebra, geometry, stats) plus patterns, series, matrices, Venn and spatial. Roughly 90 seconds a question — easy first, mark-and-return.',
+              link: { to: '/mocks/maths-qr-60', label: 'Start this block' },
+              visual: <MiniTimer />,
+            },
+            {
+              kicker: 'Block 2 · 55 min',
+              title: 'Reading + Verbal Reasoning',
+              desc: 'Six to eight passages plus analogies, synonyms, odd-one-out, codes and deductions. Point at the evidence line for every reading answer.',
+              link: { to: '/mocks/reading-vr-55', label: 'Start this block' },
+              visual: <MiniLines />,
+            },
+            {
+              kicker: 'Block 3 · 40 min',
+              title: 'Writing — two tasks',
+              desc: 'Usually one persuasive and one creative piece (unverified split — prepare for both). Five minutes planning, thirteen writing, two checking. Target 250–350 words.',
+              link: { to: '/writing', label: 'Open the writing studio' },
+              visual: <MiniPen />,
+            },
+          ]}
+        />
+      </TracingBeam>
+      <h2 className="mb-3 mt-8 font-display text-xl font-bold">Schools</h2>
       <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
         {[['Melbourne High', 'Boys, South Yarra.'], ['Mac.Robertson Girls’', 'Girls, Melbourne.'], ['Nossal', 'Co-ed, Berwick.'], ['Suzanne Cory', 'Co-ed, Werribee.']].map(([t, p]) => (
-          <div key={t} className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+          <div key={t} className="lift rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
             <h3 className="font-display text-[15.5px] font-bold">{t}</h3>
             <p className="mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
               {p}
@@ -61,18 +75,23 @@ export default function Guide() {
           </div>
         ))}
       </div>
-      <h2 className="mb-3 mt-6 font-display text-xl font-bold">12-week plan</h2>
-      <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-        <p className="text-sm" style={{ color: 'var(--mut)' }}>
-          Wk1-2: vocab foundation + maths facts + 1 diagnostic. Wk3-6: VR/QR one type per day + weekly mini. Wk7-10: full blocks timed + mistake bank. Wk11-12: 2 full mocks + writing 2×/week +
-          taper. Crash (4wk): daily 30 vocab + 20 VR + 20 QR + 1 passage + 1 prompt plan.
-        </p>
-        <p className="mt-2 flex gap-3">
-          <Link to="/study" className="text-[13.5px] font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>Open study hub →</Link>
-          <Link to="/drills" className="text-[13.5px] font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>Maths drills →</Link>
+      <h2 className="mb-3 mt-8 font-display text-xl font-bold">12-week plan</h2>
+      <div className="rounded-2xl border p-[18px] sm:p-6" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+        <Timeline
+          items={[
+            { title: 'Weeks 1–2 · Foundations', desc: 'Vocabulary tiers + Year-8 maths facts daily, plus one untimed diagnostic to find your gaps.' },
+            { title: 'Weeks 3–6 · One type a day', desc: 'Rotate verbal and quantitative types (analogy, series, matrices, codes), one passage a day, one weekly timed mini-block.' },
+            { title: 'Weeks 7–10 · Full blocks timed', desc: '60 / 55 / 40-minute blocks under exam conditions. Every miss goes in the review queue.' },
+            { title: 'Weeks 11–12 · Mocks + taper', desc: 'Two full mocks, writing twice a week, then taper: light review, sleep, and trust the preparation.' },
+            { title: 'Crash version · 4 weeks', desc: 'Daily: 30 vocab + 20 verbal + 20 quant + 1 passage + 1 prompt plan. One mock each weekend.' },
+          ]}
+        />
+        <p className="mt-4 flex flex-wrap gap-2.5">
+          <InteractiveHover to="/study" primary>Open study hub</InteractiveHover>
+          <InteractiveHover to="/drills">Maths drills</InteractiveHover>
         </p>
       </div>
-      <h2 className="mb-3 mt-6 font-display text-xl font-bold">Ask about the exam</h2>
+      <h2 className="mb-3 mt-8 font-display text-xl font-bold">Ask about the exam</h2>
       <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         <div className="flex gap-2">
           <Input
@@ -94,22 +113,34 @@ export default function Guide() {
           </p>
         )}
       </div>
-      <h2 className="mb-3 mt-6 font-display text-xl font-bold">FAQ</h2>
-      <div className="rounded-2xl border p-[18px] text-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-        <p><strong>Calculator?</strong> No — practise without one.</p>
-        <p className="mt-1"><strong>Question counts?</strong> <span style={{ color: 'var(--warn)' }}>Unverified:</span> ACER doesn&apos;t publish them — train to minutes, not counts.</p>
-        <p className="mt-1"><strong>Writing?</strong> Two tasks in 40 minutes (verified). <span style={{ color: 'var(--warn)' }}>Unverified:</span> usually one persuasive and one creative — prepare for both.</p>
-        <p className="mt-1"><strong>Offers?</strong> Around 1,000 Year 9 places; up to 5% of places may be offered at a principal&apos;s discretion (verified, vic.gov.au). We don&apos;t model cut-offs or predict results.</p>
-      </div>
-      <h2 className="mb-3 mt-6 font-display text-xl font-bold">Sources</h2>
+      <h2 className="mb-3 mt-8 font-display text-xl font-bold">FAQ</h2>
+      <Faq
+        items={[
+          { q: 'Calculator?', a: 'No — practise every mock and drill without one.' },
+          { q: 'Question counts?', a: 'Unverified: ACER doesn’t publish them — train to the minutes (60 / 55 / 40), not to assumed counts.' },
+          { q: 'Writing?', a: 'Two tasks in 40 minutes (verified). Unverified: usually one persuasive and one creative — prepare for both.' },
+          { q: 'Offers?', a: 'Around 1,000 Year 9 places; up to 5% of places may be offered at a principal’s discretion (verified, vic.gov.au). We don’t model cut-offs or predict results.' },
+        ]}
+      />
+      <h2 className="mb-3 mt-8 font-display text-xl font-bold">Sources</h2>
       <div className="rounded-2xl border p-[18px] text-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         <ul className="flex flex-col gap-1.5" style={{ color: 'var(--mut)' }}>
-          <li><a className="font-semibold underline underline-offset-2" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/prepare">ACER — Prepare (exam format, 3 blocks, 2h 35m)</a></li>
-          <li><a className="font-semibold underline underline-offset-2" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/exam-day">ACER — Exam day (schedule, answer booklets)</a></li>
-          <li><a className="font-semibold underline underline-offset-2" style={{ color: 'var(--acc)' }} href="https://www.vic.gov.au/selective-entry-high-schools">Victorian Government — Selective entry high schools</a></li>
+          <li><a className="link-slide font-semibold" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/prepare">ACER — Prepare (exam format, 3 blocks, 2h 35m)</a></li>
+          <li><a className="link-slide font-semibold" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/exam-day">ACER — Exam day (schedule, answer booklets)</a></li>
+          <li><a className="link-slide font-semibold" style={{ color: 'var(--acc)' }} href="https://www.vic.gov.au/selective-entry-high-schools">Victorian Government — Selective entry high schools</a></li>
         </ul>
         <p className="mt-2 text-[13px]" style={{ color: 'var(--faint)' }}>Independent guide — not affiliated with the Department of Education or ACER. Check the official pages for the current year.</p>
       </div>
+      <Vortex className="mt-8 px-6 py-10 text-center">
+        <h2 className="font-display text-2xl font-bold" style={{ color: '#E8EDF7' }}>Feel the timing before exam day</h2>
+        <p className="mx-auto mt-2 max-w-[48ch] text-[15px]" style={{ color: '#8A97B2' }}>
+          Run one block this week. Real clock, instant scoring, every miss explained.
+        </p>
+        <p className="mt-5 flex flex-wrap justify-center gap-2.5">
+          <InteractiveHover to="/mocks" primary>Browse timed mocks</InteractiveHover>
+          <InteractiveHover to="/study">Warm up with flashcards</InteractiveHover>
+        </p>
+      </Vortex>
     </div>
   );
 }

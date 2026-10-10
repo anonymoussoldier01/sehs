@@ -3,7 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { api } from '../lib/api';
 import { keys } from '../lib/store';
-import { BlurFade, Skeleton } from '../components/magic';
+import { BlurFade, Skeleton, SpotlightCard } from '../components/magic';
+import { Lamp } from '../components/ace';
+import { InteractiveHover } from '../components/bits';
 
 export default function Mocks() {
   const navigate = useNavigate();
@@ -30,10 +32,13 @@ export default function Mocks() {
       <p className="text-[13px] font-semibold" style={{ color: 'var(--mut)' }}>
         <Link to="/" className="hover:underline" style={{ color: 'var(--acc)' }}>Home</Link> › Mocks
       </p>
-      <h1 className="mt-1 font-display text-3xl font-bold">Timed mocks</h1>
-      <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
-        Full-length ACER-style blocks with real timing. Flag, skip, review. Instant scoring with explanations. Best scores stay in this browser.
-      </p>
+      <div className="mt-2">
+        <Lamp
+          kicker="Real clock · instant scoring"
+          title="Timed mocks"
+          sub="Full-length ACER-style blocks. Flag, skip, review. Best scores stay in this browser."
+        />
+      </div>
       {!mocks ? (
         <div className="mt-4 grid gap-3.5 sm:grid-cols-2">
           <Skeleton />
@@ -43,20 +48,29 @@ export default function Mocks() {
         <div className="mt-4 grid gap-3.5 sm:grid-cols-2">
           {mocks.map((m) => (
             <BlurFade key={m.id}>
-              <div className="rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-                <h3 className="font-display text-[15.5px] font-bold">{m.title}</h3>
-                <p className="mb-1 mt-0.5 text-[13px]" style={{ color: 'var(--mut)' }}>
-                  {m.strands.join(' · ')} · {m.minutes} min · {m.count} questions
-                </p>
-                {best[m.id] && (
-                  <p className="text-[13px] font-bold" style={{ color: 'var(--ok)' }}>
-                    Best: {best[m.id].score}/{best[m.id].total}
+              <SpotlightCard className="h-full rounded-2xl border shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+                <div className="flex h-full flex-col p-[18px]">
+                  <h3 className="font-display text-[15.5px] font-bold">{m.title}</h3>
+                  <p className="mb-1 mt-0.5 text-[13px]" style={{ color: 'var(--mut)' }}>
+                    {m.strands.join(' · ')} · {m.minutes} min · {m.count} questions
                   </p>
-                )}
-                <Button size="sm" variant="default" onClick={() => navigate('/mocks/' + encodeURIComponent(m.id))} className="mt-2">
-                  Start →
-                </Button>
-              </div>
+                  {best[m.id] ? (
+                    <p className="text-[13px] font-bold" style={{ color: 'var(--ok)' }}>
+                      Best: {best[m.id].score}/{best[m.id].total}
+                    </p>
+                  ) : (
+                    <p className="text-[13px]" style={{ color: 'var(--faint)' }}>Not attempted yet</p>
+                  )}
+                  <p className="mt-2 flex gap-2">
+                    <Button size="sm" variant="default" onClick={() => navigate('/mocks/' + encodeURIComponent(m.id))}>
+                      Start →
+                    </Button>
+                    <InteractiveHover to={`/mocks/${encodeURIComponent(m.id)}?seed=${encodeURIComponent(m.id)}-fresh`}>
+                      Fresh seed
+                    </InteractiveHover>
+                  </p>
+                </div>
+              </SpotlightCard>
             </BlurFade>
           ))}
         </div>

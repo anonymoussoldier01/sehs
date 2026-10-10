@@ -184,7 +184,7 @@ function Flip({ cards, order, pos, setPos, flipped, setFlipped, box, setBox }) {
           animate={{ rotateY: flipped ? 180 : 0 }}
           transition={{ duration: 0.45, ease: [0.2, 0.7, 0.25, 1] }}
           style={{ transformStyle: 'preserve-3d', cursor: 'pointer' }}
-          className="relative"
+          className="flip-shine relative rounded-2xl"
         >
           <div
             className="flex min-h-[230px] flex-col justify-center gap-2.5 rounded-2xl border p-8 text-center shadow-sm"

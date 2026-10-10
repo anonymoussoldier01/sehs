@@ -8,6 +8,8 @@ import { Select } from '../components/ui/select';
 import { Checkbox } from '../components/ui/checkbox';
 import { Progress } from '../components/ui/progress';
 import { SpotlightCard, StarBorder, TextGenerate, BlurText, Magnet, ClickSpark, AnimatedTabs, AnimatedTooltip, DotPattern, GridPattern, Tilt, Confetti } from '../components/magic';
+import { BentoGrid, BentoCard, MiniTimer, Evervault, Lamp, Faq, StatefulButton } from '../components/ace';
+import { BoxReveal, OrbitingCircles, SpinningText, Typewriter, TextReveal, HyperText, InteractiveHover } from '../components/bits';
 import { useMotionProfile, dur } from '../lib/motion';
 
 function Swatch({ name, css, text = '#fff' }) {
@@ -164,6 +166,34 @@ export default function Design() {
           <Button size="sm" variant="secondary" onClick={() => { setBoom(false); setTimeout(() => setBoom(true), 30); }}>Fire restrained confetti</Button>
           <Confetti fire={boom} />
         </div>
+      </Row>
+
+      <Row label="Third wave — Aceternity · MagicUI · React Bits (motion-gated, calm in exam/viewer)">
+        <div className="w-full overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--line)' }}>
+          <Lamp kicker="Specimen" title="Lamp header" sub="Glowing section headers for mocks and guides." />
+        </div>
+        <div className="w-full">
+          <BoxReveal><p className="font-display text-xl font-bold">BoxReveal headline entrance</p></BoxReveal>
+          <TextReveal className="mt-1 max-w-[60ch] text-[15px]" text="TextReveal binds each word's opacity to scroll position. Read this slowly while scrolling." />
+        </div>
+        <div className="flex flex-wrap items-center gap-4">
+          <OrbitingCircles core="✦" items={['∑', '◈', '☰', '✒', '⬡']} radius={64} duration={18} />
+          <SpinningText text="FREE FOREVER • NO ACCOUNT • ">✦</SpinningText>
+        </div>
+        <p className="w-full text-[15px]"><Typewriter lines={['Ten minutes. Real timing.', 'Find your gaps, calmly.']} /></p>
+        <p className="w-full text-sm"><HyperText text="HYPER encrypt-then-reveal specimen" /></p>
+        <InteractiveHover to="/mocks" primary>Hover-arrow primary</InteractiveHover>
+        <InteractiveHover to="/study">Hover-arrow secondary</InteractiveHover>
+        <StatefulButton idle="Stateful action" onAction={() => new Promise((r) => setTimeout(r, 900))} />
+        <div className="w-full">
+          <BentoGrid>
+            <BentoCard to="/mocks" title="Specimen card" desc="Live skeleton header." header={<MiniTimer />} />
+          </BentoGrid>
+        </div>
+        <div className="w-full">
+          <Faq items={[{ q: 'Specimen question?', a: 'Expandable answer with spring height animation.' }]} />
+        </div>
+        <p className="w-full text-sm">Evervault hover: <Evervault text="SECRET-SAUCE-123" /></p>
       </Row>
 
       <Row label="States — loading, empty, error, offline">

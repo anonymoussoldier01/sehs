@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api, pretty } from '../lib/api';
 import { keys } from '../lib/store';
 import { Button } from '../components/ui/button';
-import { AuroraText, BlurFade, DeckCard, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText, DotPattern, Magnet, ClickSpark, SpotlightCard, Tilt, StarBorder, TextGenerate, BlurText } from '../components/magic';
+import { AuroraText, BlurFade, DeckCard, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText, DotPattern, Magnet, ClickSpark, StarBorder, TextGenerate, BlurText } from '../components/magic';
 import { ResourceCard } from '../components/cards';
+import { BoxReveal, SpinningText, VanishInput, Typewriter, ScrollVelocity, Ripple, InteractiveHover } from '../components/bits';
+import { BentoGrid, BentoCard, MiniTimer, MiniViewer, MiniDeck, MiniPen, MiniBars, MiniLines, ContainerScroll, AuroraBg, SnapCarousel, Evervault } from '../components/ace';
 
 function useApi(fn, deps) {
   const [data, setData] = useState(null);
@@ -24,7 +26,6 @@ function useApi(fn, deps) {
 
 function Hero() {
   const navigate = useNavigate();
-  const [q, setQ] = useState('');
   return (
     <section className="mhero relative overflow-hidden" aria-label="Search" style={{ padding: '56px 24px 10px', maxWidth: 1060 }}>
       <DotPattern />
@@ -32,17 +33,24 @@ function Hero() {
       <Meteors count={5} />
       <div className="mhero-inner relative">
         <BlurFade>
-          <ShinyBadge>
-            <SparklesText count={5}>✦ Built for the selective entry test · free forever</SparklesText>
-          </ShinyBadge>
+          <span className="flex flex-wrap items-center gap-3">
+            <ShinyBadge>
+              <SparklesText count={5}>✦ Built for the selective entry test · free forever</SparklesText>
+            </ShinyBadge>
+            <SpinningText text="FREE FOREVER • NO ACCOUNT • " size={92}>
+              ✦
+            </SpinningText>
+          </span>
         </BlurFade>
         <BlurFade delay={0.08}>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(38px,6vw,64px)', lineHeight: 1.04, letterSpacing: '-.025em', margin: '18px 0 14px', fontWeight: 700 }}>
-            Study <AuroraText>anything</AuroraText>.<br />
-            <span className="hl-stroke">Master <WordRotate words={['maths', 'verbal reasoning', 'reading', 'writing', 'vocabulary']} />.
-              <svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 60 2, 140 2, 198 7" /></svg>
-            </span>
-          </h1>
+          <BoxReveal delay={0.1}>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(38px,6vw,64px)', lineHeight: 1.04, letterSpacing: '-.025em', margin: '18px 0 14px', fontWeight: 700 }}>
+              Study <AuroraText>anything</AuroraText>.<br />
+              <span className="hl-stroke">Master <WordRotate words={['maths', 'verbal reasoning', 'reading', 'writing', 'vocabulary']} />.
+                <svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 60 2, 140 2, 198 7" /></svg>
+              </span>
+            </h1>
+          </BoxReveal>
         </BlurFade>
         <BlurFade delay={0.16}>
           <p className="lede" style={{ color: 'var(--mut)', fontSize: 17, maxWidth: '62ch', margin: '0 0 22px' }}>
@@ -68,31 +76,8 @@ function Hero() {
           </div>
         </BlurFade>
         <BlurFade delay={0.28}>
-          <form
-            role="search"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (q.trim()) navigate('/search?q=' + encodeURIComponent(q.trim()));
-            }}
-            className="searchbox flex min-h-[60px] items-center gap-2.5 rounded-2xl border py-0 pl-[18px] pr-2 shadow-lg transition-all"
-            style={{ background: 'var(--panel)', borderColor: 'var(--line2)' }}
-          >
-            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style={{ color: 'var(--faint)', flex: 'none' }}>
-              <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" fill="none" />
-              <path d="M16.5 16.5 21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              type="search"
-              placeholder="Search papers, decks, topics — try “fractions”…"
-              aria-label="Search study resources"
-              className="min-w-0 flex-1 bg-transparent py-4 text-[17px] outline-none"
-            />
-            <kbd className="hidden rounded-md border px-2 py-0.5 text-xs sm:block" style={{ borderColor: 'var(--line2)', background: 'var(--bg2)', color: 'var(--mut)' }} title="Press / to focus">
-              /
-            </kbd>
-          </form>
+          <VanishInput onSearch={(v) => navigate('/search?q=' + encodeURIComponent(v))} />
+          <p className="mt-2 text-xs" style={{ color: 'var(--faint)' }}>Press <kbd className="kbd">/</kbd> anywhere to jump here</p>
         </BlurFade>
       </div>
     </section>
@@ -327,52 +312,36 @@ export default function Home() {
         </>
       )}
 
+      <ScrollVelocity className="mt-8 border-y py-2.5" base={60}>
+        {['maths', 'verbal reasoning', 'quantitative reasoning', 'reading', 'writing', 'vocabulary', 'timed mocks', 'past papers'].map((w) => (
+          <span key={w} className="mx-5 font-display text-lg font-bold" style={{ color: 'var(--faint)' }}>
+            {w} <span style={{ color: 'var(--acc)' }}>✦</span>
+          </span>
+        ))}
+      </ScrollVelocity>
+
       <BlurText as="h2" className="mb-3 mt-7 font-display text-[22px] font-bold">Study modes</BlurText>
-      <div className="bento grid grid-cols-2 gap-3.5 lg:grid-cols-4">
-        <StarBorder className="col-span-2">
-          <SpotlightCard className="h-full">
-            <Link to="/mocks" className="bento-card beam-card span-2 col-span-2 border-0 shadow-none">
-              <span className="bico">◷</span>
-              <h3>Timed mocks</h3>
-              <p>Full-length blocks with real timing, instant scoring and explanations. Fresh questions every attempt.</p>
-              <span className="text-[13.5px] font-bold" style={{ color: 'var(--acc)' }}>
-                Generate a mock →
-              </span>
-            </Link>
-          </SpotlightCard>
+      <BentoGrid>
+        <StarBorder className="sm:col-span-2">
+          <BentoCard
+            to="/mocks"
+            title="Timed mocks"
+            desc="Full-length blocks with real timing, instant scoring and explanations. Fresh questions every attempt."
+            badge="Most loved"
+            header={<MiniTimer />}
+          />
         </StarBorder>
-        <Link to="/study" className="bento-card">
-          <span className="bico">▢</span>
-          <h3>Flashcards</h3>
-          {/* 811 built-in cards across the five banks (vocab 187, verbal 234, quant 150, maths 120, grammar 120) */}
-          <p>800+ cards with smart repetition.</p>
-        </Link>
-        <Link to="/writing" className="bento-card">
-          <span className="bico">✒</span>
-          <h3>Writing studio</h3>
-          <p>80 prompts, timer, AI feedback.</p>
-        </Link>
-        <Link to="/drills" className="bento-card">
-          <span className="bico">▦</span>
-          <h3>Maths drills</h3>
-          <p>Infinite Year-8 problem sets.</p>
-        </Link>
-        <Link to="/reading" className="bento-card">
-          <span className="bico">☰</span>
-          <h3>Reading room</h3>
-          <p>Passages with questions.</p>
-        </Link>
-        <Link to="/exam-guide" className="bento-card">
-          <span className="bico">≡</span>
-          <h3>Exam guide</h3>
-          <p>Format, pacing, 12-week plan.</p>
-        </Link>
-        <Link to="/search" className="bento-card">
-          <span className="bico">⚲</span>
-          <h3>Library</h3>
-          <p>{stats?.publicResources ? `${Number(stats.publicResources).toLocaleString()} papers and notes.` : 'Papers and notes.'}</p>
-        </Link>
-      </div>
+        <BentoCard to="/study" title="Flashcards" desc="800+ cards with smart repetition." header={<MiniDeck />} />
+        <BentoCard to="/writing" title="Writing studio" desc="80 prompts, timer, rubric feedback." header={<MiniPen />} />
+        <BentoCard to="/drills" title="Maths drills" desc="Infinite Year-8 problem sets." header={<MiniBars />} />
+        <BentoCard to="/reading" title="Reading room" desc="Passages with questions." header={<MiniLines />} />
+        <BentoCard
+          to="/search"
+          title="Library"
+          desc={stats?.publicResources ? `${Number(stats.publicResources).toLocaleString()} papers and notes.` : 'Papers and notes.'}
+          header={<MiniViewer />}
+        />
+      </BentoGrid>
 
       <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">
         For your next session <small className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}>from the library</small>
@@ -390,6 +359,35 @@ export default function Home() {
       </h2>
       <LearnPreview />
 
+      <ContainerScroll
+        title="Read inside the site — no new tabs"
+        sub="Every paper opens in the built-in viewer with your notes, progress and related material alongside. One tap from any card."
+      >
+        <div style={{ background: 'var(--ok-paper, #FBFAF6)' }}>
+          <div className="flex items-center gap-2 border-b px-4 py-2.5" style={{ borderColor: 'var(--line)' }}>
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--bad)' }} />
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--warn)' }} />
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--ok)' }} />
+            <span className="ml-2 text-xs font-bold">Document viewer</span>
+            <span className="ml-auto flex gap-1.5">
+              <span className="rounded-md px-2 py-1 text-[11px] font-bold" style={{ background: 'var(--bg2)' }}>⛶</span>
+              <span className="rounded-md px-2 py-1 text-[11px] font-bold" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>Read here ↓</span>
+            </span>
+          </div>
+          <div className="space-y-2.5 p-5">
+            <div className="h-3.5 w-2/3 rounded" style={{ background: 'var(--txt)', opacity: 0.85 }} />
+            <div className="h-2.5 w-1/3 rounded" style={{ background: 'var(--mark-bg)' }} />
+            {[95, 99, 90, 97, 70].map((w, k) => (
+              <div key={k} className="h-2 rounded" style={{ width: `${w}%`, background: 'var(--line)' }} />
+            ))}
+            <div className="flex gap-2 pt-1">
+              <span className="rounded-lg px-2.5 py-1 text-[11px] font-bold" style={{ background: 'var(--acc-soft)', color: 'var(--acc)' }}>✓ Answers included</span>
+              <span className="rounded-lg px-2.5 py-1 text-[11px] font-bold" style={{ background: 'var(--bg2)', color: 'var(--mut)' }}>My note — saved ✓</span>
+            </div>
+          </div>
+        </div>
+      </ContainerScroll>
+
       <BlurText as="h2" className="mb-3 mt-7 font-display text-[22px] font-bold">New arrivals</BlurText>
       {!fresh ? (
         <div className="grid gap-3.5 sm:grid-cols-2">
@@ -397,21 +395,25 @@ export default function Home() {
           <Skeleton />
         </div>
       ) : (
-        <div className="grid gap-3.5 sm:grid-cols-2">
+        <SnapCarousel label="new arrivals">
           {(fresh.results || []).map((v) => (
-            <ResourceCard key={v.id} v={v} showDesc={false} />
+            <div key={v.id} className="w-[300px] flex-none snap-start sm:w-[340px]">
+              <ResourceCard v={v} showDesc={false} />
+            </div>
           ))}
-        </div>
+        </SnapCarousel>
       )}
 
       {!!trending?.results?.length && (
         <>
           <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Trending this week</h2>
-          <div className="grid gap-3.5 sm:grid-cols-2">
+          <SnapCarousel label="trending">
             {trending.results.map((v) => (
-              <ResourceCard key={v.id} v={v} showDesc={false} />
+              <div key={v.id} className="w-[300px] flex-none snap-start sm:w-[340px]">
+                <ResourceCard v={v} showDesc={false} />
+              </div>
             ))}
-          </div>
+          </SnapCarousel>
         </>
       )}
 
@@ -442,6 +444,22 @@ export default function Home() {
           <ResourceCard key={v.id} v={v} />
         ))}
       </div>
+
+      <AuroraBg className="mt-10 px-6 py-10 text-center sm:px-10">
+        <p className="text-xs font-extrabold uppercase tracking-[0.2em]" style={{ color: 'var(--acc)' }}>Not sure where to start?</p>
+        <h2 className="mx-auto mt-2 max-w-[24ch] font-display text-2xl font-bold sm:text-3xl">
+          <TextGenerate words="Take the short diagnostic." />
+        </h2>
+        <p className="mx-auto mt-2 max-w-[52ch] text-[15px]" style={{ color: 'var(--mut)' }}>
+          <Typewriter lines={['Ten minutes. Real timing.', 'Find your gaps in maths, reasoning, reading.', 'Get a concrete next step — no account.']} />
+        </p>
+        <p className="mt-5 flex flex-wrap justify-center gap-2.5">
+          <Ripple>
+            <InteractiveHover to="/mocks" primary>Take the diagnostic</InteractiveHover>
+          </Ripple>
+          <InteractiveHover to="/exam-guide">Read the exam guide</InteractiveHover>
+        </p>
+      </AuroraBg>
     </div>
   );
 }
@@ -464,7 +482,7 @@ function Qotd() {
       </p>
       {show && (
         <p className="mt-1 text-[13.5px]">
-          Answer: {item.options[item.answer]}. {item.explain}
+          Answer: <Evervault text={`${item.options[item.answer]}`} />. {item.explain}
         </p>
       )}
       {!show && (

@@ -7,6 +7,7 @@ import { Select } from '../components/ui/select';
 import { api } from '../lib/api';
 import { keys, touchStreak, useLocal, useSyncedLocal } from '../lib/store';
 import { repo, exportData, deleteAllData } from '../lib/repo';
+import { WobbleCard } from '../components/ace';
 import { useToast } from '../providers';
 import { BlurFade, ShinyBadge, Skeleton, AnimatedGrid, TypingText, SpotlightCard } from '../components/magic';
 
@@ -180,15 +181,15 @@ export default function StudyHub() {
           ['/writing', 'Writing studio', '80 prompts + timer + rubric.'],
           ['/drills', 'Maths drills', 'Infinite Year-8 drills.'],
         ].map(([to, t, p]) => (
-          <div key={to} className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+          <WobbleCard key={to} to={to} className="p-[18px]" style={{ background: 'var(--panel)' }}>
             <h3 className="font-display text-[15.5px] font-bold">{t}</h3>
             <p className="mb-3 mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
               {p}
             </p>
-            <Link to={to} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
+            <span className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
               Open →
-            </Link>
-          </div>
+            </span>
+          </WobbleCard>
         ))}
       </div>
 

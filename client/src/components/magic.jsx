@@ -5,8 +5,7 @@ import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { cn } from './cn';
 import { readMotionSetting } from '../lib/motion';
 
-function motionOk() {
-  try {
+export function motionOk() {  try {
     const s = readMotionSetting();
     if (s !== 'full') return false;
     return !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -14,7 +13,7 @@ function motionOk() {
     return false;
   }
 }
-function finePointer() {
+export function finePointer() {
   try {
     return window.matchMedia?.('(pointer: fine)').matches ?? false;
   } catch {

@@ -204,6 +204,13 @@ export function Topbar({ onMenu }) {
   const [name, setName] = useLocal(keys.name, '');
   const sugg = useSuggest(q);
   const boxRef = useRef(null);
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -238,10 +245,14 @@ export function Topbar({ onMenu }) {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b backdrop-blur-xl"
-      style={{ background: 'color-mix(in srgb, var(--panel) 90%, transparent)', borderColor: 'var(--line)' }}
+      className="sticky top-0 z-40 border-b backdrop-blur-xl transition-all duration-300"
+      style={{
+        background: scrolled ? 'color-mix(in srgb, var(--panel) 82%, transparent)' : 'color-mix(in srgb, var(--panel) 94%, transparent)',
+        borderColor: 'var(--line)',
+        boxShadow: scrolled ? '0 6px 24px rgba(15,23,42,0.10)' : 'none',
+      }}
     >
-      <div className="mx-auto flex min-h-[62px] max-w-[1240px] items-center gap-2.5 px-4 sm:px-6">
+      <div className="mx-auto flex min-h-[62px] max-w-[1240px] items-center gap-2.5 px-4 transition-all duration-300 sm:px-6" style={scrolled ? { minHeight: 54 } : undefined}>
         <Button variant="secondary" size="icon" onClick={onMenu} aria-label="Open menu" className="lg:hidden">
           <Menu className="h-5 w-5" />
         </Button>

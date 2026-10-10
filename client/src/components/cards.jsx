@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { useOpener, useToast } from '../providers';
 import { pretty } from '../lib/api';
 import { keys, useSyncedLocal } from '../lib/store';
+import { LinkPreview } from './ace';
 
 const TYPE_ABBR = { pdf: 'PDF', docx: 'DOC', image: 'IMG', archive: 'ZIP', webpage: 'WEB', code: 'CODE', other: 'FILE' };
 const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
@@ -59,9 +60,14 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
       <FileIcon type={v.fileType} />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <h3 className="text-[15.5px] font-bold leading-snug">
-          <Link data-result-link to={'/r/' + v.id} className="link-slide transition-colors hover:text-[var(--acc)]">
-            {highlight(displayTitle, tokens)}
-          </Link>
+          <LinkPreview
+            to={'/r/' + v.id}
+            title={displayTitle}
+            desc={v.description}
+            meta={[subj, v.provider ? pretty(v.provider) : null, v.answersIncluded ? 'Answers included' : null].filter(Boolean).join(' · ')}
+          >
+            <span className="link-slide transition-colors hover:text-[var(--acc)]">{highlight(displayTitle, tokens)}</span>
+          </LinkPreview>
         </h3>
         <div className="text-xs font-semibold" style={{ color: 'var(--mut)' }}>
           {subj}
