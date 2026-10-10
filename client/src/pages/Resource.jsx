@@ -465,14 +465,10 @@ function PreviewPanel({ id, kind, title, onOpen }) {
   }, [ensure, id]);
 
   useEffect(() => {
-    let live = true;
     setSrc(null);
     setLoaded(false);
     setBlockedUrl(null);
     load();
-    return () => {
-      live = false;
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
