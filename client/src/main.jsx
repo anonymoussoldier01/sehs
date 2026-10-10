@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Lenis from 'lenis';
@@ -51,9 +51,9 @@ const router = createBrowserRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  <StrictMode>
     <Providers router={<RouterProvider router={router} />} />
-  </React.StrictMode>
+  </StrictMode>
 );
 
 // Apply stored theme before first paint (module executes pre-paint in practice).
