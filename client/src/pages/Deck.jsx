@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { api } from '../lib/api';
@@ -147,6 +147,7 @@ export default function Deck() {
 function Flip({ cards, order, pos, setPos, flipped, setFlipped, box, setBox }) {
   const i = order[pos % order.length];
   const c = cards[i];
+  const swiped = useRef(false);
   if (!c) return null;
   const go = (d) => {
     setPos((p) => (p + d + order.length) % order.length);
@@ -159,8 +160,26 @@ function Flip({ cards, order, pos, setPos, flipped, setFlipped, box, setBox }) {
           key={i}
           role="button"
           tabIndex={0}
-          aria-label="Flashcard — activate to flip"
+          aria-label="Flashcard — activate to flip, swipe right if you knew it, left if not"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.6}
+          onDragEnd={(_, info) => {
+            if (info.offset.x > 90) {
+              swiped.current = true;
+              setBox(i, Math.min(4, box(i) + 1));
+              go(1);
+            } else if (info.offset.x < -90) {
+              swiped.current = true;
+              setBox(i, 1);
+              go(1);
+            }
+          }}
           onClick={(e) => {
+            if (swiped.current) {
+              swiped.current = false;
+              return;
+            }
             if (e.target.closest('a')) return;
             setFlipped((f) => !f);
           }}
@@ -227,6 +246,9 @@ function Flip({ cards, order, pos, setPos, flipped, setFlipped, box, setBox }) {
           </button>
         ))}
       </div>
+      <p className="mt-2 text-center text-xs" style={{ color: 'var(--faint)' }}>
+        Tip: swipe the card → if you knew it, ← if you&apos;re still learning
+      </p>
     </>
   );
 }

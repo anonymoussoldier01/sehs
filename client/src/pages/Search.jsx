@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api, pretty } from '../lib/api';
 import { bumpInsight } from '../lib/store';
-import { BlurFade, Empty, Skeleton } from '../components/magic';
+import { BlurFade, Empty, Skeleton, AnimatedGrid } from '../components/magic';
 import { Pager, ResourceCard, highlight } from '../components/cards';
 
 const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
@@ -283,13 +283,13 @@ export default function Search() {
           </Empty>
         ) : (
           <>
-            <div className={`grid gap-3.5 ${view === 'list' || compact ? 'grid-cols-1' : 'sm:grid-cols-2'}`}>
+            <AnimatedGrid className={`grid gap-3.5 ${view === 'list' || compact ? 'grid-cols-1' : 'sm:grid-cols-2'}`}>
               {(data.results || []).map((v, i) => (
                 <BlurFade key={v.id} delay={Math.min(i, 6) * 0.04}>
                   <ResourceCard v={v} title={v.displayTitle} tokens={tokens} showDesc={!compact} />
                 </BlurFade>
               ))}
-            </div>
+            </AnimatedGrid>
             <Pager
               page={page}
               pages={pages}

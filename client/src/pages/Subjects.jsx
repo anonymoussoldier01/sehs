@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, pretty } from '../lib/api';
-import { Skeleton } from '../components/magic';
+import { Skeleton, AnimatedGrid } from '../components/magic';
 
 export default function Subjects({ subject }) {
   const [rows, setRows] = useState(null);
@@ -39,7 +39,7 @@ export default function Subjects({ subject }) {
           <Skeleton />
         </div>
       ) : (
-        <div className="mt-4 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+        <AnimatedGrid className="mt-4 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
           {rows.map(([name, c]) => {
             const href = isSubj ? `/search?q=${encodeURIComponent(name)}` : `/search?provider=${encodeURIComponent(name)}`;
             return (
@@ -54,7 +54,7 @@ export default function Subjects({ subject }) {
               </div>
             );
           })}
-        </div>
+        </AnimatedGrid>
       )}
     </div>
   );

@@ -1,7 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { cn } from './cn';
+
+// ---------- AnimatedGrid (auto-animate list transitions) ----------
+export function AnimatedGrid({ children, className }) {
+  const [parent] = useAutoAnimate({ duration: 260, easing: 'cubic-bezier(.2,.7,.25,1)' });
+  return (
+    <div ref={parent} className={className}>
+      {children}
+    </div>
+  );
+}
 
 // ---------- BlurFade (entrance) ----------
 export function BlurFade({ children, delay = 0, className, y = 16 }) {

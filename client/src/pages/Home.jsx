@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api, pretty } from '../lib/api';
 import { keys, pushRecent } from '../lib/store';
 import { useToast } from '../providers';
-import { AuroraText, BlurFade, DeckCard, Empty, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate } from '../components/magic';
+import { AuroraText, BlurFade, DeckCard, Empty, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid } from '../components/magic';
 import { ResourceCard, highlight } from '../components/cards';
 
 function useApi(fn, deps) {
@@ -241,13 +241,13 @@ export default function Home() {
 
       <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Recents</h2>
       {recents.length ? (
-        <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+        <AnimatedGrid className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
           {recents.slice(0, 6).map((v, i) => (
             <BlurFade key={v.id} delay={i * 0.05}>
               <ResourceCard v={v} showDesc={false} />
             </BlurFade>
           ))}
-        </div>
+        </AnimatedGrid>
       ) : (
         <div className="grid gap-3.5 md:grid-cols-2">
           <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { keys, useSyncedLocal } from '../lib/store';
 import { useToast } from '../providers';
-import { Skeleton } from '../components/magic';
+import { Skeleton, AnimatedGrid } from '../components/magic';
 import { ResourceCard } from '../components/cards';
 
 const encodeIds = (ids) =>
@@ -66,11 +66,11 @@ export default function Saved() {
           Nothing here yet — tap ☆ Save on any resource and it will show up here.
         </p>
       ) : (
-        <div className="mt-4 grid gap-3.5 sm:grid-cols-2">
+        <AnimatedGrid className="mt-4 grid gap-3.5 sm:grid-cols-2">
           {items.map((v) => (
             <ResourceCard key={v.id} v={v} showDesc={false} />
           ))}
-        </div>
+        </AnimatedGrid>
       )}
 
       <h2 className="mb-3 mt-6 font-display text-xl font-bold">Folders</h2>

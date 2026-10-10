@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
 import { keys, touchStreak, useLocal, useSyncedLocal } from '../lib/store';
 import { useToast } from '../providers';
-import { BlurFade, ShinyBadge, Skeleton } from '../components/magic';
+import { BlurFade, ShinyBadge, Skeleton, AnimatedGrid } from '../components/magic';
 
 function useExam() {
   const [date, setDate] = useLocal(keys.examDate, null);
@@ -232,7 +232,7 @@ export default function StudyHub() {
           <Skeleton />
         </div>
       ) : (
-        <div className="grid gap-3.5 sm:grid-cols-2">
+        <AnimatedGrid className="grid gap-3.5 sm:grid-cols-2">
           {decks.map((d) => (
             <BlurFade key={d.id}>
               <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
@@ -249,7 +249,7 @@ export default function StudyHub() {
               </div>
             </BlurFade>
           ))}
-        </div>
+        </AnimatedGrid>
       )}
 
       <h2 className="mb-3 mt-6 flex flex-wrap items-center gap-2 font-display text-[20px] font-bold">

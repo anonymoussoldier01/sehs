@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import Lenis from 'lenis';
 import './index.css';
 import Layout, { Providers } from './Layout';
 import Home from './pages/Home';
@@ -54,3 +55,25 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <Providers router={<RouterProvider router={router} />} />
   </React.StrictMode>
 );
+
+// Buttery smooth scrolling (Lenis). Skipped for reduced-motion users;
+// React Router's ScrollRestoration keeps working (native scrollTo passes through).
+(function smooth() {
+  try {
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const lenis = new Lenis({ lerp: 0.11, smoothWheel: true });
+    window.__sehsLenis = lenis;
+    let raf;
+    const loop = (time) => {
+      lenis.raf(time);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) cancelAnimationFrame(raf);
+      else raf = requestAnimationFrame(loop);
+    });
+  } catch {
+    /* non-critical enhancement */
+  }
+})();
