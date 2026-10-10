@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" rx="0" fill="#0B1220"/>
+  <rect x="80" y="80" width="1040" height="470" rx="24" fill="#111A2E" stroke="#243049" stroke-width="2"/>
+  <text x="140" y="220" font-family="Georgia, serif" font-size="84" font-weight="700" fill="#E8EDF7">SEHS Study</text>
+  <text x="140" y="300" font-family="Arial, sans-serif" font-size="34" fill="#8A97B2">Past papers, flashcards &amp; timed mocks</text>
+  <text x="140" y="360" font-family="Arial, sans-serif" font-size="34" fill="#8A97B2">for the Victorian selective entry exam.</text>
+  <rect x="140" y="420" width="360" height="64" rx="12" fill="#38BDF8"/>
+  <text x="170" y="462" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#0B1220">Start studying — free</text>
+  <path d="M150 490 C 400 460, 700 460, 1010 480" stroke="#FDE68A" stroke-width="8" fill="none" stroke-linecap="round"/>
+</svg>

@@ -21,7 +21,9 @@ import About from './pages/About';
 import Request from './pages/Request';
 import Unlock from './pages/Unlock';
 import Guide from './pages/Guide';
+import Design from './pages/Design';
 import NotFound from './pages/NotFound';
+import { initMotion } from './lib/motion';
 
 const router = createBrowserRouter([
   {
@@ -45,6 +47,7 @@ const router = createBrowserRouter([
       { path: 'request', element: <Request /> },
       { path: 'unlock', element: <Unlock /> },
       { path: 'exam-guide', element: <Guide /> },
+      { path: 'design', element: <Design /> },
       { path: '*', element: <NotFound /> },
     ],
   },
@@ -56,12 +59,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </StrictMode>
 );
 
-// Apply stored theme before first paint (module executes pre-paint in practice).
+// Apply stored theme + motion setting before first paint (module executes pre-paint in practice).
 try {
   if (localStorage.getItem('sehs-theme') === 'dark') document.documentElement.classList.add('dark');
 } catch {
   /* noop */
 }
+initMotion();
 
 // Buttery smooth scrolling (Lenis). Skipped for reduced-motion users;
 // React Router's ScrollRestoration keeps working (native scrollTo passes through).

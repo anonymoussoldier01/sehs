@@ -5,6 +5,7 @@
 @theme inline {
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-display: "Fraunces", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --ease-out: cubic-bezier(0.2, 0.7, 0.25, 1);
 
   --radius-lg: 0.625rem;
@@ -37,6 +38,26 @@
    neutral slate surfaces. Radius kept consistent (10px base). */
 :root {
   --radius: 0.625rem;
+  /* OKLCH source tokens (hex comments = starting intent for review).
+     Light theme default; .dark overrides below. */
+  --ok-bg: oklch(0.975 0.008 250); /* #F7F8FB */
+  --ok-surface: oklch(1 0 0); /* #FFFFFF */
+  --ok-ink: oklch(0.22 0.05 265); /* #0F172A */
+  --ok-accent: oklch(0.45 0.19 265); /* #2563EB */
+  --ok-paper: oklch(0.99 0.004 95); /* #FBFAF6 */
+  --ok-mark: oklch(0.94 0.09 95); /* #FDE68A */
+  --ok-good: oklch(0.65 0.17 160); /* #10B981 */
+  --ok-bad: oklch(0.62 0.22 12); /* #F43F5E */
+  --ok-flag: oklch(0.72 0.16 70); /* #F59E0B */
+  /* Motion tokens (one central system; see lib/motion.js). */
+  --dur-micro: 120ms;
+  --dur-standard: 240ms;
+  --dur-emphasis: 480ms;
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.25, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --ease-emph: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --ring: 0 0 0 2px var(--background), 0 0 0 4px var(--primary);
   --background: #f8fafc;
   --foreground: #0f172a;
   --card: #ffffff;
@@ -85,6 +106,12 @@
 }
 
 .dark {
+  --ok-bg: oklch(0.23 0.04 260); /* #0B1220 */
+  --ok-surface: oklch(0.27 0.05 260); /* #111A2E */
+  --ok-overlay: oklch(0.31 0.05 260); /* #172238 */
+  --ok-ink: oklch(0.93 0.015 250); /* #E8EDF7 */
+  --ok-muted: oklch(0.68 0.04 250); /* #8A97B2 */
+  --ok-accent: oklch(0.75 0.14 235); /* #38BDF8 */
   --background: #0b1220;
   --foreground: #e8edf5;
   --card: #111a2e;
@@ -164,9 +191,105 @@ html.lenis body {
 }
 
 :focus-visible {
-  outline: 3px solid #fbbf24;
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-radius: 6px;
+  box-shadow: var(--ring);
+}
+
+/* Tabular numerals for timers, scores, question numbers. */
+.tnum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* Reading measure + comfortable passage text. */
+.reading {
+  max-width: 65ch;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+/* Highlighter-stroke signature motif (draws via dashoffset; static when reduced). */
+.hl-stroke {
+  position: relative;
+  white-space: nowrap;
+}
+.hl-stroke > svg {
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  bottom: -0.15em;
+  width: 104%;
+  height: 0.45em;
+  overflow: visible;
+}
+.hl-stroke > svg path {
+  stroke: var(--mark-bg);
+  stroke-width: 5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 320;
+  stroke-dashoffset: 320;
+  animation: hl-draw var(--dur-emphasis) var(--ease-decelerate) 0.35s forwards;
+}
+@keyframes hl-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Motion profiles: Reduced / Off render fades or instant changes, never removed feedback. */
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  animation-duration: 0.001s !important;
+  transition-duration: 0.001s !important;
+}
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+html[data-motion="reduced"] .marquee-track,
+html[data-motion="off"] .marquee-track {
+  animation: none !important;
+}
+html[data-motion="reduced"] .meteor,
+html[data-motion="off"] .meteor,
+html[data-motion="reduced"] .beam-card::before,
+html[data-motion="off"] .beam-card::before,
+html[data-motion="reduced"] .aurora-text,
+html[data-motion="off"] .aurora-text {
+  animation: none !important;
+}
+html[data-motion="reduced"] .hl-stroke > svg path,
+html[data-motion="off"] .hl-stroke > svg path {
+  animation: none !important;
+  stroke-dashoffset: 0;
+}
+
+/* Print styles for study guides and results review. */
+@media print {
+  nav, aside, footer, .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .reading {
+    max-width: 100%;
+  }
+  a {
+    color: #000 !important;
+    text-decoration: underline !important;
+  }
 }
 
 * {
