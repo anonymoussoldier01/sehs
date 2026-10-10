@@ -125,7 +125,22 @@ Open `http://localhost:8080`, search, open `/unlock` for admin. Re-running
 npm run validate    # dataset schema checks
 npm test            # 17 smoke checks
 npm run relevance   # 42 graded relevance checks (gates ranking changes)
+node scripts/assessment.test.mjs  # 13 assessment-engine checks (scoring, timer, seeds, review queue)
+node scripts/answer-links.mjs     # answer-key candidates report (records unchanged)
+node scripts/validate-urls.mjs            # dry run (all unchecked)
+node scripts/validate-urls.mjs --live     # rate-limited live check (default first 50; --all for full)
 ```
+
+## Adding practice questions
+
+Native banks live in `data/native/*.json`. Each question follows the schema in
+`client/src/lib/assessment.js` (`validateQuestion`): `id`, `type`
+(`single` | `numeric` | `passage` | `visual` | `writing`), `stem`, `options` +
+`answer` index (choice types) or numeric `answer` + `tolerance`, `explanation`,
+strand tags, `verification` (`draft` until it passes the pipeline in
+`docs/PLAN.md` Phase 6: author → independently re-solve → one-defensible-answer
+check → wording review → record method + date). Never copy proprietary banks or
+imply a question is official. Run `node scripts/assessment.test.mjs` after edits.
 
 ## Ingestion (unchanged legacy pipeline)
 
