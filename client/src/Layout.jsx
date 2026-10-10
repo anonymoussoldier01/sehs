@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, Outlet, ScrollRestoration } from 'react-router-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Palette, Sidebar, Topbar, useFolders } from './components/shell';
 import { StickyBanner } from './components/ace';
 import { Dock } from './components/magic';

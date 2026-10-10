@@ -38,6 +38,10 @@ Log the smallest sensible change whenever a requirement conflicts with the archi
 ## D9 — Real 404 status with the SPA page
 - `server.mjs`: unknown extensionless non-reserved paths serve `client/dist/index.html` with HTTP 404 (no soft-404s). API/admin/grants/feeds/static untouched (verified live).
 
+## D11 — GooseDesigns styles applied as ideas (MIT, inspiration only — no code copied)
+- GooseDesigns is a mockup gallery, not a component library, so its 22 style families were applied as design direction: **HUD** → exam instrument bezel, T-minus/Q/strand/seed readouts, FINAL MINUTE caution panel, lamp-lit navigator (Calm preserved: no blinking); **blueprint** → drafting-grid overlay in annotate mode; **ledger** → third library view (hairline index table, sticky header, tabular figures); **editorial** → About manifesto, is/is-not ledger, numbered principles; **terminal-dark** → mono HUD telemetry strip on the hero (live counts only); **data-viz** → StudyHub 14-day activity bars from the real on-device ledger (new `opens`/`mocks` insight kinds; honest empty state).
+- Rejected: game-UI excess (no blinking LEDs), invented gauges/scores, logo walls.
+
 ## D10 — Thorough first-visit T&C, Drive links removed, overlay annotations
 - Terms v2 seeded additively (`scripts/terms-v2.mjs`; v1 row untouched, revert = set `terms_version` back to 1; DB snapshotted to `state/backups/phase-terms-v2/`). Copy covers independence, minors, acceptable use, copyright + takedown procedure, privacy summary, AI limits, as-is availability, Australian Consumer Law savings, VIC governing law. No compliance claims — qualified legal review still required (final report).
 - First-visit gate (`FirstVisitTerms`): full scrollable v2 on first site open; Accept records version locally; Decline dismisses and re-asks next visit; per-tab resource gate unchanged. Single-source for Terms page (`/api/terms`); `/privacy` static plain-English page.
