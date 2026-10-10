@@ -27,6 +27,13 @@ export default function About() {
       <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
         Every resource is open to everyone — no account, no login. You will be asked to accept the Terms &amp; Conditions when you open your first resource in each browser tab.
       </p>
+      <h2 className="mt-6 text-base font-bold">Independence</h2>
+      <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
+        This site is independent and is not affiliated with, endorsed by, or connected to the Victorian Department of
+        Education, ACER, or any selective entry high school. Exam-format summaries cite the official ACER and
+        Department pages; anything we cannot verify is labelled as such. If you own material listed here and want it
+        updated or removed, use the Request page or the report button on any resource.
+      </p>
       <h2 className="mt-6 text-base font-bold">Privacy &amp; cookies</h2>
       <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
         We use cookies and local storage to remember your theme, library, decks and study progress. We don&apos;t sell personal data and we don&apos;t run third-party advertising. Anonymous usage

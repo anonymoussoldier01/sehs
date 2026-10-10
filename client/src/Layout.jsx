@@ -116,6 +116,9 @@ function Layout() {
                 Privacy &amp; cookies
               </Link>
             </p>
+            <p className="mt-1 text-xs" style={{ color: 'var(--faint)' }}>
+              Independent study resource — not affiliated with the Victorian Department of Education, ACER, or any exam provider.
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-0.5">
             {[

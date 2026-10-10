@@ -111,7 +111,7 @@ export function TermsProvider({ children }) {
               <h2 className="font-display text-xl font-bold">
                 Terms &amp; Conditions{' '}
                 <span className="text-sm font-normal" style={{ color: 'var(--faint)' }}>
-                  v{pending.version} -� this browser tab only
+                  v{pending.version} — this browser tab only
                 </span>
               </h2>
               <p className="mt-1 font-semibold" style={{ color: 'var(--mut)' }}>
@@ -168,11 +168,11 @@ export function useOpener() {
       } catch {
         w = null;
       }
-      if (!w) toast('Popup blocked ��� allow popups for this site, then try again');
+      if (!w) toast('Popup blocked — allow popups for this site, then try again');
       else {
         try {
           w.document.write(
-            '<!DOCTYPE html><title>Opening�Ǫ</title><body style="font-family:sans-serif;background:#0b0b28;color:#f2f2fb;display:grid;place-items:center;height:100vh;margin:0"><p>Opening your file�Ǫ</p></body>'
+            '<!DOCTYPE html><title>Opening…</title><body style="font-family:sans-serif;background:#0b1220;color:#e8edf5;display:grid;place-items:center;height:100vh;margin:0"><p>Opening your file…</p></body>'
           );
           w.document.close();
         } catch {

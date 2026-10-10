@@ -6,6 +6,7 @@ import { Select } from '../components/ui/select';
 
 import { api } from '../lib/api';
 import { keys, touchStreak, useLocal, useSyncedLocal } from '../lib/store';
+import { repo, exportData, deleteAllData } from '../lib/repo';
 import { useToast } from '../providers';
 import { BlurFade, ShinyBadge, Skeleton, AnimatedGrid, TypingText } from '../components/magic';
 
@@ -124,12 +125,15 @@ export default function StudyHub() {
         Flashcards, quizzes and goals — stored in this browser.
       </p>
 
+      <FirstRun />
+      <ReviewQueue />
+
       <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">Your exam</h2>
       <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
         <div className="flex flex-wrap items-center gap-4">
           {[
-            ['Countdown', diff === null ? '—' : diff >= 0 ? `${diff} day${diff === 1 ? '' : 's'}` : 'Done 🎉'],
-            ['Day streak', `${streak} 🔥`],
+            ['Countdown', diff === null ? '—' : diff >= 0 ? `${diff} day${diff === 1 ? '' : 's'}` : 'Exam week — good luck'],
+            ['Days active', `${streak}`],
             ['Cards mastered', String(mastered)],
           ].map(([l, v]) => (
             <div key={l}>
@@ -365,7 +369,129 @@ export default function StudyHub() {
       <div className="mt-6">
         <ShinyBadge>Streaks, Leitner boxes and plans — all on-device</ShinyBadge>
       </div>
+
+      <YourData />
     </div>
+  );
+}
+
+// ---------- First run: guided start, never an empty chart or fake number ----------
+function FirstRun() {
+  const navigate = useNavigate();
+  const [seen, setSeen] = useState(() => {
+    try {
+      return !!localStorage.getItem('sehs-started');
+    } catch {
+      return true;
+    }
+  });
+  if (seen) return null;
+  const begin = (href) => {
+    try {
+      localStorage.setItem('sehs-started', '1');
+    } catch {
+      /* noop */
+    }
+    setSeen(true);
+    navigate(href);
+  };
+  return (
+    <div className="mt-6 rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }}>
+      <h2 className="font-display text-[20px] font-bold">Start here — pick one small step</h2>
+      <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
+        New here? Choose a goal and do ten focused minutes. Your progress appears on this page — real numbers only, never samples.
+      </p>
+      <p className="mt-3 flex flex-wrap gap-2">
+        <Button size="sm" variant="default" onClick={() => begin('/mocks')}>Take the short diagnostic</Button>
+        <Button size="sm" variant="secondary" onClick={() => begin('/study')}>Meet the flashcards</Button>
+        <Button size="sm" variant="secondary" onClick={() => begin('/search')}>Browse the library</Button>
+      </p>
+    </div>
+  );
+}
+
+// ---------- Review queue: missed questions due for another look (Leitner rule) ----------
+function ReviewQueue() {
+  const navigate = useNavigate();
+  const [items, setItems] = useState(() => repo.reviewQueue.get());
+  useEffect(() => {
+    setItems(repo.reviewQueue.get());
+  }, []);
+  if (!items.length) return null;
+  const today = new Date().toISOString().slice(0, 10);
+  const due = items.filter((it) => !it.nextDue || it.nextDue <= today);
+  const later = items.filter((it) => it.nextDue && it.nextDue > today);
+  const clear = (stem) => {
+    const next = items.filter((x) => x.stem !== stem);
+    repo.reviewQueue.set(next);
+    setItems(next);
+  };
+  return (
+    <>
+      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">
+        Review queue <span className="text-sm font-semibold" style={{ color: 'var(--faint)' }}>{due.length} due</span>
+      </h2>
+      <p className="mb-2 text-[13px]" style={{ color: 'var(--mut)' }}>
+        Missed mock questions return on a schedule (1 → 3 → 7 → 14 → 30 days). Answering them again in a mock or drill clears them here.
+      </p>
+      <div className="flex flex-col gap-2">
+        {[...due, ...later].slice(0, 8).map((it, idx) => (
+          <div key={idx} className="flex items-center gap-3 rounded-xl border px-4 py-2.5 text-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+            <span className="font-bold" style={{ color: it.nextDue && it.nextDue > today ? 'var(--faint)' : 'var(--warn)' }}>
+              {it.nextDue && it.nextDue > today ? '○' : '●'}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate font-semibold">{it.stem}</span>
+              <span className="text-xs" style={{ color: 'var(--faint)' }}>{it.strand} · box {it.box || 1} · due {it.nextDue || 'now'}</span>
+            </span>
+            <Button size="sm" variant="secondary" onClick={() => navigate('/drills')}>Practise</Button>
+            <button onClick={() => clear(it.stem)} aria-label="Remove from review queue" className="grid h-9 w-9 place-items-center rounded-lg text-sm" style={{ color: 'var(--mut)' }}>✕</button>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+// ---------- Your data: export and delete (data ownership) ----------
+function YourData() {
+  const toast = useToast();
+  const [confirming, setConfirming] = useState(false);
+  const doExport = () => {
+    try {
+      const blob = new Blob([JSON.stringify(exportData(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'sehs-my-data.json';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      toast('Exported your study data');
+    } catch {
+      toast('Export failed');
+    }
+  };
+  return (
+    <>
+      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">Your data</h2>
+      <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+        <p className="text-sm" style={{ color: 'var(--mut)' }}>
+          Everything lives in this browser. Export a copy any time, or erase it all. Clearing site data removes it too.
+        </p>
+        <p className="mt-3 flex flex-wrap gap-2">
+          <Button size="sm" variant="secondary" onClick={doExport}>Export my data (JSON)</Button>
+          <Button size="sm" variant="secondary" onClick={() => setConfirming(true)}>Delete my data…</Button>
+        </p>
+        {confirming && (
+          <p className="mt-3 rounded-xl border border-dashed p-3 text-sm" style={{ borderColor: 'var(--bad)' }}>
+            Delete saved resources, notes, attempts, decks and progress on this device? This cannot be undone.
+            <span className="mt-2 flex gap-2">
+              <Button size="sm" variant="destructive" onClick={() => { deleteAllData(); setConfirming(false); toast('All local data deleted'); }}>Delete everything</Button>
+              <Button size="sm" variant="secondary" onClick={() => setConfirming(false)}>Keep my data</Button>
+            </span>
+          </p>
+        )}
+      </div>
+    </>
   );
 }
 

@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /unlock
+Disallow: /design
+Disallow: /saved
+Disallow: /list/
+Disallow: /r/
+Disallow: /api/
+Disallow: /open/
+Disallow: /embed/
+
+Sitemap: /sitemap.xml

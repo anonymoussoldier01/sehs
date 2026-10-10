@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, pretty } from '../lib/api';
-import { keys, pushRecent } from '../lib/store';
-import { useToast } from '../providers';
+import { keys } from '../lib/store';
 import { Button } from '../components/ui/button';
-import { AuroraText, BlurFade, DeckCard, Empty, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText } from '../components/magic';
-import { ResourceCard, highlight } from '../components/cards';
+import { AuroraText, BlurFade, DeckCard, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText } from '../components/magic';
+import { ResourceCard } from '../components/cards';
 
 function useApi(fn, deps) {
   const [data, setData] = useState(null);
@@ -23,7 +22,7 @@ function useApi(fn, deps) {
   return [data, err];
 }
 
-function Hero({ total }) {
+function Hero() {
   const navigate = useNavigate();
   const [q, setQ] = useState('');
   return (
@@ -39,7 +38,9 @@ function Hero({ total }) {
         <BlurFade delay={0.08}>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(38px,6vw,64px)', lineHeight: 1.04, letterSpacing: '-.025em', margin: '18px 0 14px', fontWeight: 700 }}>
             Study <AuroraText>anything</AuroraText>.<br />
-            Master <WordRotate words={['maths', 'verbal reasoning', 'reading', 'writing', 'vocabulary']} />.
+            <span className="hl-stroke">Master <WordRotate words={['maths', 'verbal reasoning', 'reading', 'writing', 'vocabulary']} />.
+              <svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 60 2, 140 2, 198 7" /></svg>
+            </span>
           </h1>
         </BlurFade>
         <BlurFade delay={0.16}>
@@ -160,7 +161,6 @@ function LearnPreview() {
 }
 
 export default function Home() {
-  const toast = useToast();
   const [stats] = useApi(() => api.stats(), []);
   const [deckCount, setDeckCount] = useState(null);
   useEffect(() => {
@@ -214,7 +214,7 @@ export default function Home() {
 
   return (
     <div className="mx-auto max-w-[1060px] px-4 pb-12 sm:px-6">
-      <Hero total={stats?.publicResources} />
+      <Hero />
 
       <BlurFade className="mt-6">
         <Marquee>
@@ -233,14 +233,14 @@ export default function Home() {
 
       <dl className="mt-5 flex flex-wrap gap-2.5" aria-label="Collection statistics">
         {[
-          ['Resources', stats?.publicResources || 0],
+          ['Resources', stats?.publicResources ?? '–'],
           ['Timed mocks', 4],
-          ['Flashcard decks', deckCount ?? 13],
+          ['Flashcard decks', deckCount ?? '–'],
           ['Writing prompts', 80],
         ].map(([l, n]) => (
           <div key={l} className="flex min-w-[118px] flex-col rounded-xl border px-4 py-2.5 shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
             <dd className="order-1 font-display text-[23px] font-bold tabular-nums">
-              <NumberTicker value={n} />
+              {typeof n === 'number' ? <NumberTicker value={n} /> : <span aria-label="loading">–</span>}
             </dd>
             <dt className="order-2 text-[11px] font-bold uppercase tracking-[.07em]" style={{ color: 'var(--faint)' }}>
               {l}
@@ -289,6 +289,7 @@ export default function Home() {
           </div>
           <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
             <h3 className="font-display text-[15.5px] font-bold">Question of the day</h3>
+            <p className="text-xs" style={{ color: 'var(--faint)' }}>AI-generated sample — practise only, not official material.</p>
             <Qotd />
           </div>
         </div>
@@ -332,7 +333,8 @@ export default function Home() {
         <Link to="/study" className="bento-card">
           <span className="bico">▢</span>
           <h3>Flashcards</h3>
-          <p>775+ cards with smart repetition.</p>
+          {/* 811 built-in cards across the five banks (vocab 187, verbal 234, quant 150, maths 120, grammar 120) */}
+          <p>800+ cards with smart repetition.</p>
         </Link>
         <Link to="/writing" className="bento-card">
           <span className="bico">✒</span>
@@ -357,7 +359,7 @@ export default function Home() {
         <Link to="/search" className="bento-card">
           <span className="bico">⚲</span>
           <h3>Library</h3>
-          <p>1,600+ papers and notes.</p>
+          <p>{stats?.publicResources ? `${Number(stats.publicResources).toLocaleString()} papers and notes.` : 'Papers and notes.'}</p>
         </Link>
       </div>
 

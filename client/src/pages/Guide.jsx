@@ -96,10 +96,19 @@ export default function Guide() {
       </div>
       <h2 className="mb-3 mt-6 font-display text-xl font-bold">FAQ</h2>
       <div className="rounded-2xl border p-[18px] text-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-        <p><strong>Calculator?</strong> No.</p>
-        <p className="mt-1"><strong>Question counts?</strong> ACER doesn&apos;t publish them — train to minutes, not counts.</p>
-        <p className="mt-1"><strong>Writing?</strong> Usually 1 persuasive + 1 narrative in 40 min.</p>
-        <p className="mt-1"><strong>Scoring?</strong> ~85% rank / 10% equity / 5% principal discretion.</p>
+        <p><strong>Calculator?</strong> No — practise without one.</p>
+        <p className="mt-1"><strong>Question counts?</strong> <span style={{ color: 'var(--warn)' }}>Unverified:</span> ACER doesn&apos;t publish them — train to minutes, not counts.</p>
+        <p className="mt-1"><strong>Writing?</strong> Two tasks in 40 minutes (verified). <span style={{ color: 'var(--warn)' }}>Unverified:</span> usually one persuasive and one creative — prepare for both.</p>
+        <p className="mt-1"><strong>Offers?</strong> Around 1,000 Year 9 places; up to 5% of places may be offered at a principal&apos;s discretion (verified, vic.gov.au). We don&apos;t model cut-offs or predict results.</p>
+      </div>
+      <h2 className="mb-3 mt-6 font-display text-xl font-bold">Sources</h2>
+      <div className="rounded-2xl border p-[18px] text-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+        <ul className="flex flex-col gap-1.5" style={{ color: 'var(--mut)' }}>
+          <li><a className="font-semibold underline underline-offset-2" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/prepare">ACER — Prepare (exam format, 3 blocks, 2h 35m)</a></li>
+          <li><a className="font-semibold underline underline-offset-2" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/exam-day">ACER — Exam day (schedule, answer booklets)</a></li>
+          <li><a className="font-semibold underline underline-offset-2" style={{ color: 'var(--acc)' }} href="https://www.vic.gov.au/selective-entry-high-schools">Victorian Government — Selective entry high schools</a></li>
+        </ul>
+        <p className="mt-2 text-[13px]" style={{ color: 'var(--faint)' }}>Independent guide — not affiliated with the Department of Education or ACER. Check the official pages for the current year.</p>
       </div>
     </div>
   );
