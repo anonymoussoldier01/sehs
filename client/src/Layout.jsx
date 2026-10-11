@@ -1,13 +1,199 @@
-import { useEffect, useState } from 'react';
-import { Link, Outlet, ScrollRestoration } from 'react-router-dom';
+import { useEffect, useState, ViewTransition } from 'react';
+import { Link, Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router-dom';
+import { readMotionSetting } from './lib/motion';
 import { motion } from 'framer-motion';
+import { Menu, Moon, Sun, X } from 'lucide-react';
 import { Palette, Sidebar, Topbar, useFolders } from './components/shell';
-import { StickyBanner } from './components/ace';
 import { Dock } from './components/magic';
-import { ThemeProvider, ToastProvider } from './providers';
+import { ThemeProvider, ToastProvider, useTheme } from './providers';
 import { TermsProvider } from './providers';
 import { api } from './lib/api';
 import { keys } from './lib/store';
+import { WelcomeBackBar } from './components/landing';
+
+function LandingNav() {
+  const { dark, toggle } = useTheme();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  const centre = [
+    ['/mocks', 'Mocks'],
+    ['/study', 'Flashcards'],
+    ['/search?type=pdf', 'Past papers'],
+    ['/writing', 'Writing'],
+    ['/exam-guide', 'Guides'],
+  ];
+  return (
+    <>
+      <header
+        className="sticky top-0 z-40"
+        style={{
+          background: 'color-mix(in srgb, var(--bg) 82%, transparent)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          borderBottom: '1px solid var(--border)',
+          boxShadow: scrolled ? '0 1px 0 rgba(15,23,42,0.06)' : 'none',
+        }}
+      >
+        <div className="mx-auto flex min-h-[64px] w-full max-w-[1200px] items-center gap-3 px-6">
+          <Link to="/" className="flex min-h-[44px] items-center gap-2.5" aria-label="SEHS Study home">
+            <span
+              className="grid h-9 w-9 flex-none place-items-center rounded-[11px] font-display text-xl font-black"
+              style={{ background: 'var(--text)', color: 'var(--bg)' }}
+            >
+              S
+            </span>
+            <strong className="font-display text-[17px]">SEHS Study</strong>
+          </Link>
+          <nav className="mx-auto hidden items-center gap-1 md:flex" aria-label="Product">
+            {centre.map(([to, l]) => (
+              <Link
+                key={to + l}
+                to={to}
+                className="min-h-[44px] items-center px-3 py-2 text-[14px] font-semibold"
+                style={{ color: 'var(--text-2)', display: 'inline-flex' }}
+              >
+                {l}
+              </Link>
+            ))}
+          </nav>
+          <div className="ml-auto flex items-center gap-2 md:ml-0">
+            <button
+              type="button"
+              onClick={(e) => toggle(e)}
+              aria-pressed={String(dark)}
+              aria-label="Toggle light and dark mode"
+              className="grid h-10 w-10 place-items-center rounded-[10px] border"
+              style={{ borderColor: 'var(--border-strong)', color: 'var(--text-2)' }}
+            >
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <Link
+              to="/study"
+              className="hidden min-h-[44px] items-center rounded-[10px] border px-4 py-2 text-sm font-bold sm:inline-flex"
+              style={{ borderColor: 'var(--border-strong)', color: 'var(--text)' }}
+            >
+              Study hub
+            </Link>
+            <button
+              type="button"
+              onClick={() => navigate('/mocks')}
+              className="hidden min-h-[44px] items-center rounded-[10px] px-4 py-2 text-sm font-extrabold sm:inline-flex"
+              style={{ background: 'var(--cta-bg)', color: 'var(--cta-fg)' }}
+            >
+              Start a free mock
+            </button>
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={String(open)}
+              className="grid h-11 w-11 place-items-center rounded-[10px] border md:hidden"
+              style={{ borderColor: 'var(--border-strong)' }}
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </header>
+      {open ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu"
+          className="fixed inset-0 z-[80] flex flex-col p-6"
+          style={{ background: 'var(--bg)' }}
+        >
+          <div className="flex items-center justify-between">
+            <strong className="font-display text-lg">SEHS Study</strong>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Close menu"
+              className="grid h-11 w-11 place-items-center rounded-[10px] border"
+              style={{ borderColor: 'var(--border-strong)' }}
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          <nav className="mt-6 flex flex-col gap-1" aria-label="Mobile">
+            {[...centre, ['/study', 'Study hub'], ['/mocks', 'Start a free mock']].map(
+              ([to, l]) => (
+                <Link
+                  key={to + l}
+                  to={to}
+                  onClick={() => setOpen(false)}
+                  className="min-h-[52px] items-center border-b py-3 text-lg font-bold"
+                  style={{ borderColor: 'var(--border)', color: 'var(--text)', display: 'flex' }}
+                >
+                  {l} →
+                </Link>
+              )
+            )}
+          </nav>
+        </div>
+      ) : null}
+    </>
+  );
+}
+
+// One footer for both surfaces (landing + app shell): same columns, same
+// legal note, same theme toggle. The app shell used to render a different
+// ledger footer — that split is what made the two halves feel disconnected.
+function SiteFooter() {
+  const { dark, toggle } = useTheme();
+  const cols = [
+    ['Product', [['/mocks', 'Timed mocks'], ['/study', 'Flashcards'], ['/drills', 'Maths drills'], ['/writing', 'Writing studio'], ['/reading', 'Reading room']]],
+    ['Practice', [['/search?type=pdf', 'Past papers'], ['/subjects', 'Subjects'], ['/providers', 'Providers'], ['/exam-guide', 'Exam guide']]],
+    ['Resources', [['/saved', 'Library'], ['/request', 'Request'], ['/whats-new', "What's new"], ['/study#backup', 'Backup & restore']]],
+    ['About', [['/about', 'About'], ['/terms', 'Terms'], ['/privacy', 'Privacy'], ['/unlock', 'Contact / takedown']]],
+  ];
+  return (
+    <footer className="mx-auto w-full max-w-[1200px] px-6 pb-12 pt-10" style={{ borderTop: '1px solid var(--border)' }}>
+      <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        {cols.map(([h, links]) => (
+          <nav key={h} aria-label={h}>
+            <p className="text-xs font-extrabold uppercase tracking-[0.14em]" style={{ color: 'var(--text-2)', margin: '0 0 10px' }}>
+              {h}
+            </p>
+            <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              {links.map(([to, l]) => (
+                <li key={to + l}>
+                  <Link to={to} className="inline-flex min-h-[36px] items-center text-[13.5px] font-semibold" style={{ color: 'var(--text-2)' }}>
+                    {l}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
+      </div>
+      <div className="mt-8 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={(e) => toggle(e)}
+          className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border px-4 py-2 text-sm font-bold"
+          style={{ borderColor: 'var(--border-strong)', color: 'var(--text)' }}
+          aria-pressed={String(dark)}
+        >
+          {dark ? 'Light mode' : 'Dark mode'}
+        </button>
+        <p className="text-xs" style={{ color: 'var(--text-3)', maxWidth: '72ch', margin: 0 }}>
+          Free forever, no account — progress saves in this browser. Melbourne High · Mac.Rob · Nossal ·
+          Suzanne Cory. Not affiliated with ACER, the Department of Education or any school; names and crests
+          used for identification only. VCE 2025 results via vic.gov.au, last checked 2026-09-30. Sources and
+          dates on school pages.
+        </p>
+      </div>
+    </footer>
+  );
+}
 
 function CookieBar() {
   const [show, setShow] = useState(false);
@@ -63,16 +249,16 @@ function Announcement() {
   }, []);
   if (!body) return null;
   return (
-    <StickyBanner top={70}>
-      <div
-        className="mx-5 mb-0 mt-3 flex items-center gap-3 rounded-2xl border p-3.5 text-sm shadow-sm"
-        style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }}
-        role="status"
-      >
-      <span className="flex-1">{body}</span>
+    <div
+      className="flex min-h-[34px] items-center justify-center gap-2 px-4 py-1 text-center text-[13px]"
+      style={{ background: 'var(--acc-soft)', borderBottom: '1px solid var(--line)', color: 'var(--txt)' }}
+      role="status"
+    >
+      <span className="truncate" title={body}>{body}</span>
       <button
-        className="font-bold underline underline-offset-2"
+        className="flex-none font-bold underline underline-offset-2"
         style={{ color: 'var(--acc)' }}
+        aria-label="Dismiss announcement"
         onClick={() => {
           try {
             localStorage.setItem(keys.annSeen, String(body).slice(0, 120));
@@ -82,10 +268,9 @@ function Announcement() {
           setBody(null);
         }}
       >
-        Dismiss
-        </button>
-      </div>
-    </StickyBanner>
+        ×
+      </button>
+    </div>
   );
 }
 
@@ -186,58 +371,115 @@ function FirstVisitTerms() {
   );
 }
 
+function ReleaseNote() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    try {
+      const seen = localStorage.getItem('sehs-whats-new-seen');
+      const returning = localStorage.getItem('sehs-started') || localStorage.getItem('sehs-saved');
+      if (returning && seen !== 'phase-2') setShow(true);
+    } catch {
+      /* noop */
+    }
+  }, []);
+  if (!show) return null;
+  return (
+    <div
+      className="flex min-h-[34px] items-center justify-center gap-2 px-4 py-1 text-center text-[13px]"
+      style={{ background: 'var(--panel)', borderBottom: '1px solid var(--line)', color: 'var(--mut)' }}
+      role="status"
+    >
+      <span className="truncate">
+        New: back up and restore your progress. <Link to="/whats-new" className="font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }} onClick={dismiss}>See what&apos;s new</Link>
+      </span>
+      <button className="flex-none font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }} aria-label="Dismiss what's new" onClick={dismiss}>×</button>
+    </div>
+  );
+  function dismiss() {
+    try {
+      localStorage.setItem('sehs-whats-new-seen', 'phase-2');
+    } catch {
+      /* noop */
+    }
+    setShow(false);
+  }
+}
+
+// Route transitions (React ViewTransition, auto cross-fade on navigations).
+// Renders only when the browser supports the API, motion is Full, and the
+// OS allows it — otherwise navigation stays instant, never broken.
+function viewTransitionsOK() {
+  try {
+    if (!ViewTransition || typeof document?.startViewTransition !== 'function') return false;
+    if ((readMotionSetting() || 'full') !== 'full') return false;
+    return !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+  } catch {
+    return false;
+  }
+}
+
+function Main({ children }) {
+  const el = (
+    <main id="main" className="flex-1">
+      {children}
+    </main>
+  );
+  return viewTransitionsOK() ? <ViewTransition>{el}</ViewTransition> : el;
+}
+
 function Layout() {
   const [sideOpen, setSideOpen] = useState(false);
-  const folders = useFolders();  useEffect(() => {
+  const folders = useFolders();
+  const { pathname } = useLocation();
+  const isLanding = pathname === '/';
+  useEffect(() => {
     const onKey = (e) => {
       if (e.key === 'Escape') setSideOpen(false);
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
   }, []);
+  if (isLanding) {
+    // "/" = marketing landing: full-width, sticky top nav, NO sidebar, full footer.
+    return (
+      <div className="flex min-h-screen min-w-0 flex-col">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[90] focus:min-h-[44px] focus:rounded-xl focus:px-4 focus:py-2 focus:text-sm focus:font-bold"
+          style={{ background: 'var(--cta-bg)', color: 'var(--cta-fg)' }}
+        >
+          Skip to content
+        </a>
+        <LandingNav />
+        <WelcomeBackBar />
+        <Main>
+          <Outlet />
+        </Main>
+        <SiteFooter />
+        <CookieBar />
+        <FirstVisitTerms />
+        <ScrollRestoration />
+      </div>
+    );
+  }
   return (
     <div className="grid min-h-screen lg:grid-cols-[248px_minmax(0,1fr)]">
       <Sidebar open={sideOpen} onClose={() => setSideOpen(false)} folders={folders} />
       <div className="flex min-w-0 flex-col">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[90] focus:min-h-[44px] focus:rounded-xl focus:px-4 focus:py-2 focus:text-sm focus:font-bold"
+          style={{ background: 'var(--cta-bg)', color: 'var(--cta-fg)' }}
+        >
+          Skip to content
+        </a>
         <Topbar onMenu={() => setSideOpen((o) => !o)} />
         <Announcement />
-        <main id="main" className="flex-1">
+        <ReleaseNote />
+        <Main>
           <Outlet />
-        </main>
-        <footer className="mx-auto w-full max-w-[1200px] px-6 pb-12 pt-7" style={{ borderTop: '2px solid var(--txt)' }}>
-          <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
-            <div>
-              <p className="kicker" style={{ marginBottom: 8 }}>SEHS Study · ledger</p>
-              <p className="mb-2 mt-1 max-w-[72ch] text-[15px]" style={{ color: 'var(--mut)' }}>
-                Past papers, notes, flashcards, mocks and guides for Victoria&apos;s selective entry exam. Free, no account.
-              </p>
-              <p className="tnum text-xs tabular-nums" style={{ color: 'var(--faint)' }}>
-                Cookies + local storage remember your theme, library and progress. Anonymous counts auto-delete after 30 days.{' '}
-                <Link to="/about" className="font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>
-                  Privacy &amp; cookies
-                </Link>
-              </p>
-              <p className="mt-1 text-xs" style={{ color: 'var(--faint)' }}>
-                Independent study resource. Not affiliated with the Victorian Department of Education, ACER, or any exam provider.
-              </p>
-            </div>
-            <nav className="flex flex-wrap items-center gap-x-1 gap-y-0.5" aria-label="Footer">
-              {[
-                ['/about', 'About'],
-                ['/terms', 'Terms'],
-                ['/privacy', 'Privacy'],
-                ['/saved', 'Library'],
-                ['/study', 'Study hub'],
-                ['/request', 'Request'],
-                ['/unlock', 'Admin'],
-              ].map(([to, l]) => (
-                <Link key={to} to={to} className="link-slide min-h-[36px] px-2 py-2 text-[13.5px] font-bold" style={{ color: 'var(--acc)' }}>
-                  {l}
-                </Link>
-              ))}
-            </nav>
-          </div>
-        </footer>
+        </Main>
+        <SiteFooter />
       </div>
       <Palette />
       <Dock />

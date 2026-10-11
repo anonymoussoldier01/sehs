@@ -56,3 +56,18 @@ One line per technique, as R-31 demands. Brand core: ink blue (trust, depth for 
 
 ## D7 — Streaks kept neutral; no streak-shaming, urgency, locks, or peer comparison
 - The existing day-streak counter stays as a neutral fact ("3 days active") with no guilt copy, no artificial locks, no leaderboards.
+
+## D11 — Colour system replacement overrides all earlier colour rules (Oct 2026)
+- Context: page used amber + red + purple + green + blue + cream at once. New brief mandates one calm hue family, near-monochrome, single quiet sky accent; colour rare so it means something.
+- Decision: tokens `--bg #0B1020 / #FAF7F0`, `--accent #7DB2FF / #2A5FD0`, ivory/ink CTA, paper for sample card only, success/error in feedback only. Amber, per-school `brandColour` fields, red glows, blue buttons, two-hue gradients, multi-colour glows, coloured card borders, rainbow charts all removed. Crests mono default (`CREST_COLOUR="mono"`), doors share one neutral palette, hero one ≤9% accent spotlight. Alt teal/brass as token swaps previewed at `/design/colours?accent=`.
+- Consequence: `DESIGN.md` §2 rewritten; `data/schools.js` colour fields deleted; annotations collapsed to single-hue accent ramp; flagged state is dashed neutral + icon (not amber). Legacy MPA `styles.css` + server templates still carry old hues — logged as follow-up, out of this pass. No new deps; `scripts/colour-budget.mjs` + Playwright `client/tests/colour-budget.spec.js` gate the budget.
+
+## D12 — Landing split into two surfaces (Oct 2026)
+- Context: "/" behaved as an app dashboard (sidebar, Continue, countdown, path card fighting above the fold).
+- Decision: "/" = marketing landing (sticky top nav, no sidebar, full 4-col footer); app shell keeps sidebar/Topbar/Dock for all other routes. New `/app` aliases `/study`; old URLs keep working. Landing Hero always shows the live sample question; target selection only sets state then offers "Go to my study hub". Continue/countdown/DoorChooser live in the Study hub, not the landing. Welcome-back bar + "Open the app" CTA appear only when local progress exists.
+- Consequence: `Layout.jsx` branches on `pathname === "/"`; `Home.jsx` is landing-only; reference teardown at `docs/landing-teardown.md` (structure/craft only, no brand copying).
+
+## D13 — Vercel + Supabase deploy path (Oct 2026)
+- Context: `server.mjs` is a long-lived plain-HTTP server on file-backed SQLite (`node:sqlite`), which cannot run on Vercel serverless (read-only fs, no listener). The header comment referenced `api/index.js`, which did not exist, and there was no `vercel.json`. The Postgres mirror (`server/pg.mjs`, switched via `DATABASE_URL` in `server/db.mjs`) already worked, including SSL for hosted Postgres.
+- Decision: extract the request closure to exported `handleRequest(req, res)` (direct-run guard keeps `node server.mjs` behaviour identical); add `api/index.js` serverless entry + `vercel.json` (static `client/dist` on the CDN, only `/api/*`, `/open/*`, `/embed/*`, `/feed.xml`, `/admin*` routed to the function); make `readBody` reuse Vercel's pre-parsed `req.body`; ship `robots.txt`/`sitemap.xml` via `client/public` so both runtimes serve them. No new deps.
+- Consequence: Supabase works today (`DATABASE_URL` = pooler URL, `SEHS_ADMIN_PASSWORD` set before first boot, then `node scripts/migrate.mjs && node scripts/seed-native.mjs` from any machine). Vercel needs those two env vars; per-invocation cold starts rebuild the in-memory search index (fast at this catalogue size); rate limiters are per-instance. Learner data stays in localStorage either way, so progress/backup flows are unaffected by hosting.

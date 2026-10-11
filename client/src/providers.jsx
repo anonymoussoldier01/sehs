@@ -11,9 +11,9 @@ export const useTheme = () => useContext(ThemeCtx);
 export function ThemeProvider({ children }) {
   const [dark, setDark] = useState(() => {
     try {
-      return localStorage.getItem(keys.theme) === 'dark';
+      return localStorage.getItem(keys.theme) !== 'light';
     } catch {
-      return false;
+      return true;
     }
   });
   useEffect(() => {

@@ -35,7 +35,7 @@ const distOn = () => {
 };
 // React SPA routes (served from client/dist when built, legacy MPA otherwise).
 // /admin*, /open/*, /feed.xml and /api/* always stay on the server.
-const SPA_RE = /^\/(search|subjects|providers|about|terms|privacy|saved|request|study|exam-guide|mocks|writing|reading|drills|unlock|list|design|r)(\/|$)/;
+const SPA_RE = /^\/(search|subjects|providers|about|terms|privacy|saved|request|study|exam-guide|mocks|writing|reading|drills|unlock|list|design|whats-new|r)(\/|$)/;
 function distFile(p) {
   try {
     const f = path.join(DIST, decodeURIComponent(p));
@@ -197,6 +197,13 @@ function serveStatic(p, res) {
 }
 
 function readBody(req, maxBytes = 100 * 1024) {
+  // Serverless runtimes (Vercel) pre-parse JSON bodies into req.body and the
+  // raw stream is already consumed — reuse it instead of hanging on 'end'.
+  if (req.body !== undefined && req.body !== null) {
+    const s = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+    if (Buffer.byteLength(s, 'utf8') > maxBytes) return Promise.reject(new Error('payload too large'));
+    return Promise.resolve(s);
+  }
   return new Promise((resolve, reject) => {
     const chunks = [];
     let n = 0;
@@ -993,7 +1000,10 @@ async function apiAiVariants(req, res, ip) {
 }
 
 // ---- router ----------------------------------------------------------------------
-const server = http.createServer(async (req, res) => {
+// Request handler shared by the long-lived server and serverless runtimes
+// (Vercel `api/index.js`). Keep it stateless across invocations: module-level
+// `db`/`indexes` are a warm-start cache only, rebuilt via ready() when empty.
+export async function handleRequest(req, res) {
   const url = new URL(req.url, 'http://x');
   const ip = clientIp(req);
   try {
@@ -1502,6 +1512,12 @@ const server = http.createServer(async (req, res) => {
   } catch (e) {
     try { sendJson(res, 500, { ok: false, error: 'unavailable' }); } catch { /* closed */ }
   }
-});
+}
 
-server.listen(PORT, () => console.log(`sehs http://localhost:${PORT}`));
+const server = http.createServer(handleRequest);
+
+// Only listen when run directly (`node server.mjs`). Serverless entries
+// (api/index.js) import handleRequest without starting a listener.
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  server.listen(PORT, () => console.log(`sehs http://localhost:${PORT}`));
+}

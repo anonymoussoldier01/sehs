@@ -28,7 +28,7 @@ export function BentoCard({ to, title, desc, header, span, badge }) {
       <h3 className="font-display text-[16px] font-bold">{title}</h3>
       <p className="mb-3 mt-1 text-[13.5px] leading-relaxed" style={{ color: 'var(--mut)' }}>{desc}</p>
       <span className="mt-auto inline-flex items-center gap-1.5 text-[13.5px] font-bold" style={{ color: 'var(--acc)' }}>
-        Open <span aria-hidden="true">→</span>
+        Open
       </span>
     </Link>
   );
@@ -153,7 +153,7 @@ export function TracingBeam({ children, className }) {
     <div ref={ref} className={cn('relative', className)}>
       <div aria-hidden="true" className="absolute -left-5 top-0 hidden h-full w-[3px] overflow-hidden rounded-full md:block" style={{ background: 'var(--line)' }}>
         {animate ? (
-          <motion.div className="w-full origin-top rounded-full" style={{ scaleY: scrollYProgress, height: '100%', background: 'linear-gradient(to bottom, var(--primary), #38bdf8)' }} />
+          <motion.div className="w-full origin-top rounded-full" style={{ scaleY: scrollYProgress, height: '100%', background: 'var(--accent)' }} />
         ) : (
           <div className="h-full w-full" style={{ background: 'var(--acc-line)' }} />
         )}

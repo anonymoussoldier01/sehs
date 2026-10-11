@@ -6,10 +6,12 @@ import { Select } from '../components/ui/select';
 
 import { api } from '../lib/api';
 import { keys, touchStreak, useLocal, useSyncedLocal } from '../lib/store';
-import { repo, exportData, deleteAllData } from '../lib/repo';
+import { repo, deleteAllData } from '../lib/repo';
+import { buildBackup, restoreBackup } from '../lib/storage';
 import { WobbleCard } from '../components/ace';
 import { useToast } from '../providers';
 import { ShinyBadge, Skeleton, AnimatedGrid, TypingText, SpotlightCard } from '../components/magic';
+import { BackupNudge } from '../components/system';
 
 function useExam() {
   const [date, setDate] = useLocal(keys.examDate, null);
@@ -128,6 +130,7 @@ export default function StudyHub() {
       </p>
 
       <FirstRun />
+      <BackupNudge />
       <ReviewQueue />
       <ActivityChart />
 
@@ -178,18 +181,18 @@ export default function StudyHub() {
       <h2 className="section-title">Built-in prep</h2>
       <div className="grid gap-3 sm:grid-cols-2">
         {[
-          ['/exam-guide', 'Exam guide', '3 blocks, pacing, schools, plans.'],
-          ['/mocks', 'Timed mocks', '60 / 55 / 40 min blocks + diagnostic.'],
-          ['/writing', 'Writing studio', '80 prompts + timer + rubric.'],
-          ['/drills', 'Maths drills', 'Infinite Year-8 drills.'],
-        ].map(([to, t, p]) => (
+          ['/exam-guide', 'Exam guide', '3 blocks, pacing, schools, plans.', 'Open'],
+          ['/mocks', 'Timed mocks', '60 / 55 / 40 min blocks + diagnostic.', 'Start'],
+          ['/writing', 'Writing studio', '80 prompts + timer + rubric.', 'Start'],
+          ['/drills', 'Maths drills', 'Infinite Year-8 drills.', 'Start'],
+        ].map(([to, t, p, verb]) => (
           <WobbleCard key={to} to={to} className="p-[18px]" style={{ background: 'var(--panel)' }}>
             <h3 className="font-display text-[15.5px] font-bold">{t}</h3>
             <p className="mb-3 mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
               {p}
             </p>
             <span className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
-              Open →
+              {verb} →
             </span>
           </WobbleCard>
         ))}
@@ -323,7 +326,7 @@ export default function StudyHub() {
               </p>
               <span className="flex gap-2">
                 <Button size="sm" variant="default" onClick={() => navigate('/study/local-' + i)}>
-                  Study →
+                  Review →
                 </Button>
                 <Button
                   size="sm"
@@ -487,7 +490,7 @@ function ActivityChart() {
               <div key={d} className="flex flex-1 flex-col items-center gap-1" title={`${d}: ${n} events`}>
                 <span
                   className="w-full rounded-t-md"
-                  style={{ height: `${Math.max(3, Math.round((n / max) * 88))}px`, background: n ? 'var(--primary)' : 'var(--bg2)', border: n ? undefined : '1px solid var(--line)' }}
+                  style={{ height: `${Math.max(3, Math.round((n / max) * 88))}px`, background: n ? 'var(--accent)' : 'var(--bg2)', border: n ? undefined : '1px solid var(--line)', opacity: n ? Math.max(0.25, Math.min(1, n / max)) : 1 }}
                 />
               </div>
             ))}
@@ -502,33 +505,75 @@ function ActivityChart() {
   );
 }
 
-// ---------- Your data: export and delete (data ownership) ----------
+// ---------- Settings: back up / restore progress (single JSON file) ----------
+// Data lives in this browser, so a cleared cache is the #1 study risk. This
+// section exports AND imports one file; the gentle nudge (BackupNudge) points
+// here once a user has meaningful progress.
 function YourData() {
   const toast = useToast();
   const [confirming, setConfirming] = useState(false);
+  const restoreRef = useRef(null);
   const doExport = () => {
     try {
-      const blob = new Blob([JSON.stringify(exportData(), null, 2)], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(buildBackup(), null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = 'sehs-my-data.json';
+      a.download = 'sehs-study-backup.json';
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-      toast('Exported your study data');
+      try {
+        localStorage.setItem('sehs-backup-done', new Date().toISOString());
+      } catch {
+        /* noop */
+      }
+      toast('Backup saved. Keep it somewhere safe.');
     } catch {
       toast('Export failed');
     }
   };
+  const doRestore = (file) => {
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        restoreBackup(JSON.parse(r.result));
+        try {
+          localStorage.setItem('sehs-backup-done', new Date().toISOString());
+        } catch {
+          /* noop */
+        }
+        toast('Progress restored. Reloading…');
+        setTimeout(() => window.location.reload(), 900);
+      } catch (e) {
+        toast(e.message || 'That file is not a valid backup');
+      }
+    };
+    r.readAsText(file);
+  };
   return (
     <>
-      <h2 className="section-title">Your data</h2>
+      <h2 className="section-title" id="backup">Settings · back up / restore</h2>
       <hr className="section-rule" />
       <div className="quiet-card p-[18px]">
         <p className="text-sm" style={{ color: 'var(--mut)' }}>
-          Everything lives in this browser. Export a copy any time, or erase it all. Clearing site data removes it too.
+          Everything lives in this browser — no account, free forever. Clearing site data removes it too,
+          so save a backup copy any time and restore it on this or another device.
         </p>
         <p className="mt-3 flex flex-wrap gap-2">
-          <Button size="sm" variant="secondary" onClick={doExport}>Export my data (JSON)</Button>
+          <Button size="sm" variant="default" onClick={doExport}>Back up progress (JSON)</Button>
+          <label className="inline-flex min-h-[38px] cursor-pointer items-center rounded-[10px] border px-3.5 py-2 font-sans text-[13px] font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+            Restore from file…
+            <input
+              ref={restoreRef}
+              type="file"
+              accept="application/json"
+              hidden
+              onChange={(e) => {
+                doRestore(e.target.files[0]);
+                e.target.value = '';
+              }}
+            />
+          </label>
           <Button size="sm" variant="secondary" onClick={() => setConfirming(true)}>Delete my data…</Button>
         </p>
         {confirming && (
@@ -691,8 +736,8 @@ function Weaknesses() {
                     <span className="truncate">{id.replace(/-/g, ' ')}</span>
                     <span className="tabular-nums">{b.score}/{b.total}</span>
                   </p>
-                  <div className="mt-0.5 h-2 overflow-hidden rounded-full" style={{ background: 'var(--bg2)' }}>
-                    <div className="h-full rounded-full transition-all" style={{ width: `${Math.round((b.score / Math.max(1, b.total)) * 100)}%`, background: 'var(--primary)' }} />
+                  <div className="mt-0.5 h-2 overflow-hidden rounded-full progress-track" style={{ background: 'var(--bg2)', border: '1px solid var(--line)' }}>
+                    <div className="h-full rounded-full transition-all" style={{ width: `${Math.round((b.score / Math.max(1, b.total)) * 100)}%`, background: 'var(--accent)' }} />
                   </div>
                 </div>
               ))}

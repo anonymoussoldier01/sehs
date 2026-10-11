@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -6,7 +6,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { useToast } from '../providers';
 import { pretty } from '../lib/api';
 import { keys, useSyncedLocal } from '../lib/store';
-import { LinkPreview } from './ace';
 
 const TYPE_ABBR = { pdf: 'PDF', docx: 'DOC', image: 'IMG', archive: 'ZIP', webpage: 'WEB', code: 'CODE', other: 'FILE' };
 const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
@@ -52,21 +51,19 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
   const { saved, toggle } = useSaved();
   const displayTitle = title || v.displayTitle || v.title;
   const subj = v.subject ? pretty(v.subject) : pretty(v.category);
-  const readable = v.fileType === 'pdf' || v.fileType === 'image';
 
   return (
     <article data-result-id={v.id} className="quiet-card flex gap-3.5 p-[18px]">
       <FileIcon type={v.fileType} />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <h3 className="text-[15.5px] font-bold leading-snug">
-          <LinkPreview
+          <Link
             to={'/r/' + v.id}
-            title={displayTitle}
-            desc={v.description}
-            meta={[subj, v.provider ? pretty(v.provider) : null, v.answersIncluded ? 'Answers included' : null].filter(Boolean).join(' · ')}
+            title={[displayTitle, subj, v.provider ? pretty(v.provider) : null].filter(Boolean).join(' · ')}
+            className="link-slide hover:text-[var(--acc)]"
           >
-            <span className="link-slide hover:text-[var(--acc)]" title={displayTitle}>{highlight(displayTitle, tokens)}</span>
-          </LinkPreview>
+            {highlight(displayTitle, tokens)}
+          </Link>
         </h3>
         <div className="text-xs font-semibold" style={{ color: 'var(--mut)' }}>
           {subj}
@@ -103,8 +100,8 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
               </TooltipTrigger>
               <TooltipContent>{saved.has(v.id) ? 'Saved' : 'Save'}</TooltipContent>
             </Tooltip>
-            <Button size="sm" variant={readable ? 'default' : 'secondary'} onClick={() => navigate('/r/' + v.id)}>
-              {readable ? 'Read here →' : 'Details →'}
+            <Button size="sm" variant="default" onClick={() => navigate('/r/' + v.id)} aria-label={`Open ${displayTitle}`}>
+              Open
             </Button>
           </span>
         </div>

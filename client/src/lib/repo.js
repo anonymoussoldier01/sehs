@@ -93,28 +93,74 @@ export const repo = {
     get: () => read('sehs-settings', { extraTime: 1, largerText: false, highContrast: false, dyslexiaFriendly: false }),
     set: (s) => write('sehs-settings', s),
   },
+  // Folders v2: [{ id, name, items, colour, tags, order, updatedAt }]
+  folders: {
+    get: () => read(keys.lists, []),
+    set: (lists) => write(keys.lists, (lists || []).slice(0, 50)),
+  },
+  // Writing drafts with 5-deep version history: { [key]: { text, updatedAt, history[] } }
+  drafts: {
+    getAll: () => read('sehs-drafts', {}),
+    get: (key) => read('sehs-drafts', {})[key]?.text || '',
+    set: (key, text) => {
+      const all = read('sehs-drafts', {});
+      if (!key) return;
+      if (!text) delete all[key];
+      else {
+        const prev = all[key];
+        const history = [...(prev?.history || [])];
+        if (prev?.text && prev.text !== text) history.unshift({ text: prev.text.slice(0, 20000), at: prev.updatedAt });
+        all[key] = { text: String(text).slice(0, 20000), updatedAt: new Date().toISOString(), history: history.slice(0, 5) };
+      }
+      write('sehs-drafts', all);
+    },
+  },
+  // Writing self-assessment grades (unversioned legacy key, now channelled here).
+  grades: {
+    get: () => read('sehs-grades', []),
+    add: (entry) => {
+      const all = read('sehs-grades', []);
+      write('sehs-grades', [...all, { ...entry, at: new Date().toISOString() }].slice(-100));
+    },
+  },
+  // Append-only mock history (v2) alongside best-only attempts (v1, kept).
+  history: {
+    get: () => read('sehs-mock-history', {}),
+    append: (id, { score, total, seed, durationSecs }) => {
+      const all = read('sehs-mock-history', {});
+      const list = [...(all[id] || []), { score, total, seed: seed || null, durationSecs: durationSecs ?? null, at: new Date().toISOString() }].slice(-50);
+      all[id] = list;
+      write('sehs-mock-history', all);
+      return list;
+    },
+  },
 };
 
-/** Export learner data (JSON). Nothing leaves the browser unless the user saves the file. */
+/** Export learner data (JSON). Nothing leaves the browser unless the user saves the file.
+ *  Kept for compatibility; new code should use storage.buildBackup() which
+ *  covers every key plus the schema stamp. */
 export function exportData() {
   return {
     exportedAt: new Date().toISOString(),
-    version: 1,
+    version: 2,
     saved: repo.bookmarks.get(),
     progress: repo.readingProgress.get(),
     notes: repo.notes.getAll(),
     annotations: read('sehs-annotations', {}),
     attempts: repo.attempts.get(),
+    history: repo.history.get(),
     review: repo.reviewQueue.get(),
     mistakes: read(keys.mistakes, []),
-    lists: read(keys.lists, []),
+    lists: repo.folders.get(),
     decks: read(keys.decks, []),
+    grades: repo.grades.get(),
+    drafts: repo.drafts.getAll(),
   };
 }
 
 /** Delete all local learner data (irreversible: callers must confirm first). */
 export function deleteAllData() {
-  for (const k of ['sehs-progress', 'sehs-notes', 'sehs-annotations', 'sehs-review', keys.saved, keys.mocks, keys.mistakes, keys.lists, keys.decks, keys.leitner, keys.recent, keys.insights, keys.profile, keys.streak])
+  for (const k of ['sehs-progress', 'sehs-notes', 'sehs-annotations', 'sehs-review', 'sehs-drafts', 'sehs-grades', 'sehs-fsrs', 'sehs-mock-history', keys.saved, keys.mocks, keys.mistakes, keys.lists, keys.decks, keys.leitner, keys.recent, keys.insights, keys.profile, keys.streak])
     try {
       localStorage.removeItem(k);
     } catch {

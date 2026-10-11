@@ -76,11 +76,34 @@ export default function Saved() {
         </AnimatedGrid>
       )}
 
-      <h2 className="mb-3 mt-6 font-display text-xl font-bold">Folders</h2>
+      <div className="mb-3 mt-6 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="font-display text-xl font-bold">Folders</h2>
+        <a href="#list-new" className="inline-flex min-h-[44px] items-center rounded-xl px-4 py-2 text-sm font-bold" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>
+          + New folder
+        </a>
+      </div>
       {!lists.length ? (
-        <p className="text-sm" style={{ color: 'var(--mut)' }}>
-          No folders yet. Tap “+” on any resource card, or create one below.
-        </p>
+        <div className="quiet-card p-[18px]">
+          <p className="text-sm" style={{ color: 'var(--mut)' }}>
+            No folders yet. Start with one of these, or create your own below.
+          </p>
+          <p className="mt-3 flex flex-wrap gap-2">
+            {['Weak spots', 'Mocks to redo', 'Nossal prep'].map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => {
+                  setLists((x) => [...x, { id: 'l' + Date.now().toString(36), name: s, items: [], colour: null, tags: [], order: x.length, updatedAt: new Date().toISOString() }]);
+                  toast(`Folder “${s}” created`);
+                }}
+                className="inline-flex min-h-[44px] items-center rounded-xl border px-4 py-2 text-sm font-bold"
+                style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
+              >
+                + {s}
+              </button>
+            ))}
+          </p>
+        </div>
       ) : (
         <div className="grid gap-3.5 sm:grid-cols-2">
           {lists.map((l, i) => (

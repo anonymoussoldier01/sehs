@@ -344,11 +344,12 @@ export default function MockRun() {
                 aria-label={'Question ' + (k + 1) + (flags[k] ? ', flagged' : '') + (st === 'todo' ? ', unanswered' : ', answered')}
                 className="grid h-10 place-items-center rounded-lg border text-[13px] font-bold tabular-nums"
                 style={{
-                  borderColor: k === i ? 'var(--acc)' : 'var(--line2)',
+                  borderColor: k === i ? 'var(--accent)' : flags[k] ? 'var(--border-strong)' : 'var(--line2)',
                   borderWidth: k === i ? 2 : 1,
-                  background: st === 'todo' ? 'var(--panel)' : 'var(--acc-soft)',
-                  color: st === 'todo' ? 'var(--mut)' : 'var(--acc)',
-                  boxShadow: flags[k] ? 'inset 0 -3px 0 var(--amber, #b45309)' : undefined,
+                  borderStyle: flags[k] ? 'dashed' : 'solid',
+                  background: st === 'todo' ? 'var(--panel)' : 'var(--accent-soft)',
+                  color: st === 'todo' ? 'var(--mut)' : 'var(--text)',
+                  boxShadow: undefined,
                 }}
               >
                 {k + 1}{flags[k] ? '⚑' : ''}
@@ -492,11 +493,12 @@ export default function MockRun() {
                 aria-current={k === i ? 'true' : undefined}
                 className={`grid h-9 place-items-center rounded-lg border text-xs font-bold tabular-nums ${k === i ? 'hud-lamp' : ''}`}
                 style={{
-                  borderColor: k === i ? 'var(--acc)' : 'var(--line2)',
+                  borderColor: k === i ? 'var(--accent)' : flags[k] ? 'var(--border-strong)' : 'var(--line2)',
                   borderWidth: k === i ? 2 : 1,
-                  background: st === 'todo' ? 'var(--panel)' : 'var(--acc-soft)',
-                  color: st === 'todo' ? 'var(--mut)' : 'var(--acc)',
-                  boxShadow: flags[k] ? 'inset 0 -3px 0 var(--amber, #b45309)' : undefined,
+                  borderStyle: flags[k] ? 'dashed' : 'solid',
+                  background: st === 'todo' ? 'var(--panel)' : 'var(--accent-soft)',
+                  color: st === 'todo' ? 'var(--mut)' : 'var(--text)',
+                  boxShadow: undefined,
                 }}
               >
                 {k + 1}

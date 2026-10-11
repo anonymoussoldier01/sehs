@@ -1,0 +1,13 @@
+{
+  "name": "SEHS Study — selective entry test prep",
+  "short_name": "SEHS Study",
+  "description": "Past papers, flashcards and timed ACER-style mocks for the Victorian selective entry exam. Free, no account.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

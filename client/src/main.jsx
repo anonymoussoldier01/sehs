@@ -1,31 +1,58 @@
-import { StrictMode } from 'react';
+import { StrictMode, Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createBrowserRouter, useRouteError, Link } from 'react-router-dom';
 import Lenis from 'lenis';
 import './index.css';
 import Layout, { Providers } from './Layout';
 import Home from './pages/Home';
-import Search from './pages/Search';
-import Resource from './pages/Resource';
-import StudyHub from './pages/StudyHub';
-import Deck from './pages/Deck';
-import Mocks from './pages/Mocks';
-import MockRun from './pages/MockRun';
-import Writing from './pages/Writing';
-import Drills from './pages/Drills';
-import Reading from './pages/Reading';
-import Saved from './pages/Saved';
-import SharedList from './pages/SharedList';
-import Subjects from './pages/Subjects';
-import About from './pages/About';
-import Terms from './pages/Terms';
-import Privacy from './pages/Privacy';
-import Request from './pages/Request';
-import Unlock from './pages/Unlock';
-import Guide from './pages/Guide';
-import Design from './pages/Design';
-import NotFound from './pages/NotFound';
 import { initMotion } from './lib/motion';
+import { migrate } from './lib/storage';
+
+// Code-split every route; heavy viewer/editor/chart bundles stay out of home.
+const Search = lazy(() => import('./pages/Search'));
+const Resource = lazy(() => import('./pages/Resource'));
+const StudyHub = lazy(() => import('./pages/StudyHub'));
+const Deck = lazy(() => import('./pages/Deck'));
+const Mocks = lazy(() => import('./pages/Mocks'));
+const MockRun = lazy(() => import('./pages/MockRun'));
+const Writing = lazy(() => import('./pages/Writing'));
+const Drills = lazy(() => import('./pages/Drills'));
+const Reading = lazy(() => import('./pages/Reading'));
+const Saved = lazy(() => import('./pages/Saved'));
+const SharedList = lazy(() => import('./pages/SharedList'));
+const Subjects = lazy(() => import('./pages/Subjects'));
+const About = lazy(() => import('./pages/About'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const Request = lazy(() => import('./pages/Request'));
+const Unlock = lazy(() => import('./pages/Unlock'));
+const Guide = lazy(() => import('./pages/Guide'));
+const WhatsNew = lazy(() => import('./pages/WhatsNew'));
+const Design = lazy(() => import('./pages/Design'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+
+function RouteFallback() {
+  return (
+    <div className="mx-auto max-w-[1200px] px-6 py-10" aria-busy="true" aria-label="Loading page">
+      <div className="skel h-7 w-2/5 rounded-lg" />
+      <div className="skel mt-3 h-4 w-3/5 rounded-lg" />
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        <div className="skel h-28 rounded-2xl border" style={{ borderColor: 'var(--line)' }} />
+        <div className="skel h-28 rounded-2xl border" style={{ borderColor: 'var(--line)' }} />
+      </div>
+    </div>
+  );
+}
+
+const susp = (el) => <Suspense fallback={<RouteFallback />}>{el}</Suspense>;
+
+// Versioned storage migration runs once, before first paint. Additive-only:
+// existing bookmarks, folders, attempts and flashcard state carry over.
+try {
+  migrate();
+} catch {
+  /* storage unavailable: app runs ephemeral */
+}
 
 // Route error boundary: a designed recovery card instead of a blank crash.
 function RouteError() {
@@ -56,27 +83,31 @@ const router = createBrowserRouter([
     errorElement: <RouteError />,
     children: [
       { index: true, element: <Home /> },
-      { path: 'search', element: <Search /> },
-      { path: 'r/:id', element: <Resource /> },
-      { path: 'study', element: <StudyHub /> },
-      { path: 'study/:deckId', element: <Deck /> },
-      { path: 'mocks', element: <Mocks /> },
-      { path: 'mocks/:id', element: <MockRun /> },
-      { path: 'writing', element: <Writing /> },
-      { path: 'drills', element: <Drills /> },
-      { path: 'reading', element: <Reading /> },
-      { path: 'saved', element: <Saved /> },
-      { path: 'list/:code', element: <SharedList /> },
-      { path: 'subjects', element: <Subjects subject /> },
-      { path: 'providers', element: <Subjects /> },
-      { path: 'about', element: <About /> },
-      { path: 'terms', element: <Terms /> },
-      { path: 'privacy', element: <Privacy /> },
-      { path: 'request', element: <Request /> },
-      { path: 'unlock', element: <Unlock /> },
-      { path: 'exam-guide', element: <Guide /> },
-      { path: 'design', element: <Design /> },
-      { path: '*', element: <NotFound /> },
+      // "/app" = study hub (app surface). Old URLs keep working.
+      { path: 'app', element: susp(<StudyHub />) },
+      { path: 'search', element: susp(<Search />) },
+      { path: 'r/:id', element: susp(<Resource />) },
+      { path: 'study', element: susp(<StudyHub />) },
+      { path: 'study/:deckId', element: susp(<Deck />) },
+      { path: 'mocks', element: susp(<Mocks />) },
+      { path: 'mocks/:id', element: susp(<MockRun />) },
+      { path: 'writing', element: susp(<Writing />) },
+      { path: 'drills', element: susp(<Drills />) },
+      { path: 'reading', element: susp(<Reading />) },
+      { path: 'saved', element: susp(<Saved />) },
+      { path: 'list/:code', element: susp(<SharedList />) },
+      { path: 'subjects', element: susp(<Subjects subject />) },
+      { path: 'providers', element: susp(<Subjects />) },
+      { path: 'about', element: susp(<About />) },
+      { path: 'terms', element: susp(<Terms />) },
+      { path: 'privacy', element: susp(<Privacy />) },
+      { path: 'request', element: susp(<Request />) },
+      { path: 'unlock', element: susp(<Unlock />) },
+      { path: 'exam-guide', element: susp(<Guide />) },
+      { path: 'whats-new', element: susp(<WhatsNew />) },
+      { path: 'design', element: susp(<Design />) },
+      { path: 'design/colours', element: susp(<Design />) },
+      { path: '*', element: susp(<NotFound />) },
     ],
   },
 ]);
@@ -87,11 +118,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </StrictMode>
 );
 
-// Apply stored theme + motion setting before first paint (module executes pre-paint in practice).
+// Apply stored theme (dark default) + motion setting before first paint.
 try {
-  if (localStorage.getItem('sehs-theme') === 'dark') document.documentElement.classList.add('dark');
+  if (localStorage.getItem('sehs-theme') !== 'light') document.documentElement.classList.add('dark');
 } catch {
-  /* noop */
+  document.documentElement.classList.add('dark');
 }
 initMotion();
 

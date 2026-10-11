@@ -205,7 +205,7 @@ export default function Search() {
               {loading ? 'Searching…' : total === 0 ? 'No results' : `${total.toLocaleString()} resource${total === 1 ? '' : 's'}${q ? ` for “${q}”` : ''}`}
             </h1>
             {!!data && total > 0 && (data.mode === 'partial' || data.mode === 'fuzzy') && (
-              <span className="inline-block rounded-[10px] border border-dashed px-2.5 py-[7px] text-[13px] font-semibold" style={{ color: 'var(--warn, #92400e)', background: 'var(--warn-bg, #fdf0d8)', borderColor: 'var(--amber, #b45309)' }}>
+              <span className="inline-block rounded-[10px] border border-dashed px-2.5 py-[7px] text-[13px] font-semibold" style={{ color: 'var(--text-2)', background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }}>
                 {data.mode === 'fuzzy' && data.corrected ? `Showing results for “${data.corrected}”. ` : 'No exact matches, showing closest matches. '}
               </span>
             )}

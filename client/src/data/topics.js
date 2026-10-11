@@ -1,0 +1,88 @@
+// Single source of truth for topic hubs (Phase 1).
+// One reusable template route reads this; topic chips deep-link to /search
+// until the hub route ships. Scoring notes are facts-only: confirm on ACER.
+
+export const TOPICS = [
+  {
+    id: 'verbal-analogy',
+    label: 'Verbal analogy',
+    query: 'verbal analogy',
+    blurb: 'Find the relationship between word pairs, then apply it.',
+    strategy: ['Say the relationship in a short sentence before looking at options.', 'Try one clear rule (synonym, part-to-whole, cause-to-effect) before mixing rules.', 'If two options fit, re-read the stem: the tighter rule wins.'],
+    drillTo: '/drills',
+    deckHint: 'verbal',
+    mockTo: '/mocks',
+  },
+  {
+    id: 'numerical-reasoning',
+    label: 'Numerical reasoning',
+    query: 'numerical reasoning',
+    blurb: 'Patterns, tables and worded number problems under time.',
+    strategy: ['Write the pattern differences down; most sequences show in two steps.', 'Estimate first on worded problems, then compute.', 'Bank easy marks first; flag long multi-step items.'],
+    drillTo: '/drills',
+    deckHint: 'quant',
+    mockTo: '/mocks',
+  },
+  {
+    id: 'reading-comprehension',
+    label: 'Reading comprehension',
+    query: 'reading comprehension',
+    blurb: 'Main idea, inference and vocabulary in context.',
+    strategy: ['Skim the questions first so names and line refs stand out.', 'Answer vocabulary-in-context from the sentence, not memory.', 'For inference, eliminate what the passage never says.'],
+    drillTo: '/reading',
+    deckHint: 'vocab',
+    mockTo: '/mocks',
+  },
+  {
+    id: 'maths',
+    label: 'Maths + answers',
+    query: 'maths answers',
+    blurb: 'Year 8 maths with worked answers: fractions, algebra, percent.',
+    strategy: ['Show one line of working even on easy items.', 'Re-do every miss within 48 hours from your Mistake Bank.', 'Time the last 10 minutes of each set like the real block.'],
+    drillTo: '/drills',
+    deckHint: 'quant',
+    mockTo: '/mocks',
+  },
+  {
+    id: 'writing-prompts',
+    label: 'Writing prompts',
+    query: 'writing',
+    blurb: 'Narrative, persuasive and descriptive prompts with a rubric.',
+    strategy: ['Plan 5 minutes: opening line + three beats + closing line.', 'One clear idea per paragraph.', 'Save the last 3 minutes for spelling and sentence checks.'],
+    drillTo: '/writing',
+    deckHint: 'writing',
+    mockTo: '/mocks',
+  },
+  {
+    id: 'vocabulary',
+    label: 'Vocabulary',
+    query: 'vocabulary',
+    blurb: 'High-value words with example sentences and roots.',
+    strategy: ['Learn roots in families (bene-, mal-, struct-) not one-offs.', 'Use each new word in one spoken sentence the same day.', 'Review misses on spaced gaps: 1, 3, 7 days.'],
+    drillTo: '/study',
+    deckHint: 'vocab',
+    mockTo: '/mocks',
+  },
+  {
+    id: 'vsse',
+    label: 'VSSE',
+    query: 'vsse',
+    blurb: 'Verbal-style reasoning sets labelled VSSE in the library.',
+    strategy: ['Treat like verbal analogy with longer stems.', 'Underline the pivot word before choosing.', 'Keep a steady pace; blanks cost the same as misses.'],
+    drillTo: '/drills',
+    deckHint: 'verbal',
+    mockTo: '/mocks',
+  },
+  {
+    id: 'exam-guide',
+    label: 'Exam guide',
+    query: 'exam guide',
+    blurb: 'How the June exam runs: blocks, pacing, what to bring.',
+    strategy: ['Read the guide once, then practise one timed block.', 'Confirm timings on ACER before exam week.', 'Sleep and arrival plan beat last-night cramming.'],
+    drillTo: '/exam-guide',
+    deckHint: null,
+    mockTo: '/mocks',
+  },
+];
+
+export const TOPIC_BY_ID = Object.fromEntries(TOPICS.map((t) => [t.id, t]));

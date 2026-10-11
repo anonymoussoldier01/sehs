@@ -230,7 +230,7 @@ export default function Resource() {
         {canPreview && (
           <span className="flex flex-wrap gap-2.5" role="group" aria-label="Read">
             <Button variant="default" onClick={scrollToViewer}>
-              Read here ↓
+              Open in viewer
             </Button>
           </span>
         )}
@@ -436,11 +436,13 @@ export default function Resource() {
   );
 }
 
+// Calm system: annotations use a single-hue accent ramp (not four hues).
+// Distinguish by label/pattern, not new hues.
 const ANN_COLOURS = [
-  { id: 'yellow', css: 'rgba(253,230,138,0.55)', solid: '#FDE68A', label: 'Yellow' },
-  { id: 'pink', css: 'rgba(249,168,212,0.5)', solid: '#F9A8D4', label: 'Pink' },
-  { id: 'blue', css: 'rgba(147,197,253,0.5)', solid: '#93C5FD', label: 'Blue' },
-  { id: 'green', css: 'rgba(110,231,183,0.5)', solid: '#6EE7B7', label: 'Green' },
+  { id: 'accent-100', css: 'var(--accent-1)', solid: 'var(--accent-9)', label: 'Accent 100' },
+  { id: 'accent-70', css: 'var(--accent-2)', solid: 'var(--accent-8)', label: 'Accent 70' },
+  { id: 'accent-45', css: 'var(--accent-3)', solid: 'var(--accent-7)', label: 'Accent 45' },
+  { id: 'accent-25', css: 'var(--accent-4)', solid: 'var(--accent-6)', label: 'Accent 25' },
 ];
 
 function PreviewPanel({ id, kind, title }) {

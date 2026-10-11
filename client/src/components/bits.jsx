@@ -183,7 +183,6 @@ export function InteractiveHover({ to, onClick, children, primary }) {
   const inner = (
     <>
       <span>{children}</span>
-      <span aria-hidden="true">→</span>
     </>
   );
   if (to)

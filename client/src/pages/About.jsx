@@ -59,11 +59,11 @@ export default function About() {
         Every resource is open to everyone: no account, no login. You will be asked to accept the Terms &amp; Conditions when you open your first resource in each browser tab.
       </p>
       <Beams className="mt-6 px-6 py-8">
-        <p className="text-xs font-extrabold uppercase tracking-[0.2em]" style={{ color: '#38BDF8' }}>Our promise</p>
-        <p className="mt-2 font-display text-xl font-bold" style={{ color: '#E8EDF7' }}>
+        <p className="text-xs font-extrabold uppercase tracking-[0.2em]" style={{ color: 'var(--accent)' }}>Our promise</p>
+        <p className="mt-2 font-display text-xl font-bold" style={{ color: 'var(--text)' }}>
           <HyperText text="Real numbers only. No hype, no guilt, no paywalls." />
         </p>
-        <p className="mt-1 max-w-[60ch] text-[15px]" style={{ color: '#8A97B2' }}>
+        <p className="mt-1 max-w-[60ch] text-[15px]" style={{ color: 'var(--text-2)' }}>
           Every count on this site comes from the live collection. Samples are labelled. Misses become practice, never shame.
         </p>
       </Beams>

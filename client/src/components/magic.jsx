@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Search as SearchIcon } from 'lucide-react';
 import { motion, useInView } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { cn } from './cn';
 import { readMotionSetting } from '../lib/motion';
@@ -213,33 +213,65 @@ export function TypingText({ text, speed = 14, className }) {
   );
 }
 
-// ---------- Dock (mobile shortcut bar, Lucide icons, solid panel) ----------
+// ---------- Dock (mobile bottom tab bar: Home, Mocks, Library, Study) ----------
+// Labels mirror the sidebar + landing nav exactly — same words, same places.
 export function Dock() {
   return (
     <nav
-      aria-label="Quick sections"
+      aria-label="Primary sections"
       className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-4 gap-1 rounded-[14px] border p-1.5 shadow-xl lg:hidden"
       style={{ background: 'var(--panel)', borderColor: 'var(--line2)', paddingBottom: 'max(6px, env(safe-area-inset-bottom))' }}
     >
       {[
-        ['/', 'Home'],
-        ['/search', 'Search'],
-        ['/study', 'Study'],
-        ['/mocks', 'Mocks'],
+        ['/', 'Home', 'Home'],
+        ['/mocks', 'Mocks', 'Mocks'],
+        ['/saved', 'Library', 'Library'],
+        ['/study', 'Study', 'Study'],
       ].map(([to, label]) => (
-        <Link
+        <NavLink
           key={to}
           to={to}
-          className="flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-[10px] text-[11px] font-bold transition-colors"
-          style={{ color: 'var(--mut)' }}
+          end={to === '/'}
+          className={({ isActive }) =>
+            'flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-[10px] text-[11px] font-bold transition-colors' +
+            (isActive ? ' dock-on' : '')
+          }
+          style={({ isActive }) => ({
+            color: isActive ? 'var(--cta-fg)' : 'var(--mut)',
+            background: isActive ? 'var(--cta-bg)' : undefined,
+          })}
         >
-          <span className="tnum text-[13px] font-extrabold" style={{ color: 'var(--acc)' }} aria-hidden="true">
-            {label === 'Home' ? '01' : label === 'Search' ? '02' : label === 'Study' ? '03' : '04'}
-          </span>
+          <DockIcon kind={label} />
           {label}
-        </Link>
+        </NavLink>
       ))}
     </nav>
+  );
+}
+
+function DockIcon({ kind }) {
+  // Lazy Lucide to avoid bloating magic bundle: simple inline SVGs, 1.5 stroke.
+  const paths = {
+    Home: <path d="M4 11l8-7 8 7v9a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z" />,
+    Mocks: (
+      <>
+        <circle cx="12" cy="13" r="7" />
+        <path d="M12 10v3l2 2" />
+        <path d="M9 3h6" />
+      </>
+    ),
+    Library: <path d="M6 4h12v16l-3-2-3 2-3-2-3 2z" />,
+    Study: (
+      <>
+        <path d="M4 19V9l8-5 8 5v10" />
+        <path d="M9 19v-5h6v5" />
+      </>
+    ),
+  };
+  return (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {paths[kind] || paths.Home}
+    </svg>
   );
 }
 export function DeckCard({ to, icon, title, sub, badge }) {
@@ -269,7 +301,7 @@ export function DeckCard({ to, icon, title, sub, badge }) {
         {sub}
       </p>
       <span className="mt-auto text-[13.5px] font-bold" style={{ color: 'var(--acc)' }}>
-        Study <span aria-hidden="true">→</span>
+        Review
       </span>
     </Link>
   );
@@ -504,7 +536,8 @@ export function Confetti({ fire }) {
     const ctx = canvas.getContext('2d');
     const W = (canvas.width = Math.min(560, window.innerWidth));
     const H = (canvas.height = 320);
-    const colors = ['#38BDF8', '#10B981', '#FDE68A', '#F59E0B', '#5b8cff'];
+    // Calm system: single-hue accent ramp on neutrals — no rainbow.
+    const colors = ['#7DB2FF', '#B9D2FF', '#F4F0E6', '#A7B0C6', '#7DB2FF'];
     const parts = Array.from({ length: 90 }, () => ({
       x: W / 2 + (Math.random() - 0.5) * 60,
       y: H * 0.35,
