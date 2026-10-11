@@ -4,6 +4,7 @@
     "app": {
       "root": ".",
       "runtime": "node",
+      "entrypoint": "api/index.js",
       "functions": {
         "api/index.js": { "includeFiles": "data/native/**" }
       }
