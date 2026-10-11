@@ -55,7 +55,7 @@ export default function Reading() {
   };
 
   return (
-    <div className="mx-auto max-w-[860px] px-5 py-7">
+    <div className="page-read py-7">
       <p className="text-[13px] font-semibold" style={{ color: 'var(--mut)' }}>
         <Link to="/" className="hover:underline" style={{ color: 'var(--acc)' }}>Home</Link> › Reading
       </p>
@@ -98,7 +98,7 @@ export default function Reading() {
         </Button>
       </div>
       {cur && (
-        <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+        <div className="quiet-card p-[18px]">
           <h3 className="font-display text-xl font-bold">{cur.title}</h3>
           <p className="mt-2 max-h-[300px] overflow-auto whitespace-pre-wrap text-sm leading-relaxed" style={{ color: 'var(--mut)' }}>
             {cur.text}

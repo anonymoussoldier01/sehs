@@ -3,47 +3,32 @@
 // Ambient/canvas pieces render only under Full motion + visible tab.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring, useInView, useMotionValue } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring, useMotionValue } from 'framer-motion';
 import { cn } from './cn';
 import { motionOk, finePointer } from './magic';
 
 // ---------- BentoGrid + BentoCard (aceternity bento, live skeleton headers) ----------
 export function BentoGrid({ children, className }) {
-  return <div className={cn('grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3', className)}>{children}</div>;
+  return <div className={cn('grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3', className)}>{children}</div>;
 }
 export function BentoCard({ to, title, desc, header, span, badge }) {
-  const [spot, setSpot] = useState(false);
-  useEffect(() => {
-    if (finePointer() && motionOk()) setSpot(true);
-  }, []);
   return (
     <Link
       to={to}
-      onMouseMove={
-        spot
-          ? (e) => {
-              const el = e.currentTarget;
-              const r = el.getBoundingClientRect();
-              el.style.setProperty('--mx', `${e.clientX - r.left}px`);
-              el.style.setProperty('--my', `${e.clientY - r.top}px`);
-            }
-          : undefined
-      }
-      className={cn('bento-spot group relative flex flex-col overflow-hidden rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg', span)}
-      style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}
+      className={cn('quiet-card group relative flex flex-col overflow-hidden p-[18px] transition-colors', span)}
     >
       {badge && (
         <span className="absolute right-3 top-3 rounded-full border px-2 py-0.5 text-[10.5px] font-extrabold uppercase tracking-wider" style={{ borderColor: 'var(--acc-line)', color: 'var(--acc)', background: 'var(--acc-soft)' }}>
           {badge}
         </span>
       )}
-      <div className="bento-head relative mb-3 overflow-hidden rounded-xl border" style={{ borderColor: 'var(--line)', background: 'var(--bg2)' }}>
+      <div className="relative mb-3 overflow-hidden rounded-[10px] border" style={{ borderColor: 'var(--line)', background: 'var(--bg2)' }} aria-hidden="true">
         {header}
       </div>
       <h3 className="font-display text-[16px] font-bold">{title}</h3>
-      <p className="mb-3 mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>{desc}</p>
+      <p className="mb-3 mt-1 text-[13.5px] leading-relaxed" style={{ color: 'var(--mut)' }}>{desc}</p>
       <span className="mt-auto inline-flex items-center gap-1.5 text-[13.5px] font-bold" style={{ color: 'var(--acc)' }}>
-        Open <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+        Open <span aria-hidden="true">→</span>
       </span>
     </Link>
   );
@@ -145,25 +130,12 @@ export function MiniLines() {
 
 // ---------- ContainerScroll (scroll-unfolds hero visual) ----------
 export function ContainerScroll({ title, sub, children }) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const rotate = useTransform(scrollYProgress, [0, 0.55], [18, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.55], [0.92, 1]);
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => {
-    setAnimate(motionOk());
-  }, []);
   return (
-    <div ref={ref} className="mx-auto max-w-[880px] px-5 pb-4 pt-10 text-center">
+    <div className="mx-auto max-w-[880px] px-5 pb-4 pt-10 text-center">
       <h2 className="font-display text-2xl font-bold sm:text-3xl">{title}</h2>
-      {sub && <p className="mx-auto mt-2 max-w-[60ch] text-[15px]" style={{ color: 'var(--mut)' }}>{sub}</p>}
-      <div style={{ perspective: 1200 }}>
-        <motion.div
-          style={animate ? { rotateX: rotate, scale } : undefined}
-          className="mt-6 overflow-hidden rounded-2xl border text-left shadow-2xl"
-        >
-          {children}
-        </motion.div>
+      {sub && <p className="mx-auto mt-2 max-w-[60ch] text-[15.5px]" style={{ color: 'var(--mut)' }}>{sub}</p>}
+      <div className="quiet-card mt-6 overflow-hidden text-left">
+        {children}
       </div>
     </div>
   );
@@ -447,41 +419,10 @@ export function Evervault({ text, className }) {
 
 // ---------- WobbleCard (translate + scale on mousemove) ----------
 export function WobbleCard({ children, className, to, style }) {
-  const ref = useRef(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const sx = useSpring(x, { stiffness: 200, damping: 18 });
-  const sy = useSpring(y, { stiffness: 200, damping: 18 });
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    if (finePointer() && motionOk()) setOn(true);
-  }, []);
   const inner = (
-    <motion.div
-      ref={ref}
-      style={on ? { x: sx, y: sy, ...style } : style}
-      onMouseMove={
-        on
-          ? (e) => {
-              const r = ref.current?.getBoundingClientRect();
-              if (!r) return;
-              x.set(((e.clientX - r.left) / r.width - 0.5) * 14);
-              y.set(((e.clientY - r.top) / r.height - 0.5) * 14);
-            }
-          : undefined
-      }
-      onMouseLeave={
-        on
-          ? () => {
-              x.set(0);
-              y.set(0);
-            }
-          : undefined
-      }
-      className={cn('h-full rounded-2xl border p-[18px] shadow-sm transition-shadow hover:shadow-lg', className)}
-    >
+    <div style={style} className={cn('quiet-card h-full p-[18px]', className)}>
       {children}
-    </motion.div>
+    </div>
   );
   return to ? (
     <Link to={to} className="block h-full">
@@ -492,64 +433,31 @@ export function WobbleCard({ children, className, to, style }) {
   );
 }
 
-// ---------- Lamp (section header glow) ----------
+// ---------- Lamp (ledger: themed section header, no dark island) ----------
 export function Lamp({ kicker, title, sub }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-80px' });
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => {
-    setAnimate(motionOk());
-  }, []);
   return (
-    <div ref={ref} className="relative overflow-hidden rounded-3xl border px-6 py-10 text-center" style={{ background: '#0B1220', borderColor: '#243049' }}>
-      <div aria-hidden="true" className="lamp-glow absolute inset-x-0 top-0 mx-auto h-40 w-[420px]" />
-      <motion.div initial={animate ? { opacity: 0, y: 18 } : false} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.6 }}>
-        {kicker && <p className="text-xs font-extrabold uppercase tracking-[0.2em]" style={{ color: '#38BDF8' }}>{kicker}</p>}
-        <h2 className="mx-auto mt-2 max-w-[22ch] font-display text-3xl font-bold" style={{ color: '#E8EDF7' }}>{title}</h2>
-        {sub && <p className="mx-auto mt-2 max-w-[56ch] text-[15px]" style={{ color: '#8A97B2' }}>{sub}</p>}
-      </motion.div>
+    <div className="quiet-card px-6 py-10 text-center" style={{ borderTop: '3px solid var(--acc)' }}>
+      {kicker && <p className="kicker" style={{ justifyContent: 'center' }}>{kicker}</p>}
+      <h2 className="mx-auto mt-2 max-w-[24ch] font-display text-3xl font-bold">{title}</h2>
+      {sub && <p className="mx-auto mt-2 max-w-[60ch] text-[15.5px]" style={{ color: 'var(--mut)' }}>{sub}</p>}
     </div>
   );
 }
 
-// ---------- AuroraBg (drifting gradient blobs) ----------
+// ---------- AuroraBg (ledger: plain panel) ----------
 export function AuroraBg({ children, className }) {
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => {
-    setAnimate(motionOk());
-  }, []);
   return (
-    <div className={cn('aurora-wrap relative overflow-hidden rounded-3xl border', className)} style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-      {animate && (
-        <div aria-hidden="true" className="absolute inset-0">
-          <span className="aurora-blob aurora-a" />
-          <span className="aurora-blob aurora-b" />
-          <span className="aurora-blob aurora-c" />
-        </div>
-      )}
-      <div className="relative">{children}</div>
+    <div className={cn('quiet-card', className)} style={{ borderTop: '3px solid var(--acc)' }}>
+      {children}
     </div>
   );
 }
 
-// ---------- Beams (animated SVG paths backdrop) ----------
+// ---------- Beams (ledger: plain panel) ----------
 export function Beams({ children, className }) {
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => {
-    setAnimate(motionOk());
-  }, []);
   return (
-    <div className={cn('relative overflow-hidden rounded-3xl border', className)} style={{ background: '#0B1220', borderColor: '#243049' }}>
-      <svg aria-hidden="true" className="absolute inset-0 h-full w-full" preserveAspectRatio="none" viewBox="0 0 800 400">
-        {[
-          'M-20,320 C200,260 320,120 820,60',
-          'M-20,360 C240,300 380,180 820,140',
-          'M-20,250 C180,220 400,80 820,20',
-        ].map((d, k) => (
-          <path key={k} d={d} fill="none" stroke={k === 1 ? '#38BDF8' : '#5b8cff'} strokeWidth="1.5" opacity={animate ? 0.55 : 0.25} strokeDasharray={animate ? '14 220' : 'none'} className={animate ? 'beam-dash' : undefined} style={animate ? { animationDelay: `${k * 1.4}s` } : undefined} />
-        ))}
-      </svg>
-      <div className="relative">{children}</div>
+    <div className={cn('quiet-card', className)}>
+      {children}
     </div>
   );
 }

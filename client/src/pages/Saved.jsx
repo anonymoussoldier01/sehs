@@ -49,7 +49,7 @@ export default function Saved() {
   };
 
   return (
-    <div className="mx-auto max-w-[1000px] px-5 py-7">
+    <div className="page-browse py-7">
       <h1 className="font-display text-3xl font-bold">
         Your library{' '}
         {!!savedIds.length && (
@@ -84,7 +84,7 @@ export default function Saved() {
       ) : (
         <div className="grid gap-3.5 sm:grid-cols-2">
           {lists.map((l, i) => (
-            <div key={i} className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+            <div key={i} className="quiet-card p-[18px]">
               <h3 className="font-display text-[15.5px] font-bold">{l.name}</h3>
               <p className="mb-3 text-[13px]" style={{ color: 'var(--mut)' }}>
                 {(l.items || []).length} resources

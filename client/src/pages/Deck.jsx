@@ -255,7 +255,7 @@ function Learn({ cards, order, pos, setPos, opts, setBox, box }) {
       <p className="text-sm" style={{ color: 'var(--mut)' }}>
         Card {(pos % order.length) + 1} of {order.length}
       </p>
-      <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="quiet-card p-[18px]">
         <h3 className="font-display text-lg font-bold">{cc.front}</h3>
         <div className="mt-3 grid gap-2">
           {opts.map((o) => (
@@ -323,7 +323,7 @@ function Test({ cards, order, test, setTest }) {
       <p className="text-sm" style={{ color: 'var(--mut)' }}>
         Question {test.i + 1} of {test.total} · score {test.score}
       </p>
-      <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="quiet-card p-[18px]">
         <h3 className="font-display text-lg font-bold">{ck.front}</h3>
         <div className="mt-3 grid gap-2">
           {oo.map((o) => (

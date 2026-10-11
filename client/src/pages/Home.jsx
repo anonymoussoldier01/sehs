@@ -4,10 +4,10 @@ import { api, pretty } from '../lib/api';
 import { keys } from '../lib/store';
 import { Layers } from 'lucide-react';
 import { Button } from '../components/ui/button';
-import { AuroraText, BlurFade, DeckCard, Marquee, Meteors, NumberTicker, Particles, ShimmerButton, ShinyBadge, Skeleton, WordRotate, AnimatedGrid, AnimatedList, SparklesText, DotPattern, Magnet, ClickSpark, StarBorder, TextGenerate, BlurText, SpotlightCard } from '../components/magic';
+import { DeckCard, Marquee, NumberTicker, Skeleton, WordRotate, AnimatedGrid, AnimatedList, StarBorder } from '../components/magic';
 import { ResourceCard } from '../components/cards';
-import { SpinningText, VanishInput, Typewriter, ScrollVelocity, Ripple, InteractiveHover, OrbitingCircles } from '../components/bits';
-import { BentoGrid, BentoCard, MiniTimer, MiniViewer, MiniDeck, MiniPen, MiniBars, MiniLines, ContainerScroll, AuroraBg, SnapCarousel, Evervault, Lamp } from '../components/ace';
+import { VanishInput, InteractiveHover } from '../components/bits';
+import { BentoGrid, BentoCard, MiniTimer, MiniViewer, MiniDeck, MiniPen, MiniBars, MiniLines, AuroraBg, SnapCarousel, Evervault, Lamp } from '../components/ace';
 
 const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive', webpage: 'Web page', code: 'Support file', other: 'File' };
 
@@ -29,75 +29,79 @@ function useApi(fn, deps) {  const [data, setData] = useState(null);
 function Hero({ stats, telemetry, deckCount }) {
   const navigate = useNavigate();
   return (
-    <section className="mhero relative overflow-hidden" aria-label="Search" style={{ padding: '56px 24px 10px', maxWidth: 1060 }}>
-      <DotPattern />
-      <Particles />
-      <Meteors count={5} />
-      <div className="mhero-inner relative" style={{ maxWidth: 1060 }}>
-        <BlurFade>
-          <span className="flex flex-wrap items-center gap-3">
-            <ShinyBadge>
-              <SparklesText count={5}>✦ Victorian selective entry · Year 8 → Year 9 · ACER format</SparklesText>
-            </ShinyBadge>
-            <SpinningText text="FREE FOREVER • NO ACCOUNT • " size={92}>
-              ✦
-            </SpinningText>
-          </span>
-        </BlurFade>
-        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_auto]">
-          <div className="min-w-0">
-        <BlurFade delay={0.08}>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(38px,6vw,64px)', lineHeight: 1.04, letterSpacing: '-.025em', margin: '18px 0 14px', fontWeight: 700 }}>
-            Study <AuroraText>anything</AuroraText>.<br />
+    <section className="hero-ledger hero-home dot-grid" aria-label="Search">
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+        <div className="min-w-0">
+          <p className="kicker">Victorian selective entry · Year 8 → Year 9 · ACER format</p>
+          <h1>
+            Walk in ready.
+            <br />
             <span className="hl-stroke">Master <WordRotate words={['maths', 'verbal reasoning', 'reading', 'writing', 'vocabulary']} />.
               <svg viewBox="0 0 200 12" preserveAspectRatio="none" aria-hidden="true"><path d="M2 8 C 60 2, 140 2, 198 7" /></svg>
             </span>
           </h1>
-        </BlurFade>
-        <BlurFade delay={0.16}>
-          <p className="lede" style={{ color: 'var(--mut)', fontSize: 17, maxWidth: '62ch', margin: '0 0 22px' }}>
-            Past papers, flashcards and timed mocks for Victoria&apos;s selective entry exam: the ACER test Year 8 students sit for Year 9 entry into Melbourne High, Mac.Rob, Nossal and Suzanne Cory. No account, just study.
+          <p className="lede">
+            Past papers, flashcards and timed mocks for the ACER test Victorian Year 8 students sit for Year 9 entry into Melbourne High, Mac.Rob, Nossal and Suzanne Cory. Free forever, no account, everything saved in this browser.
           </p>
-        </BlurFade>
-        <BlurFade delay={0.22}>
-          <div className="mhero-ctas" style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 26 }}>
-            <Magnet>
-              <ClickSpark>
-                <ShimmerButton onClick={() => navigate('/study')}>Start studying →</ShimmerButton>
-              </ClickSpark>
-            </Magnet>
-            <Magnet strength={12}>
-              <Link
-                to="/mocks"
-                className="lift inline-flex min-h-[42px] items-center rounded-xl border px-5 py-2.5 text-sm font-bold"
-                style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
-              >
-                Take a timed mock
-              </Link>
-            </Magnet>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', margin: '20px 0 22px' }}>
+            <button
+              onClick={() => navigate('/study')}
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[10px] px-5 py-2.5 text-sm font-bold transition-colors hover:brightness-110 active:translate-y-px"
+              style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
+            >
+              Start studying →
+            </button>
+            <Link
+              to="/mocks"
+              className="inline-flex min-h-[44px] items-center rounded-[10px] border px-5 py-2.5 text-sm font-bold transition-colors"
+              style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
+            >
+              Take a timed mock
+            </Link>
           </div>
-        </BlurFade>
-          </div>
-          <BlurFade delay={0.2} className="mx-auto hidden sm:block">
-            <div className="text-center">
-              <OrbitingCircles core="✦" items={['∑', '◈', '☰', '✒', '⬡', '❖']} radius={104} duration={24} />
-              <p className="mt-2 text-xs font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--faint)' }}>
-                Maths · Verbal · Quant · Reading · Writing
-              </p>
-            </div>
-          </BlurFade>
-        </div>
-        <BlurFade delay={0.28}>
           <VanishInput onSearch={(v) => navigate('/search?q=' + encodeURIComponent(v))} />
-          <p className="mt-2 text-xs" style={{ color: 'var(--faint)' }}>Press <kbd className="kbd">/</kbd> anywhere to jump here</p>
+          <p className="mt-2 text-xs" style={{ color: 'var(--faint)' }}>Press <kbd className="kbd">/</kbd> anywhere to jump here · free forever, no account</p>
           <p className="telemetry mt-2" aria-label="Live collection readout">
             lib <strong>{stats?.publicResources ? Number(stats.publicResources).toLocaleString() : '…'}</strong>
             {' · '}mocks <strong>{telemetry ? telemetry.mocks : '…'}</strong>
             {' · '}decks <strong>{deckCount ?? '…'}</strong>
             {' · '}prompts <strong>{telemetry ? telemetry.writing : '…'}</strong>
-            {' · '}free <strong>forever</strong>
           </p>
-        </BlurFade>
+        </div>
+        <div className="hero-live min-w-0">
+          <LearnPreview />
+          <p className="mt-2 text-center text-xs" style={{ color: 'var(--faint)' }}>
+            A real question from the timed mocks. Try it, then <Link to="/mocks" className="font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>take the full block</Link>.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HowItWorks() {
+  const steps = [
+    ['01', 'Find the exact paper', 'Search 1,600+ past papers, notes and guides by topic, provider or file type. Answers included where available.', '/search', 'Search the library'],
+    ['02', 'Practise under real time', 'Run 60, 55 and 40 minute blocks with instant scoring, explanations and a calm exam screen.', '/mocks', 'Take a timed mock'],
+    ['03', 'Fix what you missed', 'Misses return on a spaced schedule in drills and the review queue until they stick.', '/study', 'Open the study hub'],
+  ];
+  return (
+    <section aria-label="How it works">
+      <h2 className="section-title">How it works</h2>
+      <hr className="section-rule" />
+      <div>
+        {steps.map(([n, t, p, to, cta]) => (
+          <div key={n} className="method-row">
+            <span className="method-num">{n}</span>
+            <span className="min-w-0">
+              <span className="block font-display text-[16px] font-bold">{t}</span>
+              <span className="block text-[14px]" style={{ color: 'var(--mut)' }}>{p}</span>
+            </span>
+            <Link to={to} className="link-slide flex-none text-[13.5px] font-bold" style={{ color: 'var(--acc)' }} aria-label={`${cta}: ${t}`}>
+              {cta} →
+            </Link>
+          </div>
+        ))}
       </div>
     </section>
   );
@@ -122,9 +126,9 @@ function LearnPreview() {
     };
   }, []);
   return (
-    <section className="beam-card rounded-2xl border p-[26px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }} aria-label="Sample learn question">
-      <p className="text-xs font-bold" style={{ color: 'var(--faint)' }}>
-        LEARN · SAMPLE
+    <section className="quiet-card beam-feature p-[26px]" aria-label="Sample learn question">
+      <p className="text-xs font-extrabold uppercase tracking-[0.14em]" style={{ color: 'var(--faint)' }}>
+        Learn · sample
       </p>
       {!q ? (
         <p className="mt-2 font-display text-xl">Loading a sample question…</p>
@@ -140,7 +144,7 @@ function LearnPreview() {
                   key={k}
                   disabled={picked !== null}
                   onClick={() => setPicked(k)}
-                  className="min-h-[52px] w-full rounded-xl border-[1.5px] px-4 py-3.5 text-left text-[14.5px] font-semibold transition-all hover:-translate-y-px disabled:cursor-default"
+                  className="min-h-[52px] w-full rounded-[10px] border-[1.5px] px-4 py-3.5 text-left text-[14.5px] font-semibold transition-colors disabled:cursor-default"
                   style={{
                     background: picked !== null && isAns ? 'var(--ok-bg)' : sel ? 'var(--bad-bg)' : 'var(--bg)',
                     borderColor: picked !== null && isAns ? 'var(--ok)' : sel ? 'var(--bad)' : 'var(--line2)',
@@ -231,114 +235,62 @@ export default function Home() {
   const pdfs = (search?.results || []).filter((r) => r.fileType === 'pdf').slice(0, 6);
 
   return (
-    <div className="mx-auto max-w-[1060px] px-4 pb-12 sm:px-6">
+    <div className="page-browse pb-12">
       <Hero stats={stats} telemetry={telemetry} deckCount={deckCount} />
 
-      <BlurFade className="mt-6">
+      <div className="mt-6">
         <Marquee>
           {['VSSE', 'Maths + answers', 'Numerical reasoning', 'Reading comprehension', 'Verbal analogy', 'Writing prompts', 'Exam guide', 'Vocabulary'].map((t) => (
             <Link
               key={t}
               to={'/search?q=' + encodeURIComponent(t === 'Maths + answers' ? 'maths' : t)}
-              className="chip-hover inline-flex min-h-[38px] shrink-0 items-center rounded-full border px-4 text-[13px] font-bold"
+              className="inline-flex min-h-[38px] shrink-0 items-center rounded-full border px-4 text-[13px] font-bold transition-colors"
               style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}
             >
               {t}
             </Link>
           ))}
         </Marquee>
-      </BlurFade>
+      </div>
 
-      <dl className="mt-5 flex flex-wrap gap-2.5" aria-label="Collection statistics">
+      <dl className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-4" aria-label="Collection statistics">
         {[
           ['Resources', stats?.publicResources ?? '–'],
           ['Timed mocks', 4],
           ['Flashcard decks', deckCount ?? '–'],
           ['Writing prompts', 80],
         ].map(([l, n]) => (
-          <div key={l} className="lift flex min-w-[118px] flex-col rounded-xl border px-4 py-2.5 shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-            <dd className="order-1 font-display text-[23px] font-bold tabular-nums">
+          <div key={l} className="quiet-card flex min-w-0 flex-col px-4 py-2.5">
+            <dd className="tnum order-1 font-display text-[23px] font-bold tabular-nums">
               {typeof n === 'number' ? <NumberTicker value={n} /> : <span aria-label="loading">–</span>}
             </dd>
-            <dt className="order-2 text-[11px] font-bold uppercase tracking-[.07em]" style={{ color: 'var(--faint)' }}>
+            <dt className="order-2 text-[11px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--faint)' }}>
               {l}
             </dt>
           </div>
         ))}
       </dl>
 
-      <BlurFade className="mt-4">
-        <Link
-          to="/exam-guide"
-          className="lift flex flex-wrap items-center gap-x-4 gap-y-1 rounded-2xl border px-4 py-3 text-[13.5px] shadow-sm"
-          style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}
-        >
-          <strong>The selective entry test:</strong>
-          <span style={{ color: 'var(--mut)' }}>Maths + Quant 60 min</span>
-          <span style={{ color: 'var(--faint)' }}>·</span>
-          <span style={{ color: 'var(--mut)' }}>Reading + Verbal 55 min</span>
-          <span style={{ color: 'var(--faint)' }}>·</span>
-          <span style={{ color: 'var(--mut)' }}>Writing 40 min</span>
-          <span className="ml-auto font-bold" style={{ color: 'var(--acc)' }}>
-            Exam guide →
-          </span>
-        </Link>
-      </BlurFade>
-
-      <section aria-label="Where you could be in Year 9" className="mt-10">
-        <Lamp
-          kicker="Victorian selective entry · Year 9 intake"
-          title="Four schools. One exam. Walk in ready."
-          sub="Around 1,000 Year 9 places across Melbourne High, Mac.Robertson Girls', Nossal and Suzanne Cory. Offers come from the official selection process. This site exists so you meet exam day prepared, not surprised."
-        />
-        <div className="mx-auto mt-4 max-w-[420px]">
-          <OrbitingCircles core="✦" items={['MHS', 'MRG', 'NHS', 'SCS']} radius={72} duration={20} />
-        </div>
-        <div className="mt-4 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            ['Melbourne High', 'MHS', 'Boys · South Yarra', 'The academic powerhouse on the hill, generations of high achievers.'],
-            ['Mac.Robertson Girls’', 'MRG', 'Girls · Melbourne', 'A storied inner-city school for high-achieving girls.'],
-            ['Nossal', 'NHS', 'Co-ed · Berwick', 'Modern co-ed excellence in the south-east.'],
-            ['Suzanne Cory', 'SCS', 'Co-ed · Werribee', 'Purpose-built selective schooling in the west.'],
-          ].map(([name, short, facts, line], k) => (
-            <BlurFade key={name} delay={k * 0.06}>
-              <SpotlightCard className="h-full rounded-2xl border shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-                <div className="flex h-full flex-col p-[18px]">
-                  <span className="tnum grid h-11 w-11 place-items-center rounded-xl border text-sm font-extrabold" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)', color: 'var(--acc)' }}>
-                    {short}
-                  </span>
-                  <h3 className="mt-2.5 font-display text-[16px] font-bold">{name}</h3>
-                  <p className="text-xs font-semibold" style={{ color: 'var(--faint)' }}>{facts}</p>
-                  <p className="mb-3 mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>{line}</p>
-                  <Link to="/exam-guide" className="mt-auto inline-flex items-center gap-1.5 text-[13px] font-bold" style={{ color: 'var(--acc)' }}>
-                    How to prepare <span aria-hidden="true">→</span>
-                  </Link>
-                </div>
-              </SpotlightCard>
-            </BlurFade>
-          ))}
-        </div>
-      </section>
-
-      <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Recents</h2>
+      <h2 className="section-title">Pick up where you left off</h2>
+      <hr className="section-rule" />
       {recents.length ? (
-        <AnimatedGrid className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+        <AnimatedGrid className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {recents.slice(0, 6).map((v) => (
             <ResourceCard key={v.id} v={v} showDesc={false} />
           ))}
         </AnimatedGrid>
       ) : (
-        <div className="grid gap-3.5 md:grid-cols-2">
-          <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="quiet-card p-[18px]">
             <h3 className="font-display text-[15.5px] font-bold">{next.text}</h3>
-            <p className="mb-3 mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
+            <p className="mb-3 mt-1 text-[14px]" style={{ color: 'var(--mut)' }}>
               Your recent decks and papers appear here.
             </p>
-            <Link to={next.href} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
+            <Link to={next.href} className="inline-flex min-h-[44px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
               Continue →
             </Link>
           </div>
-          <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+          <div className="quiet-card p-[18px]">
             <h3 className="font-display text-[15.5px] font-bold">Question of the day</h3>
             <p className="text-xs" style={{ color: 'var(--faint)' }}>AI-generated sample, practise only, not official material.</p>
             <Qotd />
@@ -347,39 +299,71 @@ export default function Home() {
       )}
 
       {recents.length > 0 && (
-        <>
-          <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Your activity</h2>
-          <AnimatedList
-            className="flex flex-col gap-2"
-            items={recents.slice(0, 5).map((v) => ({ key: v.id, v }))}
-            renderItem={({ v }) => (
-              <Link
-                to={'/r/' + v.id}
-                className="flex items-center gap-3 rounded-xl border px-4 py-2.5 text-sm shadow-sm transition-all hover:-translate-y-px"
-                style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}
-              >
-                <span className="grid h-8 w-8 flex-none place-items-center rounded-lg border text-sm" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }}>
-                  ▢
-                </span>
-                <span className="truncate font-semibold" title={v.displayTitle || v.title}>{v.displayTitle || v.title}</span>
-                <span className="ml-auto flex-none text-xs" style={{ color: 'var(--faint)' }}>
-                  Recently opened →
-                </span>
-              </Link>
-            )}
-          />
-        </>
+        <AnimatedList
+          className="quiet-card mt-3 divide-y overflow-hidden"
+          items={recents.slice(0, 5).map((v) => ({ key: v.id, v }))}
+          renderItem={({ v }) => (
+            <Link
+              to={'/r/' + v.id}
+              className="index-row text-sm transition-colors hover:bg-[var(--acc-soft)]"
+            >
+              <span className="tnum grid h-8 w-8 flex-none place-items-center rounded-lg border text-xs font-extrabold tabular-nums" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)', color: 'var(--acc)' }}>
+                {String(v.fileType || 'F').slice(0, 1).toUpperCase()}
+              </span>
+              <span className="truncate font-semibold" title={v.displayTitle || v.title}>{v.displayTitle || v.title}</span>
+              <span className="ml-auto flex-none text-xs" style={{ color: 'var(--faint)' }}>
+                Recently opened →
+              </span>
+            </Link>
+          )}
+        />
       )}
 
-      <ScrollVelocity className="mt-8 border-y py-2.5" base={60}>
-        {['maths', 'verbal reasoning', 'quantitative reasoning', 'reading', 'writing', 'vocabulary', 'timed mocks', 'past papers'].map((w) => (
-          <span key={w} className="mx-5 font-display text-lg font-bold" style={{ color: 'var(--faint)' }}>
-            {w} <span style={{ color: 'var(--acc)' }}>✦</span>
-          </span>
-        ))}
-      </ScrollVelocity>
+      <Link
+        to="/exam-guide"
+        className="quiet-card mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-[14px]"
+      >
+        <strong>The selective entry test:</strong>
+        <span className="tnum" style={{ color: 'var(--mut)' }}>Maths + Quant 60 min</span>
+        <span style={{ color: 'var(--faint)' }} aria-hidden="true">·</span>
+        <span className="tnum" style={{ color: 'var(--mut)' }}>Reading + Verbal 55 min</span>
+        <span style={{ color: 'var(--faint)' }} aria-hidden="true">·</span>
+        <span className="tnum" style={{ color: 'var(--mut)' }}>Writing 40 min</span>
+        <span className="ml-auto font-bold" style={{ color: 'var(--acc)' }}>
+          Exam guide →
+        </span>
+      </Link>
 
-      <BlurText as="h2" className="mb-3 mt-7 font-display text-[22px] font-bold">Study modes</BlurText>
+      <section aria-label="Where you could be in Year 9" className="mt-10">
+        <Lamp
+          kicker="Victorian selective entry · Year 9 intake"
+          title="Four schools. One exam. Walk in ready."
+          sub="Around 1,000 Year 9 places across Melbourne High, Mac.Robertson Girls', Nossal and Suzanne Cory. Offers come from the official selection process. This site exists so you meet exam day prepared, not surprised."
+        />
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            ['Melbourne High', 'MHS', 'Boys · South Yarra', 'The academic powerhouse on the hill, generations of high achievers.'],
+            ['Mac.Robertson Girls’', 'MRG', 'Girls · Melbourne', 'A storied inner-city school for high-achieving girls.'],
+            ['Nossal', 'NHS', 'Co-ed · Berwick', 'Modern co-ed excellence in the south-east.'],
+            ['Suzanne Cory', 'SCS', 'Co-ed · Werribee', 'Purpose-built selective schooling in the west.'],
+          ].map(([name, short, facts, line]) => (
+            <div key={name} className="quiet-card flex h-full flex-col p-[18px]">
+              <span className="tnum grid h-10 w-10 place-items-center rounded-[10px] border text-[13px] font-extrabold tabular-nums" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)', color: 'var(--acc)' }}>
+                {short}
+              </span>
+              <h3 className="mt-2.5 font-display text-[16px] font-bold">{name}</h3>
+              <p className="text-xs font-semibold" style={{ color: 'var(--faint)' }}>{facts}</p>
+              <p className="mb-3 mt-1 text-[13.5px] leading-relaxed" style={{ color: 'var(--mut)' }}>{line}</p>
+              <Link to="/exam-guide" className="link-slide mt-auto inline-flex items-center gap-1.5 text-[13px] font-bold" style={{ color: 'var(--acc)' }}>
+                How to prepare <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <h2 className="section-title">Study modes</h2>
+      <hr className="section-rule" />
       <BentoGrid>
         <StarBorder className="sm:col-span-2">
           <BentoCard
@@ -402,52 +386,45 @@ export default function Home() {
         />
       </BentoGrid>
 
-      <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">
-        For your next session <small className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}>from the library</small>
+      <h2 className="section-title">
+        For your next session <small>from the library</small>
       </h2>
-      <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3" style={{ gridAutoFlow: 'row' }}>
+      <hr className="section-rule" />
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {subjects.map(([s, c]) => (
-          <DeckCard key={s} to={'/search?q=' + encodeURIComponent(s)} icon={<Layers className="h-5 w-5" aria-hidden="true" />} title={pretty(s)} sub={`${c} resources · flashcards + papers`} badge={`${c} resources`} />
+          <DeckCard key={s} to={'/search?q=' + encodeURIComponent(s)} icon={<Layers className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden="true" />} title={pretty(s)} sub={`${c} resources · flashcards + papers`} badge={`${c} resources`} />
         ))}
       </div>
 
-      <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">
-        Learn questions <small className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}>try one now</small>
-      </h2>
-      <LearnPreview />
+      <HowItWorks />
 
-      <ContainerScroll
-        title="Read inside the site: no new tabs"
-        sub="Every paper opens in the built-in viewer with your notes, progress and related material alongside. One tap from any card."
-      >
-        <div style={{ background: 'var(--ok-paper, #FBFAF6)' }}>
-          <div className="flex items-center gap-2 border-b px-4 py-2.5" style={{ borderColor: 'var(--line)' }}>
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--bad)' }} />
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--warn)' }} />
-            <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--ok)' }} />
-            <span className="ml-2 text-xs font-bold">Document viewer</span>
-            <span className="ml-auto flex gap-1.5">
-              <span className="rounded-md px-2 py-1 text-[11px] font-bold" style={{ background: 'var(--bg2)' }}>⛶</span>
-              <span className="rounded-md px-2 py-1 text-[11px] font-bold" style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}>Read here ↓</span>
-            </span>
-          </div>
-          <div className="space-y-2.5 p-5">
+      <h2 className="section-title">Read inside the site <small>no new tabs</small></h2>
+      <hr className="section-rule" />
+      <div className="quiet-card overflow-hidden">
+        <div className="flex items-center gap-2 border-b px-4 py-2.5" style={{ borderColor: 'var(--line)' }}>
+          <span className="text-xs font-bold">Document viewer</span>
+          <span className="tnum ml-auto text-xs tabular-nums" style={{ color: 'var(--faint)' }}>notes · progress · related alongside</span>
+        </div>
+        <div className="grid gap-3 p-5 sm:grid-cols-[minmax(0,1fr)_220px]">
+          <div className="space-y-2.5" aria-hidden="true">
             <div className="h-3.5 w-2/3 rounded" style={{ background: 'var(--txt)', opacity: 0.85 }} />
             <div className="h-2.5 w-1/3 rounded" style={{ background: 'var(--mark-bg)' }} />
             {[95, 99, 90, 97, 70].map((w, k) => (
               <div key={k} className="h-2 rounded" style={{ width: `${w}%`, background: 'var(--line)' }} />
             ))}
-            <div className="flex gap-2 pt-1">
-              <span className="rounded-lg px-2.5 py-1 text-[11px] font-bold" style={{ background: 'var(--acc-soft)', color: 'var(--acc)' }}>✓ Answers included</span>
-              <span className="rounded-lg px-2.5 py-1 text-[11px] font-bold" style={{ background: 'var(--bg2)', color: 'var(--mut)' }}>My note · saved ✓</span>
-            </div>
+          </div>
+          <div className="flex flex-col gap-2 text-[13px]">
+            <span className="rounded-lg px-2.5 py-1.5 text-[12px] font-bold" style={{ background: 'var(--acc-soft)', color: 'var(--acc)' }}>✓ Answers included</span>
+            <span className="rounded-lg px-2.5 py-1.5 text-[12px] font-bold" style={{ background: 'var(--bg2)', color: 'var(--mut)' }}>My note · saved ✓</span>
+            <Link to="/search?type=pdf" className="mt-auto font-bold" style={{ color: 'var(--acc)' }}>Open a paper →</Link>
           </div>
         </div>
-      </ContainerScroll>
+      </div>
 
-      <BlurText as="h2" className="mb-3 mt-7 font-display text-[22px] font-bold">New arrivals</BlurText>
+      <h2 className="section-title">New arrivals</h2>
+      <hr className="section-rule" />
       {!fresh ? (
-        <div className="grid gap-3.5 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <Skeleton />
           <Skeleton />
         </div>
@@ -463,33 +440,38 @@ export default function Home() {
 
       {!!trending?.results?.length && (
         <>
-          <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Trending this week</h2>
-          <SnapCarousel label="trending">
-            {trending.results.map((v) => (
-              <div key={v.id} className="w-[300px] flex-none snap-start sm:w-[340px]">
-                <ResourceCard v={v} showDesc={false} />
-              </div>
+          <h2 className="section-title">Trending this week</h2>
+          <hr className="section-rule" />
+          <div className="quiet-card divide-y overflow-hidden">
+            {trending.results.slice(0, 6).map((v) => (
+              <Link key={v.id} to={'/r/' + v.id} className="index-row text-sm transition-colors hover:bg-[var(--acc-soft)]">
+                <span className="tnum text-xs font-bold tabular-nums" style={{ color: 'var(--acc)' }}>{v.opens ?? '·'}</span>
+                <span className="truncate font-semibold">{v.displayTitle || v.title}</span>
+                <span className="ml-auto text-xs" style={{ color: 'var(--faint)' }} aria-hidden="true">→</span>
+              </Link>
             ))}
-          </SnapCarousel>
+          </div>
         </>
       )}
 
-      <BlurText as="h2" className="mb-3 mt-7 font-display text-[22px] font-bold">Practice tests</BlurText>
+      <h2 className="section-title">Practice tests</h2>
+      <hr className="section-rule" />
       {!search ? (
-        <div className="grid gap-3.5 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <Skeleton />
           <Skeleton />
         </div>
       ) : (
-        <div className="grid gap-3.5 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           {practice.map((v) => (
             <ResourceCard key={v.id} v={v} />
           ))}
         </div>
       )}
 
-      <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">Resources with answers <small className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}><Link to="/search?answers=1" style={{ color: 'var(--acc)' }}>View all</Link></small></h2>
-      <div className="overflow-x-auto rounded-2xl border" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
+      <h2 className="section-title">Resources with answers <small><Link to="/search?answers=1" style={{ color: 'var(--acc)' }}>View all</Link></small></h2>
+      <hr className="section-rule" />
+      <div className="quiet-card overflow-x-auto">
         <table className="ledger-table">
           <caption className="sr-only">Recent resources that include answers</caption>
           <thead>
@@ -515,27 +497,28 @@ export default function Home() {
         </table>
       </div>
 
-      <h2 className="mb-3 mt-7 font-display text-[22px] font-bold">PDF papers <small className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}><Link to="/search?type=pdf" style={{ color: 'var(--acc)' }}>View all</Link></small></h2>
-      <SnapCarousel label="PDF papers">
-        {pdfs.map((v) => (
-          <div key={v.id} className="w-[300px] flex-none snap-start sm:w-[340px]">
-            <ResourceCard v={v} />
-          </div>
+      <h2 className="section-title">PDF papers <small><Link to="/search?type=pdf" style={{ color: 'var(--acc)' }}>View all</Link></small></h2>
+      <hr className="section-rule" />
+      <div className="quiet-card divide-y overflow-hidden">
+        {pdfs.slice(0, 6).map((v) => (
+          <Link key={v.id} to={'/r/' + v.id} className="index-row text-sm transition-colors hover:bg-[var(--acc-soft)]">
+            <span className="tnum rounded-md border px-1.5 py-0.5 text-[10.5px] font-extrabold tabular-nums" style={{ color: 'var(--acc)', borderColor: 'var(--acc-line)' }}>PDF</span>
+            <span className="truncate font-semibold">{v.displayTitle || v.title}</span>
+            <span className="ml-auto text-xs" style={{ color: 'var(--faint)' }} aria-hidden="true">→</span>
+          </Link>
         ))}
-      </SnapCarousel>
+      </div>
 
       <AuroraBg className="mt-10 px-6 py-10 text-center sm:px-10">
-        <p className="text-xs font-extrabold uppercase tracking-[0.2em]" style={{ color: 'var(--acc)' }}>Not sure where to start?</p>
+        <p className="kicker" style={{ justifyContent: 'center' }}>Not sure where to start?</p>
         <h2 className="mx-auto mt-2 max-w-[24ch] font-display text-2xl font-bold sm:text-3xl">
-          <TextGenerate words="Take the short diagnostic." />
+          Take the short diagnostic.
         </h2>
-        <p className="mx-auto mt-2 max-w-[52ch] text-[15px]" style={{ color: 'var(--mut)' }}>
-          <Typewriter lines={['Ten minutes. Real timing.', 'Find your gaps in maths, reasoning, reading.', 'Get a concrete next step, no account.']} />
+        <p className="mx-auto mt-2 max-w-[52ch] text-[15.5px]" style={{ color: 'var(--mut)' }}>
+          Ten minutes. Real timing. Find your gaps in maths, reasoning and reading, then get a concrete next step. No account.
         </p>
         <p className="mt-5 flex flex-wrap justify-center gap-2.5">
-          <Ripple>
-            <InteractiveHover to="/mocks" primary>Take the diagnostic</InteractiveHover>
-          </Ripple>
+          <InteractiveHover to="/mocks" primary>Take the diagnostic</InteractiveHover>
           <InteractiveHover to="/exam-guide">Read the exam guide</InteractiveHover>
         </p>
       </AuroraBg>

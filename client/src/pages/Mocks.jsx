@@ -28,7 +28,7 @@ export default function Mocks() {
     };
   }, []);
   return (
-    <div className="mx-auto max-w-[1000px] px-5 py-7">
+    <div className="page-browse py-7">
       <p className="text-[13px] font-semibold" style={{ color: 'var(--mut)' }}>
         <Link to="/" className="hover:underline" style={{ color: 'var(--acc)' }}>Home</Link> › Mocks
       </p>

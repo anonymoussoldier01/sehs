@@ -138,7 +138,7 @@ export default function Writing() {
   const inputStyle = { borderColor: 'var(--line2)', background: 'var(--panel)', color: 'var(--txt)' };
 
   return (
-    <div className="mx-auto max-w-[860px] px-5 py-7">
+    <div className="page-read py-7">
       <p className="text-[13px] font-semibold" style={{ color: 'var(--mut)' }}>
         <Link to="/" className="hover:underline" style={{ color: 'var(--acc)' }}>Home</Link> › Writing
       </p>
@@ -166,7 +166,7 @@ export default function Writing() {
           {busy === 'prompt' ? 'Writing…' : '✦ New AI prompt'}
         </Button>
       </div>
-      <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="quiet-card p-[18px]">
         <h3 className="font-display text-[15.5px] font-bold">{current ? current.prompt : 'Pick a prompt to start'}</h3>
         {!!current?.stimulus && (
           <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
@@ -282,7 +282,7 @@ export default function Writing() {
         </div>
       )}
       <h2 className="mb-3 mt-6 font-display text-xl font-bold">Self-rubric (tick before you finish)</h2>
-      <div className="flex flex-col gap-1 rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="quiet-card flex flex-col gap-1 p-[18px]">
         {['Clear position / story problem by line 5', 'Paragraphs: 1 idea each, linked', '2+ persuasive devices / 3+ senses (creative)', 'Varied sentences (short punch + long flow)', 'Precise vocab (no repeats)', 'Spelling + punctuation checked'].map((t) => (
           <label key={t} className="flex min-h-[40px] cursor-pointer items-center gap-2.5 rounded-lg px-2 py-2 text-[13.5px] font-medium">
             <Checkbox aria-label={t} />

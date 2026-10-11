@@ -120,9 +120,10 @@ export default function StudyHub() {
   const inputStyle = { borderColor: 'var(--line2)', background: 'var(--panel)', color: 'var(--txt)' };
 
   return (
-    <div className="mx-auto max-w-[1000px] px-5 py-7">
-      <h1 className="font-display text-3xl font-bold">Study hub</h1>
-      <p className="mt-1 text-[15px]" style={{ color: 'var(--mut)' }}>
+    <div className="page-browse py-7">
+      <p className="kicker">Study hub · this browser</p>
+      <h1 className="font-display text-3xl font-bold" style={{ letterSpacing: '-0.02em' }}>Study hub</h1>
+      <p className="lede mt-1">
         Flashcards, quizzes and goals, stored in this browser.
       </p>
 
@@ -130,8 +131,8 @@ export default function StudyHub() {
       <ReviewQueue />
       <ActivityChart />
 
-      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">Your exam</h2>
-      <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <h2 className="section-title">Your exam</h2>
+      <div className="quiet-card p-[18px]">
         <div className="flex flex-wrap items-center gap-4">
           {[
             ['Countdown', diff === null ? 'Not set' : diff >= 0 ? `${diff} day${diff === 1 ? '' : 's'}` : 'Exam week. Good luck'],
@@ -174,8 +175,8 @@ export default function StudyHub() {
         </form>
       </div>
 
-      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">Built-in prep</h2>
-      <div className="grid gap-3.5 sm:grid-cols-2">
+      <h2 className="section-title">Built-in prep</h2>
+      <div className="grid gap-3 sm:grid-cols-2">
         {[
           ['/exam-guide', 'Exam guide', '3 blocks, pacing, schools, plans.'],
           ['/mocks', 'Timed mocks', '60 / 55 / 40 min blocks + diagnostic.'],
@@ -194,9 +195,9 @@ export default function StudyHub() {
         ))}
       </div>
 
-      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">AI study tools</h2>
-      <div className="grid gap-3.5 sm:grid-cols-2">
-        <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <h2 className="section-title">AI study tools</h2>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="quiet-card p-[18px]">
           <h3 className="font-display text-[15.5px] font-bold">Flashcards from any topic</h3>
           <div className="mt-2 flex gap-2">
             <Input value={aiTopic} onChange={(e) => setAiTopic(e.target.value)} maxLength={120} placeholder="e.g. analogies, fractions…" aria-label="Deck topic" className="min-w-0 flex-1" />
@@ -210,7 +211,7 @@ export default function StudyHub() {
             </p>
           )}
         </div>
-        <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+        <div className="quiet-card p-[18px]">
           <h3 className="font-display text-[15.5px] font-bold">My study plan</h3>
           <div className="mt-2 flex flex-wrap gap-2">
             <Select aria-label="Weeks" value={planWeeks} onValueChange={(k) => setPlanWeeks(String(k))} className="w-[130px]">
@@ -239,34 +240,32 @@ export default function StudyHub() {
 
       <Weaknesses />
 
-      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">Flashcard decks</h2>
+      <h2 className="section-title">Flashcard decks</h2>
       {!decks ? (
-        <div className="grid gap-3.5 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-2">
           <Skeleton />
           <Skeleton />
         </div>
       ) : (
-        <AnimatedGrid className="grid gap-3.5 sm:grid-cols-2">
+        <AnimatedGrid className="grid gap-3 sm:grid-cols-2">
           {decks.map((d) => (
-            <SpotlightCard key={d.id} className="h-full rounded-2xl border shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
-              <div className="h-full rounded-2xl p-[18px]">
-                <h3 className="font-display text-[15.5px] font-bold">{d.title}</h3>
-                <p className="mb-1 mt-0.5 text-[13px]" style={{ color: 'var(--mut)' }}>
-                  {d.description || ''}
-                </p>
-                <p className="mb-3 text-xs" style={{ color: 'var(--faint)' }}>
-                  {d.count} cards · {d.source}
-                </p>
-                <Link to={'/study/' + encodeURIComponent(d.id)} className="inline-flex min-h-[38px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
-                  Study →
-                </Link>
-              </div>
-            </SpotlightCard>
+            <div key={d.id} className="quiet-card h-full p-[18px]">
+              <h3 className="font-display text-[15.5px] font-bold">{d.title}</h3>
+              <p className="mb-1 mt-0.5 text-[13.5px]" style={{ color: 'var(--mut)' }}>
+                {d.description || ''}
+              </p>
+              <p className="tnum mb-3 text-xs tabular-nums" style={{ color: 'var(--faint)' }}>
+                {d.count} cards · {d.source}
+              </p>
+              <Link to={'/study/' + encodeURIComponent(d.id)} className="inline-flex min-h-[44px] items-center rounded-[10px] bg-[var(--primary)] px-3.5 py-2 text-[13px] font-bold text-[var(--primary-foreground)]">
+                Study →
+              </Link>
+            </div>
           ))}
         </AnimatedGrid>
       )}
 
-      <h2 className="mb-3 mt-6 flex flex-wrap items-center gap-2 font-display text-[20px] font-bold">
+      <h2 className="section-title">
         Your decks
         <span className="ml-auto flex gap-2">
           <button
@@ -314,10 +313,10 @@ export default function StudyHub() {
           </label>
         </span>
       </h2>
-      <div className="grid gap-3.5 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         {localDecks.length ? (
           localDecks.map((d, i) => (
-            <div key={i} className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+            <div key={i} className="quiet-card p-[18px]">
               <h3 className="font-display text-[15.5px] font-bold">{d.title}</h3>
               <p className="mb-3 text-[13px]" style={{ color: 'var(--mut)' }}>
                 {d.cards.length} cards · yours
@@ -342,7 +341,7 @@ export default function StudyHub() {
             </p>
         )}
       </div>
-      <div className="mt-3 rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="quiet-card mt-3 p-[18px]">
         <h3 className="font-display text-[15.5px] font-bold">New deck</h3>
         <form onSubmit={createDeck} className="mt-2 flex flex-wrap gap-2">
           <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} required maxLength={80} placeholder="Deck title" aria-label="Deck title" className="min-w-[200px] flex-1" />
@@ -398,7 +397,7 @@ function FirstRun() {
     navigate(href);
   };
   return (
-    <div className="mt-6 rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }}>
+    <div className="quiet-card beam-feature mt-6 p-[18px]">
       <h2 className="font-display text-[20px] font-bold">Start here: pick one small step</h2>
       <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
         New here? Choose a goal and do ten focused minutes. Your progress appears on this page. Real numbers only, never samples.
@@ -430,7 +429,7 @@ function ReviewQueue() {
   };
   return (
     <>
-      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">
+      <h2 className="section-title">
         Review queue <span className="text-sm font-semibold" style={{ color: 'var(--faint)' }}>{due.length} due</span>
       </h2>
       <p className="mb-2 text-[13px]" style={{ color: 'var(--mut)' }}>
@@ -474,7 +473,7 @@ function ActivityChart() {
   const total = days.reduce((a, b) => a + b.n, 0);
   return (
     <>
-      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">
+      <h2 className="section-title">
         Activity <span className="text-sm font-semibold" style={{ color: 'var(--faint)' }}>last 14 days · {total} events</span>
       </h2>
       {total === 0 ? (
@@ -482,7 +481,7 @@ function ActivityChart() {
           Nothing charted yet. Searches, opens and finished mocks draw bars here, in this browser only.
         </p>
       ) : (
-        <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+        <div className="quiet-card p-[18px]">
           <div className="flex h-24 items-end gap-1.5" role="img" aria-label={`Study activity, ${total} events in the last 14 days`}>
             {days.map(({ d, n }) => (
               <div key={d} className="flex flex-1 flex-col items-center gap-1" title={`${d}: ${n} events`}>
@@ -522,8 +521,9 @@ function YourData() {
   };
   return (
     <>
-      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">Your data</h2>
-      <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <h2 className="section-title">Your data</h2>
+      <hr className="section-rule" />
+      <div className="quiet-card p-[18px]">
         <p className="text-sm" style={{ color: 'var(--mut)' }}>
           Everything lives in this browser. Export a copy any time, or erase it all. Clearing site data removes it too.
         </p>
@@ -611,10 +611,10 @@ function Weaknesses() {
 
   return (
     <>
-      <h2 className="mb-3 mt-6 font-display text-[20px] font-bold">My weaknesses</h2>
-      <div className="grid gap-3.5 sm:grid-cols-2">
+      <h2 className="section-title">My weaknesses</h2>
+      <div className="grid gap-3 sm:grid-cols-2">
         {!!strands.length && (
-          <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+          <div className="quiet-card p-[18px]">
             <h3 className="font-display text-[15.5px] font-bold">Most-missed strands</h3>
             <div className="mt-2 flex flex-col gap-2.5">
               {strands.slice(0, 4).map((s) => (
@@ -682,7 +682,7 @@ function Weaknesses() {
           </div>
         )}
         {!!bestEntries.length && (
-          <div className="rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+          <div className="quiet-card p-[18px]">
             <h3 className="font-display text-[15.5px] font-bold">Mock mastery</h3>
             <div className="mt-2 flex flex-col gap-2">
               {bestEntries.map(([id, b]) => (

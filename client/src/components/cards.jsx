@@ -14,7 +14,7 @@ const TYPE_LABEL = { pdf: 'PDF', docx: 'Word', image: 'Image', archive: 'Archive
 export function FileIcon({ type }) {
   return (
     <div
-      className="grid h-[52px] w-[46px] flex-none place-items-center rounded-md rounded-tr-xl text-[10px] font-extrabold tracking-wide shadow"
+      className="tnum grid h-[52px] w-[46px] flex-none place-items-center rounded-[8px] text-[10px] font-extrabold tracking-wide tabular-nums"
       style={{ background: 'var(--acc-soft)', color: 'var(--acc)', border: '1px solid var(--acc-line)' }}
       aria-hidden="true"
     >
@@ -55,7 +55,7 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
   const readable = v.fileType === 'pdf' || v.fileType === 'image';
 
   return (
-    <article data-result-id={v.id} className="glare flex gap-3.5 rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg" style={{ background: 'var(--card)', borderColor: 'var(--line)' }}>
+    <article data-result-id={v.id} className="quiet-card flex gap-3.5 p-[18px]">
       <FileIcon type={v.fileType} />
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <h3 className="text-[15.5px] font-bold leading-snug">
@@ -65,7 +65,7 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
             desc={v.description}
             meta={[subj, v.provider ? pretty(v.provider) : null, v.answersIncluded ? 'Answers included' : null].filter(Boolean).join(' · ')}
           >
-            <span className="link-slide transition-colors hover:text-[var(--acc)]" title={displayTitle}>{highlight(displayTitle, tokens)}</span>
+            <span className="link-slide hover:text-[var(--acc)]" title={displayTitle}>{highlight(displayTitle, tokens)}</span>
           </LinkPreview>
         </h3>
         <div className="text-xs font-semibold" style={{ color: 'var(--mut)' }}>
@@ -73,7 +73,7 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
           {v.provider ? ` › ${pretty(v.provider)}` : ''}
         </div>
         {showDesc && v.description ? (
-          <p className="line-clamp-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--mut)' }} title={v.description}>
+          <p className="line-clamp-2 text-[14px] leading-relaxed" style={{ color: 'var(--mut)' }} title={v.description}>
             {highlight(v.description, tokens)}
           </p>
         ) : null}
@@ -83,11 +83,11 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
           </Badge>
           {v.answersIncluded && <Badge variant="success">✓ Answers included</Badge>}
         </div>
-        <div className="mt-auto flex items-center justify-between gap-2.5 border-t border-dashed pt-2" style={{ borderColor: 'var(--line)' }}>
-          <span className="text-[11.5px] tabular-nums" style={{ color: 'var(--faint)' }}>
+        <div className="mt-auto flex items-center justify-between gap-2.5 border-t border-dashed pt-2.5" style={{ borderColor: 'var(--line)' }}>
+          <span className="tnum text-[11.5px] tabular-nums" style={{ color: 'var(--faint)' }}>
             {[v.year, v.sizeBytes ? fmtBytes(v.sizeBytes) : null].filter(Boolean).join(' · ')}
           </span>
-          <span className="flex items-center gap-[7px]">
+          <span className="flex items-center gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -98,19 +98,16 @@ export function ResourceCard({ v, title, tokens = [], showDesc = true }) {
                   aria-label={saved.has(v.id) ? 'Remove from saved' : 'Save this resource'}
                   className="h-9 w-9 p-0"
                 >
-                  <Star className="h-4 w-4" fill={saved.has(v.id) ? 'currentColor' : 'none'} aria-hidden="true" />
+                  <Star className="h-4 w-4" strokeWidth={2} fill={saved.has(v.id) ? 'currentColor' : 'none'} aria-hidden="true" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>{saved.has(v.id) ? 'Saved' : 'Save'}</TooltipContent>
             </Tooltip>
-            <Button size="sm" variant="secondary" onClick={() => navigate('/r/' + v.id)}>
-              {readable ? 'Read' : 'Details'}
+            <Button size="sm" variant={readable ? 'default' : 'secondary'} onClick={() => navigate('/r/' + v.id)}>
+              {readable ? 'Read here →' : 'Details →'}
             </Button>
           </span>
         </div>
-        <Button variant="default" size="sm" onClick={() => navigate('/r/' + v.id)} className="w-full">
-          {readable ? 'Read here →' : 'Details →'}
-        </Button>
       </div>
     </article>
   );

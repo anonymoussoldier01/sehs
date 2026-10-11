@@ -204,36 +204,38 @@ function Layout() {
         <main id="main" className="flex-1">
           <Outlet />
         </main>
-        <footer className="mx-auto grid w-full max-w-[1240px] grid-cols-1 items-start gap-4 border-t-2 px-5 pb-12 pt-7 md:grid-cols-[1fr_auto]" style={{ borderColor: 'var(--txt)' }}>
-          <div>
-            <h2 className="font-display text-base font-bold">About this directory</h2>
-            <p className="mb-2 mt-1 max-w-[80ch] text-[13.5px]" style={{ color: 'var(--mut)' }}>
-              A searchable collection of selective-entry study resources: past papers, notes, flashcards, mocks and guides. Free for anyone studying, no account needed.
-            </p>
-            <p className="text-xs tabular-nums" style={{ color: 'var(--faint)' }}>
-              We use cookies + local storage to remember your theme, library and progress. Anonymous usage counts auto-delete after 30 days.{' '}
-              <Link to="/about" className="font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>
-                Privacy &amp; cookies
-              </Link>
-            </p>
-            <p className="mt-1 text-xs" style={{ color: 'var(--faint)' }}>
-              Independent study resource, not affiliated with the Victorian Department of Education, ACER, or any exam provider.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-0.5">
-            {[
-              ['/about', 'About'],
-              ['/terms', 'Terms'],
-              ['/privacy', 'Privacy'],
-              ['/saved', 'Library'],
-              ['/study', 'Study hub'],
-              ['/request', 'Request'],
-              ['/unlock', 'Admin'],
-            ].map(([to, l]) => (
-              <Link key={to} to={to} className="text-stroke-hover min-h-[36px] px-2 py-2 text-[13.5px] font-bold underline underline-offset-[3px]" style={{ color: 'var(--acc)' }}>
-                {l}
-              </Link>
-            ))}
+        <footer className="mx-auto w-full max-w-[1200px] px-6 pb-12 pt-7" style={{ borderTop: '2px solid var(--txt)' }}>
+          <div className="grid grid-cols-1 items-start gap-4 md:grid-cols-[minmax(0,1fr)_auto]">
+            <div>
+              <p className="kicker" style={{ marginBottom: 8 }}>SEHS Study · ledger</p>
+              <p className="mb-2 mt-1 max-w-[72ch] text-[15px]" style={{ color: 'var(--mut)' }}>
+                Past papers, notes, flashcards, mocks and guides for Victoria&apos;s selective entry exam. Free, no account.
+              </p>
+              <p className="tnum text-xs tabular-nums" style={{ color: 'var(--faint)' }}>
+                Cookies + local storage remember your theme, library and progress. Anonymous counts auto-delete after 30 days.{' '}
+                <Link to="/about" className="font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>
+                  Privacy &amp; cookies
+                </Link>
+              </p>
+              <p className="mt-1 text-xs" style={{ color: 'var(--faint)' }}>
+                Independent study resource. Not affiliated with the Victorian Department of Education, ACER, or any exam provider.
+              </p>
+            </div>
+            <nav className="flex flex-wrap items-center gap-x-1 gap-y-0.5" aria-label="Footer">
+              {[
+                ['/about', 'About'],
+                ['/terms', 'Terms'],
+                ['/privacy', 'Privacy'],
+                ['/saved', 'Library'],
+                ['/study', 'Study hub'],
+                ['/request', 'Request'],
+                ['/unlock', 'Admin'],
+              ].map(([to, l]) => (
+                <Link key={to} to={to} className="link-slide min-h-[36px] px-2 py-2 text-[13.5px] font-bold" style={{ color: 'var(--acc)' }}>
+                  {l}
+                </Link>
+              ))}
+            </nav>
           </div>
         </footer>
       </div>

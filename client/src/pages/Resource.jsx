@@ -165,7 +165,7 @@ export default function Resource() {
 
   if (missing)
     return (
-      <div className="mx-auto max-w-[900px] px-5 py-10">
+      <div className="page-read py-10">
         <Empty title="Resource not found" msg="It may have been moved, hidden, or the link is incorrect.">
           <div className="mt-4">
             <Link to="/search" className="inline-flex min-h-[42px] items-center rounded-[11px] bg-[var(--primary)] px-[18px] py-2.5 text-sm font-bold text-[var(--primary-foreground)]">
@@ -177,21 +177,22 @@ export default function Resource() {
     );
   if (!v)
     return (
-      <div className="mx-auto max-w-[900px] px-5 py-5">
+      <div className="page-read py-5">
         <Skeleton />
       </div>
     );
 
   const title = v.displayTitle || v.title;
   return (
-    <div className="mx-auto max-w-[900px] px-5 py-5">
+    <div className="page-read py-6">
+      <p className="kicker">Library · {pretty(v.category)}</p>
       <p className="text-[13px] font-semibold" style={{ color: 'var(--mut)' }}>
         <Link to="/" className="hover:underline" style={{ color: 'var(--acc)' }}>
           Home
         </Link>{' '}
         › <Link to={'/search?cat=' + encodeURIComponent(v.category)} className="hover:underline" style={{ color: 'var(--acc)' }}>{pretty(v.category)}</Link> › {title.slice(0, 60)}
       </p>
-      <h1 className="mt-1 font-display text-3xl font-bold tracking-tight">{highlight(title, [])}</h1>
+      <h1 className="mt-2 font-display text-3xl font-bold tracking-tight" style={{ letterSpacing: '-0.02em', maxWidth: '22ch' }}>{highlight(title, [])}</h1>
       <div className="mb-4 mt-2.5 flex flex-wrap items-center gap-1.5">
         <Badge variant="accent">
           {pretty(v.category)}
@@ -212,12 +213,13 @@ export default function Resource() {
           You opened this before ({new Date(openedBefore).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })}). Your note and place are kept below.
         </p>
       )}
+      <hr className="section-rule" />
       <div className="mb-[18px] mt-1.5 flex flex-wrap gap-1.5">
         {(v.tags || []).slice(0, 10).map((t) => (
           <Link
             key={t}
             to={'/search?q=' + encodeURIComponent(t)}
-            className="chip-hover rounded-full border px-2.5 py-1 text-[11.5px] font-semibold"
+            className="rounded-full border px-2.5 py-1 text-[11.5px] font-semibold transition-colors"
             style={{ borderColor: 'var(--line2)', color: 'var(--mut)' }}
           >
             {pretty(t)}
@@ -233,8 +235,8 @@ export default function Resource() {
           </span>
         )}
         <span className="flex flex-wrap gap-2.5" role="group" aria-label="Organise">
-          <Button variant="secondary" onClick={() => toggle(v.id)} aria-pressed={String(saved.has(v.id))}>
-            {saved.has(v.id) ? '★ Saved' : '☆ Save'}
+          <Button variant={saved.has(v.id) ? 'default' : 'secondary'} onClick={() => toggle(v.id)} aria-pressed={String(saved.has(v.id))}>
+            {saved.has(v.id) ? 'Saved ✓' : 'Save'}
           </Button>
           <Button
             variant="secondary"
@@ -301,7 +303,7 @@ export default function Resource() {
         </SpotlightCard>
       )}
 
-      <div className="mb-7 rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="quiet-card mb-7 p-[18px]">
         <h3 className="mt-0 font-display text-[15.5px] font-bold">
           My note <span className="ml-1 text-xs font-semibold" style={{ color: 'var(--faint)' }}>{noteState === 'saving' ? 'Saving…' : 'Saved in this browser'}</span>
         </h3>
@@ -325,7 +327,7 @@ export default function Resource() {
       )}
 
       {!distractionFree && (
-      <div className="mb-7 rounded-2xl border p-[18px] shadow-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="quiet-card mb-7 p-[18px]">
         <h3 className="mt-0 font-display text-[15.5px] font-bold">Study this properly</h3>
         <p className="mb-2.5 mt-0 text-[13.5px]" style={{ color: 'var(--mut)' }}>
           Turn this resource into flashcards or a short quiz. Made on the spot, saved to your browser.

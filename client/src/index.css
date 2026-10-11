@@ -38,6 +38,18 @@
    neutral slate surfaces. Radius kept consistent (10px base). */
 :root {
   --radius: 0.625rem;
+  /* Study Ledger system: 3 radii, 2 elevations, 8pt grid. */
+  --radius-box: 14px;
+  --radius-field: 10px;
+  --radius-selector: 8px;
+  --size-field: 44px;
+  --size-selector: 32px;
+  --page-browse: 1200px;
+  --page-read: 960px;
+  --page-narrow: 860px;
+  --fs-hero: clamp(34px, 4.6vw, 54px);
+  --fs-h2: 21px;
+  --fs-body: 15.5px;
   /* OKLCH source tokens (hex comments = starting intent for review).
      Light theme default; .dark overrides below. */
   --ok-bg: oklch(0.975 0.008 250); /* #F7F8FB */
@@ -457,17 +469,7 @@ kbd.kbd {
   }
 }
 .bento-spot::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(56, 189, 248, 0.12), transparent 65%);
-  opacity: 0;
-  transition: opacity var(--dur-standard) var(--ease-standard);
-  pointer-events: none;
-}
-.bento-spot:hover::before {
-  opacity: 1;
+  content: none;
 }
 .ih-arrows {
   display: inline-flex;
@@ -735,14 +737,11 @@ button:disabled,
   scrollbar-color: var(--line2) transparent;
 }
 
-/* ---------- magic: aurora text (hero headline only) ---------- */
+/* ---------- Study Ledger: solid ink headlines (gradient text purged) ---------- */
 .aurora-text {
-  background: linear-gradient(110deg, var(--primary) 20%, #0284c7 50%, var(--primary) 80%);
-  background-size: 220% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: aurora-slide 7s linear infinite;
+  background: none;
+  color: inherit;
+  animation: none;
 }
 @keyframes aurora-slide {
   to {
@@ -751,14 +750,12 @@ button:disabled,
 }
 
 .shiny-text {
-  background: linear-gradient(110deg, currentColor 40%, #fff 50%, currentColor 60%);
-  background-size: 220% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: aurora-slide 4.5s linear infinite;
+  background: none;
+  color: inherit;
+  animation: none;
 }
 
-/* ---------- magic: border beam (featured cards only) ---------- */
+/* ---------- Study Ledger: single static feature frame (beam animation purged) ---------- */
 @property --beam-a {
   syntax: "<angle>";
   initial-value: 0deg;
@@ -773,23 +770,11 @@ button:disabled,
   position: relative;
 }
 .beam-card::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: inherit;
-  padding: 1.5px;
-  background: conic-gradient(
-    from var(--beam-a, 0deg) at 50% 50%,
-    transparent 0 78%,
-    var(--primary) 86%,
-    #38bdf8 90%,
-    transparent 96%
-  );
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  animation: beam-spin 4.5s linear infinite;
-  pointer-events: none;
+  content: none;
+}
+.beam-feature {
+  position: relative;
+  border: 1.5px solid var(--acc);
 }
 
 /* ---------- magic: marquee ---------- */
@@ -813,17 +798,21 @@ button:disabled,
   }
 }
 
-/* ---------- magic: meteors (hero only, subtle) ---------- */
-.meteor {
-  position: absolute;
-  top: -10%;
-  width: 2px;
-  height: 120px;
-  border-radius: 4px;
-  background: linear-gradient(to bottom, transparent, #93a8e8);
-  transform: rotate(28deg);
-  opacity: 0;
-  animation: meteor-fall 7s linear infinite;
+/* ---------- Study Ledger: ambient effects purged (meteors/aurora/particles off) ---------- */
+.meteor,
+.meteors,
+.aurora-blob,
+.aurora-a,
+.aurora-b,
+.aurora-c,
+.orbit-spin,
+.orbit-counter,
+.spin-slow {
+  display: none !important;
+  animation: none !important;
+}
+.meteor-fallback {
+  display: none;
 }
 @keyframes meteor-fall {
   0% {
@@ -890,22 +879,13 @@ button:disabled,
     opacity: 0;
   }
 }
-/* glare sweep on cards */
+/* glare sweep purged: cards stay matte */
 .glare {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 .glare::before {
-  content: "";
-  position: absolute;
-  inset: -60%;
-  background: linear-gradient(105deg, transparent 42%, rgba(255, 255, 255, 0.14) 50%, transparent 58%);
-  transform: translateX(-70%);
-  transition: transform 0.9s var(--ease-out, ease);
-  pointer-events: none;
-}
-.glare:hover::before {
-  transform: translateX(70%);
+  content: none;
 }
 
 /* ---------- bento cards (home study modes) ---------- */
@@ -989,5 +969,159 @@ button:disabled,
   }
   html {
     scroll-behavior: auto;
+  }
+}
+
+/* ================= Study Ledger canonical system =================
+   Left-anchored heroes, ledger density, quiet cards, one accent. */
+.page-browse {
+  max-width: var(--page-browse);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+.page-read {
+  max-width: var(--page-read);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+.page-narrow {
+  max-width: var(--page-narrow);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+.kicker {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--acc);
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.kicker::before {
+  content: "";
+  width: 22px;
+  height: 2px;
+  background: var(--acc);
+  border-radius: 2px;
+  flex: none;
+}
+.lede {
+  color: var(--mut);
+  font-size: 16.5px;
+  line-height: 1.62;
+  max-width: 62ch;
+  margin: 0;
+}
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-h2);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  margin: 40px 0 12px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.section-title small {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--faint);
+}
+.section-rule {
+  border: none;
+  border-top: 2px solid var(--txt);
+  margin: 0 0 16px;
+  opacity: 0.9;
+}
+.hero-ledger {
+  border-bottom: 2px solid var(--txt);
+  padding: 48px 0 24px;
+  margin-bottom: 8px;
+}
+.hero-ledger h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-hero);
+  line-height: 1.05;
+  letter-spacing: -0.022em;
+  margin: 0 0 12px;
+  max-width: 20ch;
+}
+/* Landing peak: larger display + live-surface grid. Tracking tightens with size. */
+.hero-home h1 {
+  font-size: clamp(40px, 5.4vw, 68px);
+  letter-spacing: -0.028em;
+  max-width: 16ch;
+}
+.hero-live {
+  position: relative;
+}
+@media (min-width: 1024px) {
+  .hero-live {
+    position: sticky;
+    top: 84px;
+  }
+}
+/* Numbered method rows: ledger rhythm, no icon cards. */
+.method-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 4px;
+  border-bottom: 1px solid var(--line);
+}
+.method-row:first-of-type {
+  border-top: 1px solid var(--line);
+}
+.method-num {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--acc);
+  border: 1px solid var(--acc-line);
+  background: var(--acc-soft);
+  border-radius: 8px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+.quiet-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-box);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+.quiet-card.pad {
+  padding: 18px;
+}
+.index-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  min-height: 56px;
+}
+.index-row:last-child {
+  border-bottom: none;
+}
+.dot-grid {
+  background-image: radial-gradient(var(--line2) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.view-route {
+  animation: vt-in 0.24s cubic-bezier(0.2, 0.7, 0.25, 1) both;
+}
+@media (max-width: 640px) {
+  .page-browse,
+  .page-read,
+  .page-narrow {
+    padding-inline: 16px;
+  }
+  .hero-ledger {
+    padding-top: 32px;
   }
 }

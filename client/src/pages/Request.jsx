@@ -28,7 +28,7 @@ export default function Request() {
   const cls = 'rounded-[10px] border px-3 py-2.5 text-base';
   const st = { borderColor: 'var(--line2)', background: 'var(--panel)', color: 'var(--txt)' };
   return (
-    <div className="mx-auto max-w-[640px] px-5 py-7">
+    <div className="page-narrow py-7">
       <p className="text-[13px] font-semibold" style={{ color: 'var(--mut)' }}>
         <Link to="/" className="hover:underline" style={{ color: 'var(--acc)' }}>Home</Link> › Request a resource
       </p>

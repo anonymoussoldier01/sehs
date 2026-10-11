@@ -46,10 +46,9 @@ const MAIN = [
   ['/study', 'Study hub', GraduationCap],
 ];
 const START = [
-  ['/study', 'Flashcards', Layers],
   ['/mocks', 'Timed mocks', Timer],
   ['/exam-guide', 'Study guides', BookOpen],
-  ['/drills', 'Games & drills', Gamepad2],
+  ['/drills', 'Maths drills', Gamepad2],
   ['/writing', 'Writing studio', PenLine],
   ['/reading', 'Reading room', Library],
 ];
@@ -68,20 +67,21 @@ function SideLink({ to, icon: Icon, label, onNav }) {
       onClick={onNav}
       className={({ isActive }) =>
         cn(
-          'flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all',
-          isActive ? '' : 'hover:translate-x-[1px]'
+          'flex min-h-[44px] items-center gap-3 rounded-[10px] px-3 py-2.5 text-sm font-semibold transition-colors',
+          isActive ? 'ledger-active' : ''
         )
       }
       style={({ isActive }) => ({
         background: isActive ? 'var(--acc-soft)' : undefined,
         color: isActive ? 'var(--acc)' : 'var(--mut)',
+        boxShadow: isActive ? 'inset 2px 0 0 var(--acc)' : undefined,
       })}
     >
       <span
         className="grid h-[26px] w-[26px] flex-none place-items-center rounded-lg border"
         style={{ background: 'var(--bg2)', borderColor: 'var(--line)' }}
       >
-        <Icon className="h-4 w-4" aria-hidden="true" />
+        <Icon className="h-[18px] w-[18px]" strokeWidth={2} aria-hidden="true" />
       </span>
       <span className="truncate">{label}</span>
     </NavLink>
@@ -119,8 +119,8 @@ export function Sidebar({ open, onClose, folders }) {
           {MAIN.map(([to, l, i]) => (
             <SideLink key={to + l} to={to} icon={i} label={l} onNav={onClose} />
           ))}
-          <p className="mx-3 mb-1.5 mt-4 text-[11px] font-extrabold uppercase tracking-[.08em]" style={{ color: 'var(--faint)' }}>
-            Start here
+          <p className="mx-3 mb-1.5 mt-4 text-[11px] font-extrabold uppercase tracking-[0.14em]" style={{ color: 'var(--faint)' }}>
+            Practice
           </p>
           {START.map(([to, l, i]) => (
             <SideLink key={to + l} to={to} icon={i} label={l} onNav={onClose} />
@@ -245,21 +245,21 @@ export function Topbar({ onMenu }) {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b backdrop-blur-xl transition-all duration-300"
+      className="sticky top-0 z-40 border-b"
       style={{
-        background: scrolled ? 'color-mix(in srgb, var(--panel) 82%, transparent)' : 'color-mix(in srgb, var(--panel) 94%, transparent)',
+        background: 'var(--panel)',
         borderColor: 'var(--line)',
-        boxShadow: scrolled ? '0 6px 24px rgba(15,23,42,0.10)' : 'none',
+        boxShadow: scrolled ? '0 1px 0 rgba(15,23,42,0.06)' : 'none',
       }}
     >
-      <div className="mx-auto flex min-h-[62px] max-w-[1240px] items-center gap-2.5 px-4 transition-all duration-300 sm:px-6" style={scrolled ? { minHeight: 54 } : undefined}>
+      <div className="mx-auto flex min-h-[60px] max-w-[1200px] items-center gap-2.5 px-4 sm:px-6">
         <Button variant="secondary" size="icon" onClick={onMenu} aria-label="Open menu" className="lg:hidden">
-          <Menu className="h-5 w-5" />
+          <Menu className="h-[18px] w-[18px]" strokeWidth={2} />
         </Button>
         <div className="relative mx-auto w-full min-w-0 max-w-[560px]" ref={boxRef}>
           <Form
             onSubmit={submit}
-            className="flex min-h-[44px] items-center gap-2.5 rounded-full border py-0 pl-4 pr-2 transition-all focus-within:-translate-y-px"
+            className="flex min-h-[44px] items-center gap-2.5 rounded-[10px] border py-0 pl-4 pr-2 transition-colors"
             style={{ background: 'var(--bg2)', borderColor: focus ? 'var(--acc)' : 'var(--line)' }}
             role="search"
           >

@@ -46,7 +46,7 @@ export default function Design() {
     return () => meta.remove();
   }, []);
   return (
-    <div className="mx-auto max-w-[1060px] px-5 py-7">
+    <div className="page-browse py-7">
       <p className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--faint)' }}>
         Internal · noindex
       </p>

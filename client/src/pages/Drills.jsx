@@ -123,7 +123,7 @@ export default function Drills() {
   const shown = aiSet ? { q: aiSet[aiIdx].stem, a: [] } : cur;
 
   return (
-    <div className="mx-auto max-w-[860px] px-5 py-7">
+    <div className="page-read py-7">
       <p className="text-[13px] font-semibold" style={{ color: 'var(--mut)' }}>
         <Link to="/" className="hover:underline" style={{ color: 'var(--acc)' }}>Home</Link> › Drills
       </p>
@@ -153,7 +153,7 @@ export default function Drills() {
           ✦ AI set
         </Button>
       </div>
-      <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="quiet-card p-[18px]">
         <h3 className="font-display text-xl font-bold tabular-nums">{shown.q}</h3>
         {aiSet && <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>AI question {aiIdx + 1} of {aiSet.length}</p>}
         <div className="mt-2.5 flex gap-2">

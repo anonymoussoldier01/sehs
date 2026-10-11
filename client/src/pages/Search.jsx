@@ -26,9 +26,9 @@ export default function Search() {
   const page = Math.max(1, Number(sp.get('page')) || 1);
   const [view, setView] = useState(() => {
     try {
-      return localStorage.getItem('sehs-view') || 'grid';
+      return localStorage.getItem('sehs-view') || 'ledger';
     } catch {
-      return 'grid';
+      return 'ledger';
     }
   });
   const [compact, setCompact] = useState(() => {
@@ -160,10 +160,10 @@ export default function Search() {
   );
 
   return (
-    <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-start gap-5 px-4 pb-14 pt-2.5 sm:px-6 lg:grid-cols-[272px_minmax(0,1fr)]">
-      <aside className="rounded-2xl border p-4 shadow-sm lg:sticky lg:top-[78px] lg:max-h-[calc(100vh-100px)] lg:overflow-auto" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }} aria-label="Filters">
+    <div className="page-browse grid grid-cols-1 items-start gap-5 pb-14 pt-6 lg:grid-cols-[272px_minmax(0,1fr)]">
+      <aside className="quiet-card p-4 lg:sticky lg:top-[78px] lg:max-h-[calc(100vh-100px)] lg:overflow-auto" aria-label="Filters">
         <div className="mb-1.5 flex items-center justify-between">
-          <h2 className="m-0 flex items-center gap-2 text-xs font-extrabold uppercase tracking-[.08em]" style={{ color: 'var(--mut)' }}>
+          <h2 className="m-0 flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.14em]" style={{ color: 'var(--mut)' }}>
             Filters
           </h2>
           <Link to={q ? `/search?q=${encodeURIComponent(q)}` : '/search'} className="rounded-md px-1.5 py-2 text-[13.5px] font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>
@@ -198,11 +198,12 @@ export default function Search() {
       </aside>
 
       <main aria-label="Results">
-        <div className="mb-3.5 flex flex-wrap items-start justify-between gap-3">
-          <div className="flex flex-col gap-[3px] pt-0.5">
-            <span className="font-display text-[19px] font-bold">
-              {loading ? 'Searching…' : total === 0 ? 'No results' : `${total.toLocaleString()} resource${total === 1 ? '' : 's'} found${q ? ` for “${q}”` : ''}`}
-            </span>
+        <p className="kicker">Library · index</p>
+        <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+          <div className="flex min-w-0 flex-col gap-[3px] pt-0.5">
+            <h1 className="font-display text-[26px] font-bold leading-tight">
+              {loading ? 'Searching…' : total === 0 ? 'No results' : `${total.toLocaleString()} resource${total === 1 ? '' : 's'}${q ? ` for “${q}”` : ''}`}
+            </h1>
             {!!data && total > 0 && (data.mode === 'partial' || data.mode === 'fuzzy') && (
               <span className="inline-block rounded-[10px] border border-dashed px-2.5 py-[7px] text-[13px] font-semibold" style={{ color: 'var(--warn, #92400e)', background: 'var(--warn-bg, #fdf0d8)', borderColor: 'var(--amber, #b45309)' }}>
                 {data.mode === 'fuzzy' && data.corrected ? `Showing results for “${data.corrected}”. ` : 'No exact matches, showing closest matches. '}
@@ -234,15 +235,15 @@ export default function Search() {
             >
               {answers ? '✓ Answers' : 'Answers'}
             </Button>
-            <div className="flex gap-0.5 rounded-[11px] border p-[3px] shadow-sm" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }} role="group" aria-label="View">
+            <div className="flex gap-0.5 rounded-[10px] border p-[3px]" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }} role="group" aria-label="View">
               {[
-                ['grid', '▦', 'Grid view'],
-                ['list', '☰', 'List view'],
-                ['ledger', '≣', 'Ledger table view'],
-              ].map(([v, ico, label]) => (
+                ['ledger', 'Index'],
+                ['grid', 'Cards'],
+                ['list', 'List'],
+              ].map(([v, label]) => (
                 <button
                   key={v}
-                  aria-label={label}
+                  aria-label={`${label} view`}
                   aria-pressed={String(view === v)}
                   onClick={() => {
                     setView(v);
@@ -252,10 +253,10 @@ export default function Search() {
                       /* noop */
                     }
                   }}
-                  className="grid min-h-[36px] min-w-[44px] place-items-center rounded-lg px-3 text-[15px] transition-all"
+                  className="grid min-h-[36px] min-w-[44px] place-items-center rounded-lg px-3 text-[13px] font-bold transition-colors"
                   style={view === v ? { background: 'var(--txt)', color: 'var(--bg)' } : { color: 'var(--mut)' }}
                 >
-                  {ico}
+                  {label}
                 </button>
               ))}
             </div>
@@ -277,9 +278,9 @@ export default function Search() {
         {!!chips.length && (
           <div className="mb-3 flex flex-wrap items-center gap-1.5" aria-live="polite" aria-label="Active filters">
             {chips.map((c, idx) => (
-              <span key={idx} className="chip-hover inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)' }}>
+              <span key={idx} className="inline-flex min-h-[36px] items-center gap-1.5 rounded-full border px-3 text-[13px] font-semibold" style={{ borderColor: 'var(--acc-line)', background: 'var(--acc-soft)', color: 'var(--acc)' }}>
                 {c.label}
-                <button onClick={() => dropChip(c)} aria-label={'Remove filter ' + c.label} className="grid h-6 w-6 place-items-center rounded-full" style={{ color: 'var(--mut)' }}>✕</button>
+                <button onClick={() => dropChip(c)} aria-label={'Remove filter ' + c.label} className="grid h-6 w-6 place-items-center rounded-full font-bold" style={{ color: 'inherit' }}>✕</button>
               </span>
             ))}
             <Link to={q ? `/search?q=${encodeURIComponent(q)}` : '/search'} className="min-h-[36px] px-2 py-2 text-[13px] font-bold underline underline-offset-2" style={{ color: 'var(--acc)' }}>
@@ -290,9 +291,13 @@ export default function Search() {
         <p className="mb-3 text-xs" style={{ color: 'var(--faint)' }}>Tip: ↑ ↓ to move · Enter to open · S to save</p>
 
         {loading ? (
-          <div className={`grid gap-3.5 ${view === 'list' || view === 'ledger' ? 'grid-cols-1' : 'sm:grid-cols-2'}`}>
+          <div className="quiet-card divide-y overflow-hidden" aria-label="Loading results">
             {Array.from({ length: 6 }, (_, i) => (
-              <Skeleton key={i} />
+              <div key={i} className="index-row animate-pulse">
+                <div className="h-3 w-8 rounded" style={{ background: 'var(--bg2)' }} />
+                <div className="h-3 flex-1 rounded" style={{ background: 'var(--bg2)' }} />
+                <div className="h-3 w-12 rounded" style={{ background: 'var(--bg2)' }} />
+              </div>
             ))}
           </div>
         ) : total === 0 ? (
@@ -345,8 +350,8 @@ export default function Search() {
           </Empty>
         ) : (
           <>
-            {view === 'ledger' && !compact ? (
-              <div className="overflow-x-auto rounded-2xl border" style={{ borderColor: 'var(--line)', background: 'var(--panel)' }}>
+            {view === 'ledger' || compact ? (
+              <div className="quiet-card overflow-x-auto">
                 <table className="ledger-table">
                   <caption className="sr-only">Resources as an index table</caption>
                   <thead>
@@ -371,16 +376,18 @@ export default function Search() {
                         </td>
                         <td className="tnum">{TYPE_LABEL[v.fileType] || v.fileType}</td>
                         <td className="tnum">{v.year || '–'}</td>
-                        <td>{v.answersIncluded ? <span aria-label="Answers included">✓</span> : <span style={{ color: 'var(--faint)' }}>–</span>}</td>
+                        <td>{v.answersIncluded ? <span aria-label="Answers included" style={{ color: 'var(--ok)', fontWeight: 800 }}>✓</span> : <span style={{ color: 'var(--faint)' }}>–</span>}</td>
                         <td>
                           <button
                             onClick={() => toggle(v.id)}
                             aria-pressed={String(saved.has(v.id))}
                             aria-label={saved.has(v.id) ? 'Remove from saved' : 'Save this resource'}
-                            className="icon-hover grid h-9 w-9 place-items-center rounded-lg border text-sm"
-                            style={{ borderColor: 'var(--line2)', color: saved.has(v.id) ? 'var(--acc)' : 'var(--mut)' }}
+                            className="min-h-[36px] rounded-lg border px-2.5 text-xs font-bold transition-colors"
+                            style={saved.has(v.id)
+                              ? { borderColor: 'var(--acc)', color: 'var(--acc)', background: 'var(--acc-soft)' }
+                              : { borderColor: 'var(--line2)', color: 'var(--mut)' }}
                           >
-                            {saved.has(v.id) ? '★' : '☆'}
+                            {saved.has(v.id) ? 'Saved' : 'Save'}
                           </button>
                         </td>
                       </tr>
@@ -389,9 +396,9 @@ export default function Search() {
                 </table>
               </div>
             ) : (
-              <AnimatedGrid className={`grid gap-3.5 ${view === 'list' || compact ? 'grid-cols-1' : 'sm:grid-cols-2'}`}>
+              <AnimatedGrid className="grid gap-3 sm:grid-cols-2">
                 {(data.results || []).map((v) => (
-                  <ResourceCard key={v.id} v={v} title={v.displayTitle} tokens={tokens} showDesc={!compact} />
+                  <ResourceCard key={v.id} v={v} title={v.displayTitle} tokens={tokens} showDesc />
                 ))}
               </AnimatedGrid>
             )}

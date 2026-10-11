@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Search as SearchIcon } from 'lucide-react';
-import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { cn } from './cn';
@@ -32,19 +32,11 @@ export function AnimatedGrid({ children, className }) {
   );
 }
 
-// ---------- BlurFade (entrance) ----------
+// ---------- BlurFade (ledger: section-level calm only, no blur choreography) ----------
 export function BlurFade({ children, delay = 0, className, y = 16 }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y, filter: 'blur(10px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.55, delay, ease: [0.2, 0.7, 0.25, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
+  void delay;
+  void y;
+  return <div className={className}>{children}</div>;
 }
 
 // ---------- AuroraText ----------
@@ -100,13 +92,13 @@ export function WordRotate({ words, interval = 2400, className }) {
   );
 }
 
-// ---------- ShimmerButton ----------
+// ---------- ShimmerButton (ledger: solid primary, no beam/pulse) ----------
 export function ShimmerButton({ children, className, ...props }) {
   return (
     <button
       {...props}
       className={cn(
-        'btn-magic btn-pulse relative inline-flex min-h-[42px] items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-2.5 text-sm font-bold text-white transition-transform active:scale-[.97]',
+        'inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[10px] px-5 py-2.5 text-sm font-bold transition-colors hover:brightness-110 active:translate-y-px',
         className
       )}
       style={{ background: 'var(--primary)', color: 'var(--primary-foreground)' }}
@@ -163,122 +155,32 @@ export function NumberTicker({ value, className }) {
   );
 }
 
-// ---------- Particles (lightweight canvas) ----------
-export function Particles({ className, density = 60 }) {
-  const ref = useRef(null);
-  useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    const ctx = canvas.getContext('2d');
-    let w, h, raf, running = true;
-    const dots = Array.from({ length: density }, () => ({
-      x: Math.random(),
-      y: Math.random(),
-      r: Math.random() * 1.8 + 0.6,
-      vy: -(Math.random() * 0.0006 + 0.0002),
-      vx: (Math.random() - 0.5) * 0.0003,
-      tw: Math.random() * Math.PI * 2,
-    }));
-    const size = () => {
-      const rect = canvas.parentElement.getBoundingClientRect();
-      w = canvas.width = rect.width;
-      h = canvas.height = rect.height;
-    };
-    size();
-    window.addEventListener('resize', size);
-    const io = new IntersectionObserver(([e]) => {
-      running = e.isIntersecting;
-      if (running) raf = requestAnimationFrame(frame);
-    });
-    io.observe(canvas);
-    const frame = () => {
-      if (!running) return;
-      ctx.clearRect(0, 0, w, h);
-      for (const d of dots) {
-        d.x = (d.x + d.vx + 1) % 1;
-        d.y += d.vy;
-        if (d.y < -0.02) {
-          d.y = 1.02;
-          d.x = Math.random();
-        }
-        d.tw += 0.03;
-        ctx.globalAlpha = 0.25 + 0.35 * Math.abs(Math.sin(d.tw));
-        ctx.fillStyle = '#7d9bf0';
-        ctx.beginPath();
-        ctx.arc(d.x * w, d.y * h, d.r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-      raf = requestAnimationFrame(frame);
-    };
-    raf = requestAnimationFrame(frame);
-    return () => {
-      cancelAnimationFrame(raf);
-      io.disconnect();
-      window.removeEventListener('resize', size);
-    };
-  }, [density]);
-  return <canvas ref={ref} aria-hidden="true" className={cn('pointer-events-none absolute inset-0 h-full w-full', className)} />;
+// ---------- Particles: retired (ledger uses static dot-grid; canvas removed for perf) ----------
+export function Particles() {
+  return null;
 }
 
-// ---------- Meteors ----------
-export function Meteors({ count = 5 }) {
-  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return null;
-  return (
-    <div className="meteors" aria-hidden="true">
-      {Array.from({ length: count }, (_, i) => (
-        <span
-          key={i}
-          className="meteor"
-          style={{ left: `${8 + i * 19}%`, animationDelay: `${(i * 1.7) % 7}s`, animationDuration: `${6 + (i % 3)}s` }}
-        />
-      ))}
-    </div>
-  );
+// ---------- Meteors: retired ----------
+export function Meteors() {
+  return null;
 }
 
-// ---------- AnimatedList (items slide in one after another) ----------
+// ---------- AnimatedList (ledger: instant list, layout animation only via auto-animate parent) ----------
 export function AnimatedList({ items, className, renderItem, step = 0.09 }) {
+  void step;
   return (
     <div className={className}>
       {(items || []).map((item, i) => (
-        <motion.div
-          key={item.key || i}
-          initial={{ opacity: 0, y: 18, filter: 'blur(6px)' }}
-          whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          viewport={{ once: true, margin: '-30px' }}
-          transition={{ duration: 0.45, delay: Math.min(i, 8) * step, ease: [0.2, 0.7, 0.25, 1] }}
-        >
-          {renderItem ? renderItem(item, i) : item}
-        </motion.div>
+        <div key={item.key || i}>{renderItem ? renderItem(item, i) : item}</div>
       ))}
     </div>
   );
 }
 
-// ---------- SparklesText (twinkling stars around text) ----------
+// ---------- SparklesText: retired twinkles, plain text ----------
 export function SparklesText({ children, className, count = 6 }) {
-  const [seeds, setSeeds] = useState([]);
-  useEffect(() => {
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
-    setSeeds(Array.from({ length: count }, () => ({ left: Math.random() * 100, delay: Math.random() * 2.4, size: 8 + Math.random() * 8 })));
-  }, [count]);
-  return (
-    <span className={cn('relative inline-block', className)}>
-      {children}
-      {seeds.map((s, i) => (
-        <span
-          key={i}
-          aria-hidden="true"
-          className="sparkle-star"
-          style={{ left: `${s.left}%`, animationDelay: `${s.delay}s`, fontSize: s.size }}
-        >
-          ✦
-        </span>
-      ))}
-    </span>
-  );
+  void count;
+  return <span className={cn('inline-block', className)}>{children}</span>;
 }
 
 // ---------- TypingAnimation (stream-in text, click to complete) ----------
@@ -311,27 +213,29 @@ export function TypingText({ text, speed = 14, className }) {
   );
 }
 
-// ---------- Dock (mobile shortcut bar) ----------
+// ---------- Dock (mobile shortcut bar, Lucide icons, solid panel) ----------
 export function Dock() {
   return (
     <nav
       aria-label="Quick sections"
-      className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-4 gap-1 rounded-2xl border p-1.5 shadow-2xl backdrop-blur-xl lg:hidden"
-      style={{ background: 'color-mix(in srgb, var(--panel) 92%, transparent)', borderColor: 'var(--line2)', paddingBottom: 'max(6px, env(safe-area-inset-bottom))' }}
+      className="fixed inset-x-3 bottom-3 z-40 grid grid-cols-4 gap-1 rounded-[14px] border p-1.5 shadow-xl lg:hidden"
+      style={{ background: 'var(--panel)', borderColor: 'var(--line2)', paddingBottom: 'max(6px, env(safe-area-inset-bottom))' }}
     >
       {[
-        ['/', '⌂', 'Home'],
-        ['/search', '⚲', 'Search'],
-        ['/study', '✎', 'Study'],
-        ['/mocks', '◷', 'Mocks'],
-      ].map(([to, ico, label]) => (
+        ['/', 'Home'],
+        ['/search', 'Search'],
+        ['/study', 'Study'],
+        ['/mocks', 'Mocks'],
+      ].map(([to, label]) => (
         <Link
           key={to}
           to={to}
-          className="flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-bold transition-colors"
+          className="flex min-h-[52px] flex-col items-center justify-center gap-1 rounded-[10px] text-[11px] font-bold transition-colors"
           style={{ color: 'var(--mut)' }}
         >
-          <span className="text-lg leading-none">{ico}</span>
+          <span className="tnum text-[13px] font-extrabold" style={{ color: 'var(--acc)' }} aria-hidden="true">
+            {label === 'Home' ? '01' : label === 'Search' ? '02' : label === 'Study' ? '03' : '04'}
+          </span>
           {label}
         </Link>
       ))}
@@ -342,19 +246,18 @@ export function DeckCard({ to, icon, title, sub, badge }) {
   return (
     <Link
       to={to}
-      className="glare group flex min-h-[190px] flex-col gap-2 rounded-2xl border p-[18px] shadow-sm transition-all hover:-translate-y-[3px] hover:shadow-lg"
-      style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}
+      className="quiet-card group flex min-h-[176px] flex-col gap-2 p-[18px] transition-colors"
     >
       <span className="flex items-start justify-between gap-2">
         <span
-          className="grid h-[42px] w-[42px] place-items-center rounded-xl border"
+          className="grid h-[40px] w-[40px] place-items-center rounded-[10px] border"
           style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)', color: 'var(--acc)' }}
         >
           {icon}
         </span>
         {badge && (
           <span
-            className="whitespace-nowrap rounded-full border px-2.5 py-[3px] text-[11px] font-bold"
+            className="tnum whitespace-nowrap rounded-full border px-2.5 py-[3px] text-[11px] font-bold tabular-nums"
             style={{ background: 'var(--bg2)', borderColor: 'var(--line)', color: 'var(--mut)' }}
           >
             {badge}
@@ -362,11 +265,11 @@ export function DeckCard({ to, icon, title, sub, badge }) {
         )}
       </span>
       <h3 className="mt-1 text-[15.5px] font-bold leading-snug">{title}</h3>
-      <p className="text-[13px]" style={{ color: 'var(--mut)' }}>
+      <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--mut)' }}>
         {sub}
       </p>
       <span className="mt-auto text-[13.5px] font-bold" style={{ color: 'var(--acc)' }}>
-        Study <span className="inline-block transition-transform group-hover:translate-x-1">→</span>
+        Study <span aria-hidden="true">→</span>
       </span>
     </Link>
   );
@@ -410,189 +313,51 @@ export function Empty({ title, msg, children }) {
 // Every effect below renders statically when motion is Reduced/Off.
 // ============================================================================
 
-// ---------- SpotlightCard (Aceternity Spotlight + MagicUI MagicCard) ----------
-// Cursor-following radial highlight + border glow. Desktop pointers only.
+// ---------- SpotlightCard (ledger: quiet card, no cursor tracking) ----------
 export function SpotlightCard({ children, className, spotlight = 'rgba(56,189,248,0.14)', ...props }) {
-  const ref = useRef(null);
-  const mx = useMotionValue(0.5);
-  const my = useMotionValue(0.5);
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    if (!finePointer() || !motionOk()) return;
-    setOn(true);
-  }, []);
-  const onMove = useCallback(
-    (e) => {
-      const el = ref.current;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      mx.set((e.clientX - r.left) / Math.max(1, r.width));
-      my.set((e.clientY - r.top) / Math.max(1, r.height));
-    },
-    [mx, my]
-  );
-  const bg = useTransform([mx, my], ([x, y]) => `radial-gradient(420px circle at ${x * 100}% ${y * 100}%, ${spotlight}, transparent 65%)`);
+  void spotlight;
   return (
-    <motion.div
-      ref={ref}
-      onMouseMove={on ? onMove : undefined}
-      whileHover={on ? { y: -3 } : undefined}
-      transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-      className={cn('relative overflow-hidden', className)}
-      {...props}
-    >
-      {on && <motion.span aria-hidden="true" className="pointer-events-none absolute inset-0" style={{ background: bg }} />}
+    <div className={cn('quiet-card', className)} {...props}>
       {children}
-    </motion.div>
-  );
-}
-
-// ---------- StarBorder / ShineBorder (MagicUI + React Bits) ----------
-// Animated conic-gradient border for one featured surface per screen, max.
-export function StarBorder({ children, className, speed = 5 }) {
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => {
-    setAnimate(motionOk());
-  }, []);
-  return (
-    <div className={cn('relative rounded-2xl p-[1.5px]', className)} style={{ background: 'var(--line)' }}>
-      {animate && (
-        <span
-          aria-hidden="true"
-          className="star-border-beam absolute inset-[-1.5px] rounded-2xl"
-          style={{ animationDuration: `${speed}s` }}
-        />
-      )}
-      <div className="relative rounded-2xl" style={{ background: 'var(--panel)' }}>
-        {children}
-      </div>
     </div>
   );
 }
 
-// ---------- TextGenerate (Aceternity TextGenerateEffect) ----------
-// Word-by-word blur + rise on first view. Marketing/hero surfaces only.
+// ---------- StarBorder (ledger: single static featured frame) ----------
+export function StarBorder({ children, className, speed = 5 }) {
+  void speed;
+  return (
+    <div className={cn('beam-feature quiet-card', className)}>
+      {children}
+    </div>
+  );
+}
+
+// ---------- TextGenerate (ledger: plain text) ----------
 export function TextGenerate({ words, className, stagger = 0.05 }) {
+  void stagger;
   const text = Array.isArray(words) ? words.join(' ') : String(words || '');
-  const parts = text.split(' ');
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-40px' });
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => {
-    setAnimate(motionOk());
-  }, []);
-  if (!animate) return <span className={className}>{text}</span>;
-  return (
-    <span ref={ref} className={className} aria-label={text}>
-      {parts.map((w, i) => (
-        <motion.span
-          key={i}
-          aria-hidden="true"
-          className="inline-block"
-          initial={{ opacity: 0, filter: 'blur(8px)', y: 8 }}
-          animate={inView ? { opacity: 1, filter: 'blur(0px)', y: 0 } : {}}
-          transition={{ duration: 0.45, delay: i * stagger, ease: [0, 0, 0.2, 1] }}
-        >
-          {w}
-          {i < parts.length - 1 ? ' ' : ''}
-        </motion.span>
-      ))}
-    </span>
-  );
+  return <span className={className}>{text}</span>;
 }
 
-// ---------- BlurText (React Bits) ----------
-// Scroll-linked word blur reveal for section headings. Once only.
+// ---------- BlurText (ledger: plain heading) ----------
 export function BlurText({ children, className, as: Tag = 'h2', stagger = 0.04 }) {
-  const text = typeof children === 'string' ? children : '';
-  const words = text.split(' ');
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-60px' });
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => {
-    setAnimate(motionOk());
-  }, []);
-  if (!animate || !text) return <Tag className={className}>{children}</Tag>;
-  return (
-    <Tag ref={ref} className={className} aria-label={text}>
-      {words.map((w, i) => (
-        <motion.span
-          key={i}
-          aria-hidden="true"
-          className="inline-block"
-          initial={{ opacity: 0.15, filter: 'blur(6px)' }}
-          animate={inView ? { opacity: 1, filter: 'blur(0px)' } : {}}
-          transition={{ duration: 0.4, delay: i * stagger }}
-        >
-          {w}
-          {i < words.length - 1 ? ' ' : ''}
-        </motion.span>
-      ))}
-    </Tag>
-  );
+  void stagger;
+  return <Tag className={className}>{children}</Tag>;
 }
 
-// ---------- Magnet (React Bits) ----------
-// Gentle pull toward the cursor; springs back on leave. pointer:fine only.
+// ---------- Magnet (ledger: static wrapper) ----------
 export function Magnet({ children, strength = 18, className }) {
-  const ref = useRef(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const sx = useSpring(x, { stiffness: 250, damping: 18, mass: 0.6 });
-  const sy = useSpring(y, { stiffness: 250, damping: 18, mass: 0.6 });
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    if (finePointer() && motionOk()) setOn(true);
-  }, []);
-  if (!on) return <span className={cn('inline-block', className)}>{children}</span>;
-  return (
-    <motion.span
-      ref={ref}
-      className={cn('inline-block', className)}
-      style={{ x: sx, y: sy }}
-      onMouseMove={(e) => {
-        const r = ref.current?.getBoundingClientRect();
-        if (!r) return;
-        x.set(((e.clientX - (r.left + r.width / 2)) / r.width) * strength);
-        y.set(((e.clientY - (r.top + r.height / 2)) / r.height) * strength);
-      }}
-      onMouseLeave={() => {
-        x.set(0);
-        y.set(0);
-      }}
-    >
-      {children}
-    </motion.span>
-  );
+  void strength;
+  return <span className={cn('inline-block', className)}>{children}</span>;
 }
 
-// ---------- ClickSpark (React Bits) ----------
-// Brief spark burst on click. Marketing buttons only, never exam/viewer.
+// ---------- ClickSpark (ledger: plain click-through) ----------
 export function ClickSpark({ children, className, onClick, color = 'var(--primary)' }) {
-  const [sparks, setSparks] = useState([]);
-  const id = useRef(0);
-  const fire = useCallback(
-    (e) => {
-      if (motionOk() && finePointer()) {
-        const r = e.currentTarget.getBoundingClientRect();
-        const s = { id: ++id.current, x: e.clientX - r.left, y: e.clientY - r.top };
-        setSparks((p) => [...p.slice(-11), s]);
-        setTimeout(() => setSparks((p) => p.filter((q) => q.id !== s.id)), 550);
-      }
-      onClick?.(e);
-    },
-    [onClick]
-  );
+  void color;
   return (
-    <span className={cn('relative inline-block overflow-visible', className)} onClick={fire}>
+    <span className={cn('inline-block', className)} onClick={onClick}>
       {children}
-      {sparks.map((s) => (
-        <span key={s.id} aria-hidden="true" className="click-spark" style={{ left: s.x, top: s.y, '--spark': color }}>
-          {Array.from({ length: 8 }, (_, k) => (
-            <i key={k} style={{ '--a': `${k * 45}deg` }} />
-          ))}
-        </span>
-      ))}
     </span>
   );
 }
@@ -722,37 +487,10 @@ export function GridPattern({ className, line = 'var(--line)' }) {
   );
 }
 
-// ---------- Tilt (subtle 3D hover; desktop only) ----------
+// ---------- Tilt (ledger: static wrapper, 3D hover retired) ----------
 export function Tilt({ children, className, max = 6 }) {
-  const ref = useRef(null);
-  const rx = useMotionValue(0);
-  const ry = useMotionValue(0);
-  const srx = useSpring(rx, { stiffness: 260, damping: 20 });
-  const sry = useSpring(ry, { stiffness: 260, damping: 20 });
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    if (finePointer() && motionOk()) setOn(true);
-  }, []);
-  if (!on) return <div className={className}>{children}</div>;
-  return (
-    <motion.div
-      ref={ref}
-      className={className}
-      style={{ rotateX: srx, rotateY: sry, transformPerspective: 900 }}
-      onMouseMove={(e) => {
-        const r = ref.current?.getBoundingClientRect();
-        if (!r) return;
-        ry.set(((e.clientX - r.left) / r.width - 0.5) * max * 2);
-        rx.set(-((e.clientY - r.top) / r.height - 0.5) * max * 2);
-      }}
-      onMouseLeave={() => {
-        rx.set(0);
-        ry.set(0);
-      }}
-    >
-      {children}
-    </motion.div>
-  );
+  void max;
+  return <div className={className}>{children}</div>;
 }
 
 // ---------- Confetti (restrained: perfect-score reward only) ----------

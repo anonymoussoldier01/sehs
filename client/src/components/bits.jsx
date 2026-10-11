@@ -3,22 +3,9 @@
 // Full motion, pointer capability where apt, and on-screen visibility.
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useAnimationFrame, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { cn } from './cn';
 import { motionOk, finePointer } from './magic';
-
-function useVisible() {
-  const ref = useRef(null);
-  const [vis, setVis] = useState(true);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || typeof IntersectionObserver === 'undefined') return;
-    const obs = new IntersectionObserver((es) => setVis(es[0].isIntersecting), { threshold: 0.05 });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-  return [ref, vis];
-}
 
 // ---------- BoxReveal (sliding colour-block headline reveal) ----------
 export function BoxReveal({ children, color = 'var(--primary)', delay = 0, className }) {
@@ -50,62 +37,32 @@ export function BoxReveal({ children, color = 'var(--primary)', delay = 0, class
 
 // ---------- OrbitingCircles (subject icons orbiting a core) ----------
 export function OrbitingCircles({ core, items, radius = 110, duration = 22, className }) {
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => {
-    setAnimate(motionOk() && finePointer());
-  }, []);
+  void radius;
+  void duration;
   return (
-    <div className={cn('relative mx-auto', className)} style={{ width: radius * 2 + 72, height: radius * 2 + 72 }} aria-hidden="true">
-      <div className="absolute inset-0 rounded-full border border-dashed" style={{ borderColor: 'var(--line2)' }} />
-      <div className="absolute inset-6 rounded-full border" style={{ borderColor: 'var(--line)' }} />
-      <div className="absolute left-1/2 top-1/2 grid h-16 w-16 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-2xl border text-2xl shadow-lg" style={{ background: 'var(--panel)', borderColor: 'var(--acc-line)' }}>
+    <div className={cn('quiet-card flex flex-wrap items-center justify-center gap-2 p-4', className)}>
+      <span className="tnum grid h-11 w-11 place-items-center rounded-[10px] border text-sm font-extrabold" style={{ background: 'var(--acc)', color: '#fff', borderColor: 'var(--acc)' }} aria-hidden="true">
         {core}
-      </div>
-      <div className={cn('absolute inset-0', animate && 'orbit-spin')} style={animate ? { animationDuration: `${duration}s` } : undefined}>
-        {items.map((it, k) => {
-          const a = (k / items.length) * Math.PI * 2;
-          return (
-            <span
-              key={k}
-              className="absolute grid h-11 w-11 place-items-center rounded-full border text-lg shadow-md"
-              style={{
-                background: 'var(--panel)',
-                borderColor: 'var(--line2)',
-                left: `calc(50% + ${Math.cos(a) * radius}px - 22px)`,
-                top: `calc(50% + ${Math.sin(a) * radius}px - 22px)`,
-              }}
-            >
-              <span className={animate ? 'orbit-counter' : undefined} style={animate ? { animationDuration: `${duration}s` } : undefined}>
-                {it}
-              </span>
-            </span>
-          );
-        })}
-      </div>
+      </span>
+      {(items || []).map((it, k) => (
+        <span key={k} className="tnum rounded-full border px-3 py-1.5 text-xs font-bold tabular-nums" style={{ borderColor: 'var(--line2)', color: 'var(--mut)' }}>
+          {it}
+        </span>
+      ))}
     </div>
   );
 }
 
-// ---------- SpinningText (circular rotating badge) ----------
+// ---------- SpinningText (ledger: static free/no-account seal) ----------
 export function SpinningText({ text, size = 110, duration = 14, children }) {
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => {
-    setAnimate(motionOk());
-  }, []);
-  const [id] = useState(() => `st-${Math.floor(Math.random() * 1e6)}`);
+  void size;
+  void duration;
   return (
-    <span className="relative inline-grid place-items-center" style={{ width: size, height: size }} aria-hidden="true">
-      <svg viewBox="0 0 100 100" className={animate ? 'absolute inset-0 spin-slow' : 'absolute inset-0'} style={animate ? { animationDuration: `${duration}s` } : undefined}>
-        <defs>
-          <path id={id} d="M 50,50 m -37,0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" />
-        </defs>
-        <text style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: 2.5, fill: 'var(--mut)' }}>
-          <textPath href={`#${id}`}>{text}</textPath>
-        </text>
-      </svg>
-      <span className="grid h-11 w-11 place-items-center rounded-full border text-xl" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }}>
+    <span className="inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-bold" style={{ borderColor: 'var(--line2)', background: 'var(--panel)', color: 'var(--mut)' }} title={text}>
+      <span className="grid h-7 w-7 place-items-center rounded-full border text-sm" style={{ background: 'var(--acc-soft)', borderColor: 'var(--acc-line)' }} aria-hidden="true">
         {children}
       </span>
+      Free · no account
     </span>
   );
 }
@@ -205,83 +162,38 @@ export function Typewriter({ lines, className, speed = 34 }) {
 
 // ---------- TextReveal (scroll-linked word opacity) ----------
 export function TextReveal({ text, className }) {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 0.85', 'end 0.45'] });
-  const words = String(text).split(' ');
-  const [animate, setAnimate] = useState(false);
-  useEffect(() => {
-    setAnimate(motionOk());
-  }, []);
-  if (!animate) return <p className={className}>{text}</p>;
-  return (
-    <p ref={ref} className={className}>
-      {words.map((w, k) => (
-        <Word key={k} progress={scrollYProgress} range={[k / words.length, (k + 1) / words.length]} word={w} last={k === words.length - 1} />
-      ))}
-    </p>
-  );
-}
-function Word({ progress, range, word, last }) {
-  const opacity = useTransform(progress, range, [0.14, 1]);
-  return (
-    <motion.span style={{ opacity }}>
-      {word}
-      {last ? '' : ' '}
-    </motion.span>
-  );
+  return <p className={className}>{text}</p>;
 }
 
-// ---------- HyperText (decrypt reveal on first view) ----------
-const HY_GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ#*+?=';
+// ---------- HyperText (ledger: plain mono label) ----------
 export function HyperText({ text, className, as: Tag = 'span' }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-40px' });
-  const [out, setOut] = useState(null);
-  useEffect(() => {
-    if (!inView || !motionOk()) {
-      setOut(text);
-      return;
-    }
-    const start = performance.now();
-    let raf;
-    const tick = (t) => {
-      const k = Math.min(1, (t - start) / 900);
-      setOut(text.split('').map((c, i) => (c === ' ' || i / text.length < k ? c : HY_GLYPHS[Math.floor(Math.random() * HY_GLYPHS.length)])).join(''));
-      if (k < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [inView, text]);
   return (
-    <Tag ref={ref} className={cn('font-mono', className)} aria-label={text}>
-      {out ?? text}
+    <Tag className={cn('font-mono', className)} aria-label={text}>
+      {text}
     </Tag>
   );
 }
 
-// ---------- InteractiveHover (arrow-slide button) ----------
+// ---------- InteractiveHover (ledger: two button variants, static arrow) ----------
 export function InteractiveHover({ to, onClick, children, primary }) {
-  const cls = 'ih-btn group inline-flex min-h-[44px] items-center gap-2 overflow-hidden rounded-xl px-5 py-2.5 text-sm font-bold transition-all hover:-translate-y-px';
+  const cls = 'inline-flex min-h-[44px] items-center gap-2 rounded-[10px] px-5 py-2.5 text-sm font-bold transition-colors hover:brightness-110 active:translate-y-px';
   const style = primary
     ? { background: 'var(--primary)', color: 'var(--primary-foreground)' }
-    : { borderColor: 'var(--line2)', background: 'var(--panel)' };
+    : { border: '1px solid var(--line2)', background: 'var(--panel)', color: 'var(--txt)' };
   const inner = (
     <>
-      <span className="ih-label">{children}</span>
-      <span className="ih-arrows" aria-hidden="true">
-        <span>→</span>
-        <span>→</span>
-      </span>
+      <span>{children}</span>
+      <span aria-hidden="true">→</span>
     </>
   );
   if (to)
     return (
-      <Link to={to} className={cn(cls, !primary && 'border')} style={style}>
+      <Link to={to} className={cls} style={style}>
         {inner}
       </Link>
     );
   return (
-    <button type="button" onClick={onClick} className={cn(cls, !primary && 'border')} style={style}>
+    <button type="button" onClick={onClick} className={cls} style={style}>
       {inner}
     </button>
   );
@@ -328,181 +240,37 @@ export function FlipTrue({ flipped, onFlip, front, back, label }) {
   );
 }
 
-// ---------- ScrollVelocity (scroll-reactive marquee ribbon) ----------
+// ---------- ScrollVelocity (ledger: static topic index strip) ----------
 export function ScrollVelocity({ children, base = 40, className }) {
-  const baseX = useMotionValue(0);
-  const { scrollY } = useScroll();
-  const [dir, setDir] = useState(1);
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    setOn(motionOk());
-  }, []);
-  const vel = useRef(0);  useEffect(() => scrollY.on('change', (v, prev) => {
-    vel.current = v - (prev ?? v);
-    setDir(vel.current >= 0 ? 1 : -1);
-  }), [scrollY]);
-  useAnimationFrame((_, delta) => {
-    if (!on) return;
-    const boost = Math.min(4, 1 + Math.abs(vel.current) / 40);
-    vel.current *= 0.92;
-    baseX.set(baseX.get() + dir * (base / 1000) * delta * boost);
-  });
-  const x = useTransform(baseX, (v) => `${-(((v % 100) + 100) % 100)}%`);
-  const row = (
-    <div className="flex w-max shrink-0 items-center">
-      {children}
-      {children}
-    </div>
-  );
-  if (!on) return <div className={cn('overflow-hidden', className)}><div className="flex w-max">{children}</div></div>;
+  void base;
   return (
-    <div className={cn('marquee overflow-hidden', className)}>
-      <motion.div className="flex w-max" style={{ x }}>
-        {row}
-        {row}
-      </motion.div>
+    <div className={cn('overflow-hidden border-y py-2.5', className)} style={{ borderColor: 'var(--line)' }}>
+      <div className="flex w-max items-center">{children}</div>
     </div>
   );
 }
 
-// ---------- Ripple (expanding rings behind a CTA) ----------
+// ---------- Ripple (ledger: plain wrapper) ----------
 export function Ripple({ children, className, rings = 3 }) {
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    setOn(motionOk());
-  }, []);
-  return (
-    <span className={cn('relative inline-grid place-items-center', className)}>
-      {on &&
-        Array.from({ length: rings }, (_, k) => (
-          <span key={k} aria-hidden="true" className="ripple-ring absolute rounded-full border" style={{ borderColor: 'var(--acc-line)', animationDelay: `${k * 1.1}s` }} />
-        ))}
-      <span className="relative">{children}</span>
-    </span>
-  );
+  void rings;
+  return <span className={cn('relative inline-grid place-items-center', className)}><span className="relative">{children}</span></span>;
 }
 
-// ---------- Vortex (canvas particle swirl for CTA bands) ----------
+// ---------- Vortex (ledger: themed panel, canvas removed) ----------
 export function Vortex({ children, className }) {
-  const [ref, vis] = useVisible();
-  const canvas = useRef(null);
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    setOn(motionOk());
-  }, []);
-  useEffect(() => {
-    if (!on || !vis) return;
-    const cv = canvas.current;
-    if (!cv) return;
-    const ctx = cv.getContext('2d');
-    let raf;
-    let w;
-    let h;
-    let t = 0;
-    const fit = () => {
-      const r = cv.parentElement.getBoundingClientRect();
-      w = cv.width = Math.floor(r.width);
-      h = cv.height = Math.floor(r.height);
-    };
-    fit();
-    const N = 70;
-    const ps = Array.from({ length: N }, () => ({ a: Math.random() * Math.PI * 2, r: 40 + Math.random() * 200, s: 0.004 + Math.random() * 0.012, sz: Math.random() * 2 + 0.6 }));
-    const tick = () => {
-      t++;
-      ctx.clearRect(0, 0, w, h);
-      const cx = w / 2;
-      const cy = h / 2;
-      for (const p of ps) {
-        p.a += p.s * (1 + Math.sin(t / 60) * 0.3);
-        const x = cx + Math.cos(p.a) * p.r;
-        const y = cy + Math.sin(p.a) * p.r * 0.45;
-        ctx.beginPath();
-        ctx.arc(x, y, p.sz, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(91,140,255,0.5)';
-        ctx.fill();
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    window.addEventListener('resize', fit);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('resize', fit);
-    };
-  }, [on, vis]);
   return (
-    <div ref={ref} className={cn('relative overflow-hidden rounded-3xl border', className)} style={{ background: '#0B1220', borderColor: '#243049' }}>
-      {on && <canvas ref={canvas} aria-hidden="true" className="absolute inset-0 h-full w-full" />}
-      <div className="relative">{children}</div>
+    <div className={cn('quiet-card', className)}>
+      {children}
     </div>
   );
 }
 
-// ---------- ShootingStars (canvas starfield + meteors) ----------
+// ---------- ShootingStars (ledger: themed panel, starfield canvas retired) ----------
 export function ShootingStars({ children, className, density = 90 }) {
-  const [ref, vis] = useVisible();
-  const canvas = useRef(null);
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    setOn(motionOk());
-  }, []);
-  useEffect(() => {
-    if (!on || !vis) return;
-    const cv = canvas.current;
-    if (!cv) return;
-    const ctx = cv.getContext('2d');
-    let raf;
-    let w;
-    let h;
-    const fit = () => {
-      const r = cv.parentElement.getBoundingClientRect();
-      w = cv.width = Math.floor(r.width);
-      h = cv.height = Math.floor(r.height);
-    };
-    fit();
-    const stars = Array.from({ length: density }, () => ({ x: Math.random(), y: Math.random(), r: Math.random() * 1.2 + 0.3, p: Math.random() * Math.PI * 2 }));
-    let meteors = [];
-    let t = 0;
-    const tick = () => {
-      t++;
-      ctx.clearRect(0, 0, w, h);
-      for (const s of stars) {
-        ctx.globalAlpha = 0.35 + Math.sin(t / 30 + s.p) * 0.25;
-        ctx.beginPath();
-        ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = '#cdd8f3';
-        ctx.fill();
-      }
-      ctx.globalAlpha = 1;
-      if (t % 130 === 0 && meteors.length < 3) meteors.push({ x: Math.random() * w * 0.7 + w * 0.2, y: -20, vx: -4 - Math.random() * 3, vy: 5 + Math.random() * 2, life: 1 });
-      meteors = meteors.filter((m) => m.life > 0 && m.y < h + 40);
-      for (const m of meteors) {
-        m.x += m.vx;
-        m.y += m.vy;
-        m.life -= 0.02;
-        const g = ctx.createLinearGradient(m.x, m.y, m.x - m.vx * 12, m.y - m.vy * 12);
-        g.addColorStop(0, `rgba(147,168,232,${0.9 * m.life})`);
-        g.addColorStop(1, 'rgba(147,168,232,0)');
-        ctx.strokeStyle = g;
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(m.x, m.y);
-        ctx.lineTo(m.x - m.vx * 12, m.y - m.vy * 12);
-        ctx.stroke();
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    window.addEventListener('resize', fit);
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('resize', fit);
-    };
-  }, [on, vis, density]);
+  void density;
   return (
-    <div ref={ref} className={cn('relative overflow-hidden rounded-3xl border', className)} style={{ background: '#0B1220', borderColor: '#243049' }}>
-      {on && <canvas ref={canvas} aria-hidden="true" className="absolute inset-0 h-full w-full" />}
-      <div className="relative">{children}</div>
+    <div className={cn('quiet-card', className)}>
+      {children}
     </div>
   );
 }

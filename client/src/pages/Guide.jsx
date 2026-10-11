@@ -23,7 +23,7 @@ export default function Guide() {
     setBusy(false);
   };
   return (
-    <div className="mx-auto max-w-[860px] px-5 py-7">
+    <div className="page-read py-7">
       <p className="text-[13px] font-semibold" style={{ color: 'var(--mut)' }}>
         <Link to="/" className="hover:underline" style={{ color: 'var(--acc)' }}>Home</Link> › Exam guide
       </p>
@@ -67,7 +67,7 @@ export default function Guide() {
       <h2 className="mb-3 mt-8 font-display text-xl font-bold">Schools</h2>
       <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
         {[['Melbourne High', 'Boys, South Yarra.'], ['Mac.Robertson Girls’', 'Girls, Melbourne.'], ['Nossal', 'Co-ed, Berwick.'], ['Suzanne Cory', 'Co-ed, Werribee.']].map(([t, p]) => (
-          <div key={t} className="lift rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+          <div key={t} className="quiet-card p-[18px]">
             <h3 className="font-display text-[15.5px] font-bold">{t}</h3>
             <p className="mt-1 text-[13px]" style={{ color: 'var(--mut)' }}>
               {p}
@@ -76,7 +76,7 @@ export default function Guide() {
         ))}
       </div>
       <h2 className="mb-3 mt-8 font-display text-xl font-bold">12-week plan</h2>
-      <div className="rounded-2xl border p-[18px] sm:p-6" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="quiet-card p-[18px] sm:p-6">
         <Timeline
           items={[
             { title: 'Weeks 1–2 · Foundations', desc: 'Vocabulary tiers + Year-8 maths facts daily, plus one untimed diagnostic to find your gaps.' },
@@ -92,7 +92,7 @@ export default function Guide() {
         </p>
       </div>
       <h2 className="mb-3 mt-8 font-display text-xl font-bold">Ask about the exam</h2>
-      <div className="rounded-2xl border p-[18px]" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="quiet-card p-[18px]">
         <div className="flex gap-2">
           <Input
             value={tq}
@@ -123,7 +123,7 @@ export default function Guide() {
         ]}
       />
       <h2 className="mb-3 mt-8 font-display text-xl font-bold">Sources</h2>
-      <div className="rounded-2xl border p-[18px] text-sm" style={{ background: 'var(--panel)', borderColor: 'var(--line)' }}>
+      <div className="quiet-card p-[18px] text-sm">
         <ul className="flex flex-col gap-1.5" style={{ color: 'var(--mut)' }}>
           <li><a className="link-slide font-semibold" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/prepare">ACER: Prepare (exam format, 3 blocks, 2h 35m)</a></li>
           <li><a className="link-slide font-semibold" style={{ color: 'var(--acc)' }} href="https://selectiveentry.acer.org/vic/exam-day">ACER: Exam day (schedule, answer booklets)</a></li>

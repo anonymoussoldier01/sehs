@@ -251,10 +251,10 @@ export default function MockRun() {
     return () => document.removeEventListener('keydown', onKey);
   }, [mock, done, review, resumeOffer, order, i]);
 
-  if (missing) return <div className="mx-auto max-w-[860px] px-5 py-10 text-sm" style={{ color: 'var(--mut)' }}>Mock not found.</div>;
+  if (missing) return <div className="page-narrow py-10 text-sm" style={{ color: 'var(--mut)' }}>Mock not found.</div>;
   if (!mock || !order)
     return (
-      <div className="mx-auto max-w-[860px] px-5 py-7">
+      <div className="page-narrow py-7">
         {missing ? null : (
           <MultiStepLoader
             steps={['Finding your question pool…', 'Shuffling from the seed…', 'Starting the clock…']}
@@ -268,7 +268,7 @@ export default function MockRun() {
 
   if (resumeOffer) {
     return (
-      <div className="mx-auto max-w-[640px] px-5 py-10">
+      <div className="page-narrow py-10">
         <h1 className="font-display text-2xl font-bold">Resume your mock?</h1>
         <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
           {mock.title} · {(resumeOffer.answers || []).filter((a) => a !== undefined && a !== -1).length} of {(resumeOffer.qids || []).length} answered,
@@ -291,7 +291,7 @@ export default function MockRun() {
     const misses = qs.map((qq, k) => ({ ...qq, picked: answers[k], secs: times[k] })).filter((m) => m.picked !== m.answer);
     const perfect = result.score === result.total && result.total > 0;
     return (
-      <div className="mx-auto max-w-[860px] px-5 py-7">
+      <div className="page-narrow py-7">
         <motion.div
           initial={mp.animate ? { scale: 0.96, opacity: 0 } : false}
           animate={{ scale: 1, opacity: 1 }}
@@ -325,7 +325,7 @@ export default function MockRun() {
     const unanswered = qs.filter((_, k) => answers[k] === undefined || answers[k] === -1).length;
     const flagged = Object.values(flags).filter(Boolean).length;
     return (
-      <div className="mx-auto max-w-[860px] px-5 py-7">
+      <div className="page-narrow py-7">
         <h1 className="font-display text-2xl font-bold">Review before submitting</h1>
         <p className="mt-1 text-sm" style={{ color: 'var(--mut)' }}>
           {unanswered} unanswered · {flagged} flagged · {result.score} correct so far
@@ -383,7 +383,7 @@ export default function MockRun() {
 
   const q = qs[i];
   return (
-    <div className={`mx-auto max-w-[1080px] px-5 py-7${acc.largerText ? ' text-[17px]' : ''}${acc.dyslexiaFriendly ? ' tracking-wide leading-relaxed' : ''}`}
+    <div className={`page-browse py-7${acc.largerText ? ' text-[17px]' : ''}${acc.dyslexiaFriendly ? ' tracking-wide leading-relaxed' : ''}`}
       style={acc.highContrast ? { filter: 'contrast(1.15)' } : undefined}>
       <p className="text-[13px] font-semibold" style={{ color: 'var(--mut)' }}>
         <Link to="/mocks" className="hover:underline" style={{ color: 'var(--acc)' }}>Mocks</Link> › {mock.title}
