@@ -21,7 +21,7 @@ async function upsertDeck(db, key, title, description, cards) {
   const existing = await db.prepare('SELECT * FROM decks WHERE public_id = ?').get(pid);
   let deckId;
   if (!existing) {
-    const info = await db.prepare('INSERT INTO decks(public_id, title, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?)').run(pid, title, description.slice(0, 500), now, now);
+    const info = await db.prepare('INSERT INTO decks(public_id, title, description, created_at, updated_at) VALUES (?, ?, ?, ?, ?)', { returning: 'id' }).run(pid, title, description.slice(0, 500), now, now);
     deckId = Number(info.lastInsertRowid);
   } else {
     deckId = existing.id;

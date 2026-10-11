@@ -3,7 +3,10 @@
   "services": {
     "app": {
       "root": ".",
-      "runtime": "node"
+      "runtime": "node",
+      "functions": {
+        "api/index.js": { "includeFiles": "data/native/**" }
+      }
     },
     "client": {
       "root": "client",
