@@ -40,20 +40,20 @@ let lastUpstreamAt = 0;
 const sha = (s) => crypto.createHash('sha256').update(s).digest('hex');
 const nowIso = () => new Date().toISOString();
 
-// ---- persistent cache (sync handle, same style as the rest of the server) ----
-export function aiCacheGet(db, key) {
+// ---- persistent cache (async interface; callers must await) ----
+export async function aiCacheGet(db, key) {
   try {
-    const row = db.prepare('SELECT text, created_at FROM ai_cache WHERE key = ?').get(key);
+    const row = await db.prepare('SELECT text, created_at FROM ai_cache WHERE key = ?').get(key);
     if (!row) return null;
     if (Date.now() - Date.parse(row.created_at) > 24 * 3600 * 1000) return null; // 24h TTL
     return row.text;
   } catch { return null; }
 }
-export function aiCacheSet(db, key, mode, text) {
+export async function aiCacheSet(db, key, mode, text) {
   try {
-    db.prepare('INSERT INTO ai_cache(key, mode, text, created_at) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET text = excluded.text, created_at = excluded.created_at')
+    await db.prepare('INSERT INTO ai_cache(key, mode, text, created_at) VALUES (?, ?, ?, ?) ON CONFLICT(key) DO UPDATE SET text = excluded.text, created_at = excluded.created_at')
       .run(key, mode, text, nowIso());
-    db.prepare('DELETE FROM ai_cache WHERE rowid NOT IN (SELECT rowid FROM ai_cache ORDER BY created_at DESC LIMIT 500)').run();
+    await db.prepare('DELETE FROM ai_cache WHERE rowid NOT IN (SELECT rowid FROM ai_cache ORDER BY created_at DESC LIMIT 500)').run();
   } catch { /* cache must never break requests */ }
 }
 

@@ -62,22 +62,28 @@ export function autoDecks(index, rowMap) {
   return decks.map(d => ({ ...d, count: d.cards.length }));
 }
 
-export function adminDecks(db) {
-  return db.prepare('SELECT * FROM decks ORDER BY updated_at DESC').all().map(r => ({
-    id: 'db-' + r.public_id, source: 'admin', title: r.title, description: r.description,
-    count: db.prepare('SELECT COUNT(*) n FROM deck_cards WHERE deck_id = ?').get(r.id).n,
-  }));
+export async function adminDecks(db) {
+  const rows = await db.prepare('SELECT * FROM decks ORDER BY updated_at DESC').all();
+  const out = [];
+  for (const r of rows) {
+    const c = await db.prepare('SELECT COUNT(*) n FROM deck_cards WHERE deck_id = ?').get(r.id);
+    out.push({
+      id: 'db-' + r.public_id, source: 'admin', title: r.title, description: r.description,
+      count: c ? c.n : 0,
+    });
+  }
+  return out;
 }
 
-export function deckCards(db, index, rowMap, id) {
+export async function deckCards(db, index, rowMap, id) {
   if (id === 'auto-provider' || id === 'auto-subject' || id === 'auto-practice') {
     const full = autoDecks(index, rowMap).find(d => d.id === id);
     return full ? { ...full } : null;
   }
   const m = String(id).match(/^db-([0-9a-f]{32})$/);
   if (!m) return null;
-  const r = db.prepare('SELECT * FROM decks WHERE public_id = ?').get(m[1]);
+  const r = await db.prepare('SELECT * FROM decks WHERE public_id = ?').get(m[1]);
   if (!r) return null;
-  const cards = db.prepare('SELECT front, back FROM deck_cards WHERE deck_id = ? ORDER BY position, id').all(r.id);
+  const cards = await db.prepare('SELECT front, back FROM deck_cards WHERE deck_id = ? ORDER BY position, id').all(r.id);
   return { id: 'db-' + r.public_id, source: 'admin', title: r.title, description: r.description, count: cards.length, cards: cards.map(c => ({ front: c.front, back: c.back, resourceId: null })) };
 }

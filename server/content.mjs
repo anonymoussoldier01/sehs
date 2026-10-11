@@ -58,12 +58,22 @@ export function visibleWhere() {
   return `visibility = 1 AND file_type != 'folder' AND category != 'folder'`;
 }
 
+// Row cache: PG statements are async, but ~10 long-standing call sites
+// (legacy pages, search helpers) read rows synchronously. The full catalogue
+// is ~2k rows — cache it at boot/rebuild and serve sync reads from memory.
+// Local SQLite keeps working either way (await on plain values is a no-op).
+let rowCache = null;
+export async function warmRows(db) {
+  rowCache = await db.prepare(`SELECT * FROM resources WHERE ${visibleWhere()}`).all();
+  return rowCache;
+}
 export function loadRows(db) {
+  if (rowCache) return rowCache;
   return db.prepare(`SELECT * FROM resources WHERE ${visibleWhere()}`).all();
 }
 
-export function buildIndexes(db) {
-  const recs = db.prepare(`SELECT * FROM resources WHERE ${visibleWhere()}`).all().map(toRec);
+export async function buildIndexes(db) {
+  const recs = (await warmRows(db)).map(toRec);
   const index = buildIndex(recs);
   return { anon: index, authed: index };
 }

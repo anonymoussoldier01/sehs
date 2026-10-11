@@ -159,13 +159,13 @@ function bearerToken(req) {
   const m = h.match(/^Bearer ([A-Za-z0-9_-]{43,44})$/);
   return m ? m[1] : null;
 }
-function getAdmin(req) {
+async function getAdmin(req) {
   const tok = bearerToken(req);
   if (!tok) return null;
-  const row = db.prepare("SELECT * FROM sessions WHERE token_hash = ? AND role = 'admin'").get(tokenHash(tok));
+  const row = await db.prepare("SELECT * FROM sessions WHERE token_hash = ? AND role = 'admin'").get(tokenHash(tok));
   if (!row || row.expires_at <= nowIso()) return null;
   if (Date.now() - Date.parse(row.last_seen_at) > 5 * 60 * 1000) {
-    db.prepare('UPDATE sessions SET last_seen_at = ? WHERE token_hash = ?').run(nowIso(), row.token_hash);
+    await db.prepare('UPDATE sessions SET last_seen_at = ? WHERE token_hash = ?').run(nowIso(), row.token_hash);
   }
   return { ...row, token: tok };
 }
@@ -218,12 +218,12 @@ function readBody(req, maxBytes = 100 * 1024) {
 }
 
 // ---- terms (public text; acceptance is per-tab client state, see gate.js) --------
-function currentTermsVersion() {
-  return Number(getMeta(db, 'terms_version') || 1);
+async function currentTermsVersion() {
+  return Number(await getMeta(db, 'terms_version') || 1);
 }
-function apiTerms(_req, res) {
-  const v = currentTermsVersion();
-  const row = db.prepare('SELECT version, body_md, summary_md FROM terms WHERE version = ?').get(v);
+async function apiTerms(_req, res) {
+  const v = await currentTermsVersion();
+  const row = await db.prepare('SELECT version, body_md, summary_md FROM terms WHERE version = ?').get(v);
   if (!row) return sendJson(res, 500, { ok: false, error: 'unavailable' });
   return sendJson(res, 200, { version: row.version, summary: row.summary_md, body: row.body_md });
 }
@@ -244,7 +244,7 @@ async function apiUnlock(req, res, ip) {
     logEvent('unlock_fail', { data: { which: 'admin' } });
     return sendJson(res, 401, { ok: false, error: 'Incorrect password. Please try again.' });
   }
-  const row = db.prepare('SELECT * FROM passwords WHERE role = ?').get('admin');
+  const row = await db.prepare('SELECT * FROM passwords WHERE role = ?').get('admin');
   if (!row || !verifyPassword(pw, row.hash, row.salt)) {
     const e = unlockLockouts.recordFail(ip);
     logEvent('unlock_fail', { data: { which: 'admin', fails: e.fails } });
@@ -253,31 +253,31 @@ async function apiUnlock(req, res, ip) {
   unlockLockouts.recordSuccess(ip);
   const token = newToken();
   const now = nowIso();
-  db.prepare(`INSERT INTO sessions(token_hash, role, created_at, expires_at, last_seen_at, ip_hash, ua_family, terms_version)
+  await db.prepare(`INSERT INTO sessions(token_hash, role, created_at, expires_at, last_seen_at, ip_hash, ua_family, terms_version)
     VALUES (?, 'admin', ?, ?, ?, ?, ?, 0)`)
     .run(tokenHash(token), now, new Date(Date.now() + ADMIN_TTL_SEC * 1000).toISOString(),
-      now, ipHash(ip, saltForIp()), uaFamily(req.headers['user-agent']));
+      now, ipHash(ip, await saltForIp()), uaFamily(req.headers['user-agent']));
   logEvent('unlock', { data: { which: 'admin' } });
   // purge expired sessions/grants opportunistically
   try {
-    db.prepare(`DELETE FROM sessions WHERE expires_at < ?`).run(now);
-    db.prepare(`DELETE FROM grants WHERE expires_at < ?`).run(new Date(Date.now() - 7 * 86400000).toISOString());
+    await db.prepare(`DELETE FROM sessions WHERE expires_at < ?`).run(now);
+    await db.prepare(`DELETE FROM grants WHERE expires_at < ?`).run(new Date(Date.now() - 7 * 86400000).toISOString());
   } catch { /* noop */ }
   // Token returned in body (never a cookie): the tab keeps it in sessionStorage.
   return sendJson(res, 200, { ok: true, role: 'admin', token, expiresIn: ADMIN_TTL_SEC });
 }
 
-function apiLogout(req, res) {
-  const admin = getAdmin(req);
+async function apiLogout(req, res) {
+  const admin = await getAdmin(req);
   if (admin) {
-    try { db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(tokenHash(admin.token)); } catch { /* noop */ }
+    try { await db.prepare('DELETE FROM sessions WHERE token_hash = ?').run(tokenHash(admin.token)); } catch { /* noop */ }
   }
   return sendJson(res, 200, { ok: true });
 }
 
-function findResource(publicId) {
+async function findResource(publicId) {
   if (!/^[0-9a-f]{32}$/.test(publicId || '')) return null;
-  return db.prepare('SELECT * FROM resources WHERE public_id = ?').get(publicId) || null;
+  return await db.prepare('SELECT * FROM resources WHERE public_id = ?').get(publicId) || null;
 }
 // Uniform missing response: same shape whether the id never existed, is hidden, or is tier-gated.
 function apiMissing(res) {
@@ -287,7 +287,7 @@ function apiMissing(res) {
 async function apiAccess(req, res, ip, publicId) {
   const rl = rlAccess.allow('a:' + ip);
   if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Too many requests. Slow down.' });
-  const row = findResource(publicId);
+  const row = await findResource(publicId);
   // Files-only: folders never resolve. Uniform 404 otherwise.
   if (!row || !row.visibility || row.file_type === 'folder' || row.category === 'folder') {
     logEvent('open_denied', { data: {} });
@@ -299,7 +299,7 @@ async function apiAccess(req, res, ip, publicId) {
   }
   const token = newToken(24);
   const now = nowIso();
-  db.prepare(`INSERT INTO grants(token, resource_id, session_hash, created_at, expires_at, used_at)
+  await db.prepare(`INSERT INTO grants(token, resource_id, session_hash, created_at, expires_at, used_at)
     VALUES (?, ?, NULL, ?, ?, NULL)`)
     .run(token, row.id, now, new Date(Date.now() + 15 * 60 * 1000).toISOString());
   logEvent('open', { resourceId: row.id, data: {} });
@@ -313,7 +313,7 @@ async function apiAccess(req, res, ip, publicId) {
 async function apiPreview(req, res, ip, publicId) {
   const rl = rlAccess.allow('p:' + ip);
   if (!rl.ok) return sendJson(res, 429, { ok: false, error: 'Too many requests. Slow down.' });
-  const row = findResource(publicId);
+  const row = await findResource(publicId);
   if (!row || !row.visibility || row.file_type === 'folder' || row.category === 'folder') {
     logEvent('open_denied', { data: {} });
     return apiMissing(res);
@@ -324,22 +324,22 @@ async function apiPreview(req, res, ip, publicId) {
   }
   const token = newToken(24);
   const now = nowIso();
-  db.prepare(`INSERT INTO grants(token, resource_id, session_hash, created_at, expires_at, used_at)
+  await db.prepare(`INSERT INTO grants(token, resource_id, session_hash, created_at, expires_at, used_at)
     VALUES (?, ?, NULL, ?, ?, NULL)`)
     .run(token, row.id, now, new Date(Date.now() + 15 * 60 * 1000).toISOString());
   logEvent('preview', { resourceId: row.id, data: {} });
   return sendJson(res, 200, { ok: true, embedUrl: `/embed/${token}` });
 }
 
-function embedGrant(_req, res, token) {
+async function embedGrant(_req, res, token) {
   if (!/^[A-Za-z0-9_-]{16,64}$/.test(token || '')) return apiMissing(res);
-  const g = db.prepare('SELECT * FROM grants WHERE token = ?').get(token);
+  const g = await db.prepare('SELECT * FROM grants WHERE token = ?').get(token);
   const now = nowIso();
   if (!g || g.used_at || g.expires_at < now) return apiMissing(res);
-  const row = db.prepare('SELECT * FROM resources WHERE id = ?').get(g.resource_id);
+  const row = await db.prepare('SELECT * FROM resources WHERE id = ?').get(g.resource_id);
   if (!row || !row.visibility || row.file_type === 'folder' || row.category === 'folder') return apiMissing(res);
-  const src = db.prepare('SELECT * FROM resource_sources WHERE resource_id = ?').get(row.id);
-  db.prepare('UPDATE grants SET used_at = ? WHERE token = ?').run(now, token);
+  const src = await db.prepare('SELECT * FROM resource_sources WHERE resource_id = ?').get(row.id);
+  await db.prepare('UPDATE grants SET used_at = ? WHERE token = ?').run(now, token);
   logEvent('preview_redeemed', { resourceId: row.id, data: {} });
   if (!src || !src.provider_file_id) return apiMissing(res);
   const dest = `https://drive.google.com/file/d/${src.provider_file_id}/preview`;
@@ -348,15 +348,15 @@ function embedGrant(_req, res, token) {
   res.end();
 }
 
-function openGrant(_req, res, token) {
+async function openGrant(_req, res, token) {
   if (!/^[A-Za-z0-9_-]{16,64}$/.test(token || '')) return apiMissing(res);
-  const g = db.prepare('SELECT * FROM grants WHERE token = ?').get(token);
+  const g = await db.prepare('SELECT * FROM grants WHERE token = ?').get(token);
   const now = nowIso();
   if (!g || g.used_at || g.expires_at < now) return apiMissing(res);
-  const row = db.prepare('SELECT * FROM resources WHERE id = ?').get(g.resource_id);
+  const row = await db.prepare('SELECT * FROM resources WHERE id = ?').get(g.resource_id);
   if (!row || !row.visibility || row.file_type === 'folder' || row.category === 'folder') return apiMissing(res);
-  const src = db.prepare('SELECT * FROM resource_sources WHERE resource_id = ?').get(row.id);
-  db.prepare('UPDATE grants SET used_at = ? WHERE token = ?').run(now, token);
+  const src = await db.prepare('SELECT * FROM resource_sources WHERE resource_id = ?').get(row.id);
+  await db.prepare('UPDATE grants SET used_at = ? WHERE token = ?').run(now, token);
   logEvent('open_redeemed', { resourceId: row.id, data: {} });
   if (!src || !src.provider_file_id) return apiMissing(res);
   const dest = `https://drive.google.com/file/d/${src.provider_file_id}/view`;
@@ -433,15 +433,15 @@ function parseAffinity(raw) {
 }
 
 // Trending: top-opened resources, last 7 days (anonymous aggregates only).
-function apiTrending(_req, res) {
+async function apiTrending(_req, res) {
   const since = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
-  const rows = db.prepare(`SELECT key, SUM(count) c FROM daily_aggregates
+  const rows = await db.prepare(`SELECT key, SUM(count) c FROM daily_aggregates
     WHERE kind = 'resource' AND day >= ? GROUP BY key ORDER BY c DESC LIMIT 8`).all(since);
   const index = forRole(indexes);
   const docById = new Map(index.docs.map(d => [d.rec.id, d]));
   const items = [];
   for (const r of rows) {
-    const row = db.prepare(`SELECT * FROM resources WHERE public_id = ? AND visibility = 1 AND file_type != 'folder' AND category != 'folder'`).get(r.key);
+    const row = await db.prepare(`SELECT * FROM resources WHERE public_id = ? AND visibility = 1 AND file_type != 'folder' AND category != 'folder'`).get(r.key);
     if (!row) continue;
     const d = docById.get(r.key);
     items.push({ ...publicView(row), displayTitle: d ? d.displayTitle : row.title, opens: r.c });
@@ -457,11 +457,11 @@ function apiSuggest(_req, res, sp) {
 }
 
 // Saved/recents hydration: order-preserving, hard-capped (everything public).
-function apiByIds(_req, res, sp) {  const ids = (sp.get('ids') || '').split(',').map(s => s.trim()).filter(s => /^[0-9a-f]{32}$/.test(s)).slice(0, 100);
+async function apiByIds(_req, res, sp) {  const ids = (sp.get('ids') || '').split(',').map(s => s.trim()).filter(s => /^[0-9a-f]{32}$/.test(s)).slice(0, 100);
   if (!ids.length) return sendJson(res, 200, { ok: true, results: [] });
   const where = `visibility = 1 AND file_type != 'folder' AND category != 'folder'`;
   const placeholders = ids.map(() => '?').join(',');
-  const rows = db.prepare(`SELECT * FROM resources WHERE ${where} AND public_id IN (${placeholders})`).all(...ids);
+  const rows = await db.prepare(`SELECT * FROM resources WHERE ${where} AND public_id IN (${placeholders})`).all(...ids);
   const byId = new Map(rows.map(r => [r.public_id, r]));
   const index = forRole(indexes);
   const docById = new Map(index.docs.map(d => [d.rec.id, d]));
@@ -649,7 +649,7 @@ async function apiAiChat(req, res, ip) {
   const input = String(body.input || '').trim().slice(0, AI_MAXLEN[mode]);
   if (input.length < 2) return sendJson(res, 400, { ok: false, error: 'Write a little more first.' });
   const key = aiCacheKey('chat:' + mode, input);
-  const hit = aiCacheGet(db, key);
+  const hit = await aiCacheGet(db, key);
   if (hit) {
     logEvent('ai', { data: { mode, cached: true } });
     return sendJson(res, 200, { ok: true, text: hit, cached: true });
@@ -658,7 +658,7 @@ async function apiAiChat(req, res, ip) {
     const r = await aiText(
       [{ role: 'system', content: AI_SYSTEM[mode] }, { role: 'user', content: input }],
       { maxTokens: 400, temperature: 0.7, maxChars: 1500 });
-    aiCacheSet(db, key, 'chat:' + mode, r.text);
+    await aiCacheSet(db, key, 'chat:' + mode, r.text);
     logEvent('ai', { data: { mode, inLen: input.length, via: r.via } });
     bumpAggregate(nowIso().slice(0, 10), 'ai', mode);
     return sendJson(res, 200, { ok: true, text: r.text });
@@ -699,7 +699,7 @@ async function apiAiGrade(req, res, ip) {
   if ((essay.match(/\S+/g) || []).length < 30) return sendJson(res, 400, { ok: false, error: 'Write at least ~30 words first.' });
   const auto = heuristicGrade(kind, essay);
   const key = aiCacheKey('grade:' + kind, essay);
-  const hit = aiCacheGet(db, key);
+  const hit = await aiCacheGet(db, key);
   if (hit) {
     try {
       const j = JSON.parse(hit);
@@ -716,7 +716,7 @@ async function apiAiGrade(req, res, ip) {
     if (!j || typeof j !== 'object' || !j.scores) throw { status: 'down' };
     for (const c of GRADE_CRITERIA) j.scores[c] = Math.min(5, Math.max(1, Number(j.scores[c]) || 3));
     j.overall = Math.min(5, Math.max(1, Number(j.overall) || 3));
-    aiCacheSet(db, key, 'grade:' + kind, JSON.stringify(j));
+    await aiCacheSet(db, key, 'grade:' + kind, JSON.stringify(j));
     logEvent('ai', { data: { mode: 'grade', inLen: essay.length, via: r.via } });
     bumpAggregate(nowIso().slice(0, 10), 'ai', 'grade');
     return sendJson(res, 200, { ok: true, auto, ai: j });
@@ -763,7 +763,7 @@ async function apiAiQuestions(req, res, ip) {
   const topic = String(body.topic || '').trim().slice(0, 120) || 'mixed practice';
   const n = Math.min(8, Math.max(3, Number(body.n) || 5));
   const key = aiCacheKey('gen:' + strand, topic + '|' + n);
-  const hit = aiCacheGet(db, key);
+  const hit = await aiCacheGet(db, key);
   if (hit) {
     try {
       const arr = cleanGenSet(JSON.parse(hit));
@@ -780,7 +780,7 @@ async function apiAiQuestions(req, res, ip) {
     ], { maxTokens: 900, temperature: 0.8, maxChars: 4000, json: true });
     const arr = cleanGenSet(extractJson(r.text));
     if (arr.length < 3) throw { status: 'down' };
-    aiCacheSet(db, key, 'gen:' + strand, JSON.stringify(arr));
+    await aiCacheSet(db, key, 'gen:' + strand, JSON.stringify(arr));
     logEvent('ai', { data: { mode: 'gen', strand, via: r.via } });
     bumpAggregate(nowIso().slice(0, 10), 'ai', 'gen-' + strand);
     return sendJson(res, 200, { ok: true, strand, questions: arr });
@@ -800,7 +800,7 @@ async function apiAiFlashcards(req, res, ip) {
   const topic = String(body.topic || '').trim().slice(0, 120);
   if (topic.length < 3) return sendJson(res, 400, { ok: false, error: 'Name a topic (3+ characters).' });
   const key = aiCacheKey('cards', topic);
-  const hit = aiCacheGet(db, key);
+  const hit = await aiCacheGet(db, key);
   if (hit) {
     try {
       const arr = JSON.parse(hit);
@@ -820,7 +820,7 @@ async function apiAiFlashcards(req, res, ip) {
     arr = arr.filter(c => c && typeof c.front === 'string' && typeof c.back === 'string' && c.front.trim() && c.back.trim())
       .slice(0, 12).map(c => ({ front: c.front.trim().slice(0, 200), back: c.back.trim().slice(0, 500) }));
     if (arr.length < 4) throw { status: 'down' };
-    aiCacheSet(db, key, 'cards', JSON.stringify(arr));
+    await aiCacheSet(db, key, 'cards', JSON.stringify(arr));
     logEvent('ai', { data: { mode: 'cards', via: r.via } });
     bumpAggregate(nowIso().slice(0, 10), 'ai', 'cards');
     return sendJson(res, 200, { ok: true, topic, cards: arr });
@@ -854,7 +854,7 @@ async function apiAiPassage(req, res, ip) {
   const genre = PASSAGE_GENRES.includes(body.genre) ? body.genre : PASSAGE_GENRES[Math.floor(Math.random() * PASSAGE_GENRES.length)];
   const seed = String(body.seed || '').trim().slice(0, 60) || 'everyday life';
   const key = aiCacheKey('passage', genre + '|' + seed);
-  const hit = aiCacheGet(db, key);
+  const hit = await aiCacheGet(db, key);
   if (hit) {
     try {
       const j = JSON.parse(hit);
@@ -874,7 +874,7 @@ async function apiAiPassage(req, res, ip) {
     const text = String((j && (j.text || j.passage)) || '').trim().slice(0, 4000);
     if (!text || questions.length < 3) throw { status: 'down' };
     const out = { title: String((j && j.title) || 'Practice passage').slice(0, 120), text, questions };
-    aiCacheSet(db, key, 'passage', JSON.stringify(out));
+    await aiCacheSet(db, key, 'passage', JSON.stringify(out));
     logEvent('ai', { data: { mode: 'passage', genre, via: r.via } });
     bumpAggregate(nowIso().slice(0, 10), 'ai', 'passage');
     return sendJson(res, 200, { ok: true, genre, passage: out });
@@ -894,7 +894,7 @@ async function apiAiPrompt(req, res, ip) {
   const kind = body.kind === 'creative' ? 'creative' : 'persuasive';
   const theme = String(body.theme || '').trim().slice(0, 80) || 'school life';
   const key = aiCacheKey('prompt:' + kind, theme);
-  const hit = aiCacheGet(db, key);
+  const hit = await aiCacheGet(db, key);
   if (hit) {
     try {
       const j = JSON.parse(hit);
@@ -916,7 +916,7 @@ async function apiAiPrompt(req, res, ip) {
       stimulus: String(j.stimulus || '').slice(0, 300),
       plan: Array.isArray(j.plan) ? j.plan.map(String).filter(Boolean).slice(0, 5) : [],
     };
-    aiCacheSet(db, key, 'prompt:' + kind, JSON.stringify(out));
+    await aiCacheSet(db, key, 'prompt:' + kind, JSON.stringify(out));
     logEvent('ai', { data: { mode: 'prompt', via: r.via } });
     bumpAggregate(nowIso().slice(0, 10), 'ai', 'prompt');
     return sendJson(res, 200, { ok: true, kind, prompt: out });
@@ -938,7 +938,7 @@ async function apiAiPlan(req, res, ip) {
   const strong = (Array.isArray(body.strong) ? body.strong : []).map(String).filter(s => /^[a-z-]{2,30}$/.test(s)).slice(0, 6);
   const mins = Math.min(180, Math.max(15, Number(body.minsPerDay) || 45));
   const key = aiCacheKey('plan', weeks + '|' + weak.join(',') + '|' + strong.join(',') + '|' + mins);
-  const hit = aiCacheGet(db, key);
+  const hit = await aiCacheGet(db, key);
   if (hit) {
     logEvent('ai', { data: { mode: 'plan', cached: true } });
     return sendJson(res, 200, { ok: true, plan: hit, cached: true });
@@ -948,7 +948,7 @@ async function apiAiPlan(req, res, ip) {
       { role: 'system', content: `You are an SEHS study planner. The student has ${weeks} weeks until the ACER exam, ${mins} min/day. Weak strands: ${weak.join(', ') || 'unknown'}. Strong strands: ${strong.join(', ') || 'unknown'}. Write a practical week-by-week plan naming concrete activities (timed blocks 60/55/40, VR/QR builders, vocab tiers, writing 2x/week, full mocks in final weeks, taper week). Plain text, short lines, under 1200 characters. No preamble.` },
       { role: 'user', content: `Plan for ${weeks} weeks, ${mins} min/day.` },
     ], { maxTokens: 700, temperature: 0.6, maxChars: 2500 });
-    aiCacheSet(db, key, 'plan', r.text);
+    await aiCacheSet(db, key, 'plan', r.text);
     logEvent('ai', { data: { mode: 'plan', via: r.via } });
     bumpAggregate(nowIso().slice(0, 10), 'ai', 'plan');
     return sendJson(res, 200, { ok: true, plan: r.text });
@@ -971,7 +971,7 @@ async function apiAiVariants(req, res, ip) {
   })).filter(m => m.stem.length > 3);
   if (!misses.length) return sendJson(res, 400, { ok: false, error: 'Send 1-5 missed questions to vary.' });
   const key = aiCacheKey('variants', JSON.stringify(misses));
-  const hit = aiCacheGet(db, key);
+  const hit = await aiCacheGet(db, key);
   if (hit) {
     try {
       const arr = cleanGenSet(JSON.parse(hit));
@@ -989,7 +989,7 @@ async function apiAiVariants(req, res, ip) {
     ], { maxTokens: 800, temperature: 0.8, maxChars: 3500, json: true });
     const arr = cleanGenSet(extractJson(r.text));
     if (!arr.length) throw { status: 'down' };
-    aiCacheSet(db, key, 'variants', JSON.stringify(arr));
+    await aiCacheSet(db, key, 'variants', JSON.stringify(arr));
     logEvent('ai', { data: { mode: 'variants', via: r.via } });
     bumpAggregate(nowIso().slice(0, 10), 'ai', 'variants');
     return sendJson(res, 200, { ok: true, questions: arr });
@@ -1019,11 +1019,11 @@ export async function handleRequest(req, res) {
       const session = null; // public API is stateless (IP rate limits); admin uses bearer tokens
       if (url.pathname === '/api/health') return sendJson(res, 200, { ok: true });
       if (url.pathname === '/api/stats') {
-        const total = db.prepare(`SELECT COUNT(*) AS n FROM resources WHERE visibility = 1 AND file_type != 'folder' AND category != 'folder'`).get().n;
+        const total = (await db.prepare(`SELECT COUNT(*) AS n FROM resources WHERE visibility = 1 AND file_type != 'folder' AND category != 'folder'`).get()).n;
         return sendJson(res, 200, { ok: true, publicResources: total });
       }
       if (url.pathname === '/api/me') {
-        const admin = getAdmin(req);
+        const admin = await getAdmin(req);
         return sendJson(res, 200, { ok: true, role: admin ? 'admin' : null });
       }
       if (url.pathname === '/api/search' && req.method === 'GET') return apiSearch(req, res, url.searchParams);
@@ -1037,11 +1037,11 @@ export async function handleRequest(req, res) {
       }
       if (url.pathname === '/api/trending' && req.method === 'GET') return apiTrending(req, res);
       if (url.pathname === '/api/announcement' && req.method === 'GET') {
-        const row = db.prepare('SELECT body FROM announcements WHERE active = 1 ORDER BY id DESC LIMIT 1').get();
+        const row = await db.prepare('SELECT body FROM announcements WHERE active = 1 ORDER BY id DESC LIMIT 1').get();
         return sendJson(res, 200, { ok: true, body: row?.body || null });
       }
       if (url.pathname === '/api/new' && req.method === 'GET') {
-        const rows = db.prepare(`SELECT * FROM resources WHERE visibility = 1 AND file_type != 'folder' AND category != 'folder' ORDER BY id DESC LIMIT 6`).all();
+        const rows = await db.prepare(`SELECT * FROM resources WHERE visibility = 1 AND file_type != 'folder' AND category != 'folder' ORDER BY id DESC LIMIT 6`).all();
         const index = forRole(indexes);
         const docById = new Map(index.docs.map(d => [d.rec.id, d]));
         return sendJson(res, 200, {
@@ -1062,12 +1062,12 @@ export async function handleRequest(req, res) {
         const rid = String(body.resourceId || '');
         let resourceId = null;
         if (/^[0-9a-f]{32}$/.test(rid)) {
-          const row = db.prepare('SELECT id FROM resources WHERE public_id = ?').get(rid);
+          const row = await db.prepare('SELECT id FROM resources WHERE public_id = ?').get(rid);
           if (!row) return sendJson(res, 400, { ok: false, error: 'Unknown resource.' });
           resourceId = row.id;
         }
-        db.prepare('INSERT INTO reports(resource_id, reason, detail, ip_hash, status, created_at) VALUES (?, ?, ?, ?, ?, ?)')
-          .run(resourceId, reason, detail, ipHash(ip, saltForIp()), 'open', nowIso());
+        await db.prepare('INSERT INTO reports(resource_id, reason, detail, ip_hash, status, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+          .run(resourceId, reason, detail, ipHash(ip, await saltForIp()), 'open', nowIso());
         logEvent('report', { resourceId, data: { reason } });
         return sendJson(res, 201, { ok: true });
       }
@@ -1077,8 +1077,8 @@ export async function handleRequest(req, res) {
         try { body = JSON.parse(await readBody(req, 10 * 1024)); } catch { return sendJson(res, 400, { ok: false, error: 'Invalid request.' }); }
         const title = String(body.title || '').trim().slice(0, 200);
         if (title.length < 4) return sendJson(res, 400, { ok: false, error: 'Describe what you need (4+ characters).' });
-        db.prepare('INSERT INTO requests(title, detail, ip_hash, status, created_at) VALUES (?, ?, ?, ?, ?)')
-          .run(title, String(body.detail || '').slice(0, 1000), ipHash(ip, saltForIp()), 'open', nowIso());
+        await db.prepare('INSERT INTO requests(title, detail, ip_hash, status, created_at) VALUES (?, ?, ?, ?, ?)')
+          .run(title, String(body.detail || '').slice(0, 1000), ipHash(ip, await saltForIp()), 'open', nowIso());
         logEvent('request', { data: {} });
         return sendJson(res, 201, { ok: true });
       }
@@ -1086,7 +1086,7 @@ export async function handleRequest(req, res) {
         const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
         return sendJson(res, 200, {
           ok: true,
-          decks: [...bankDecks(), ...autoDecks(forRole(indexes), rowMap), ...adminDecks(db)]
+          decks: [...bankDecks(), ...autoDecks(forRole(indexes), rowMap), ...await adminDecks(db)]
             .map(d => ({ id: d.id, source: d.source, title: d.title, description: d.description, count: d.count })),
         });
       }
@@ -1111,7 +1111,7 @@ export async function handleRequest(req, res) {
           return sendJson(res, 200, { ok: true, deck });
         }
         const rowMap = new Map(loadRows(db).map(r => [r.public_id, r]));
-        const deck = deckCards(db, forRole(indexes), rowMap, dm[1]);
+        const deck = await deckCards(db, forRole(indexes), rowMap, dm[1]);
         if (!deck) return sendJson(res, 404, { ok: false, error: 'Not found.' });
         if (deck.cards.length > 200) deck.cards = deck.cards.slice(0, 200);
         return sendJson(res, 200, { ok: true, deck });
@@ -1127,7 +1127,7 @@ export async function handleRequest(req, res) {
       if (pm && req.method === 'POST') return apiPreview(req, res, ip, pm[1]);
       // ---- admin API (bearer-gated, uniform 404 otherwise) ----
       if (url.pathname.startsWith('/api/admin/')) {
-        const admin = getAdmin(req);
+        const admin = await getAdmin(req);
         if (!admin) return adminMissing(res, sendJson);
         if (url.pathname === '/api/admin/stats' && req.method === 'GET') {
           const s = apiAdminStats(db);
@@ -1454,7 +1454,7 @@ export async function handleRequest(req, res) {
     if (req.method !== 'GET') { secureHeaders(res); res.writeHead(405); res.end('method not allowed'); return; }
     // Pages are public; the header shows an Admin link only with a valid bearer session.
     // Page shells carry no sensitive data — all admin data loads via bearer-authed API.
-    const admin = getAdmin(req);
+    const admin = await getAdmin(req);
     const ctx = { db, indexes, session: admin ? { role: 'admin' } : null };
     const html = (code, body) => sendHtml(res, code, body);
     if (url.pathname === '/') return html(200, landing(ctx));
@@ -1469,7 +1469,7 @@ export async function handleRequest(req, res) {
     if (url.pathname === '/about') return html(200, aboutPage(ctx));
     if (url.pathname === '/saved') return html(200, savedPage(ctx));
     if (url.pathname === '/feed.xml' && req.method === 'GET') {
-      const rows = db.prepare(`SELECT * FROM resources WHERE visibility = 1 AND file_type != 'folder' AND category != 'folder' ORDER BY id DESC LIMIT 30`).all();
+      const rows = await db.prepare(`SELECT * FROM resources WHERE visibility = 1 AND file_type != 'folder' AND category != 'folder' ORDER BY id DESC LIMIT 30`).all();
       const items = rows.map(r => {
         const t = String(r.title).replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
         return `<item><title>${t}</title><link>https://sehs.directory/r/${r.public_id}</link><guid>https://sehs.directory/r/${r.public_id}</guid><pubDate>${new Date(r.created_at).toUTCString()}</pubDate></item>`;

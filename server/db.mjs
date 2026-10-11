@@ -227,10 +227,10 @@ export async function openDatabase() {
   return db;
 }
 
-export function getMeta(db, key, fallback = null) {
-  const row = db.prepare('SELECT value FROM meta WHERE key = ?').get(key);
+export async function getMeta(db, key, fallback = null) {
+  const row = await db.prepare('SELECT value FROM meta WHERE key = ?').get(key);
   return row ? row.value : fallback;
 }
-export function setMeta(db, key, value) {
-  db.prepare('INSERT INTO meta(key, value) VALUES(?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value').run(key, value);
+export async function setMeta(db, key, value) {
+  await db.prepare('INSERT INTO meta(key, value) VALUES(?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value').run(key, value);
 }
