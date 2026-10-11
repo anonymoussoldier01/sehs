@@ -1,12 +1,23 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build:client",
-  "outputDirectory": "client/dist",
+  "services": {
+    "app": {
+      "root": ".",
+      "runtime": "node"
+    },
+    "client": {
+      "root": "client",
+      "framework": "vite"
+    }
+  },
   "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/index.js" },
-    { "source": "/open/:path*", "destination": "/api/index.js" },
-    { "source": "/embed/:path*", "destination": "/api/index.js" },
-    { "source": "/feed.xml", "destination": "/api/index.js" },
-    { "source": "/admin/:path*", "destination": "/api/index.js" }
+    { "source": "/api/:path*", "destination": { "service": "app" } },
+    { "source": "/api", "destination": { "service": "app" } },
+    { "source": "/open/:path*", "destination": { "service": "app" } },
+    { "source": "/embed/:path*", "destination": { "service": "app" } },
+    { "source": "/feed.xml", "destination": { "service": "app" } },
+    { "source": "/admin/:path*", "destination": { "service": "app" } },
+    { "source": "/admin", "destination": { "service": "app" } },
+    { "source": "/(.*)", "destination": { "service": "client" } }
   ]
 }
