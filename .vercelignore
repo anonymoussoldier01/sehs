@@ -1,0 +1,17 @@
+# Keep CLI uploads (and any future git builds) free of stale/local-only files.
+# A stale client/dist mixed with fresh build output breaks output collection.
+.git
+node_modules
+client/node_modules
+client/dist
+dist
+.env*
+!.env.example
+data/links.json
+data/app.db*
+data/categories.json
+source-data
+state
+logs
+nit-review
+*.log
