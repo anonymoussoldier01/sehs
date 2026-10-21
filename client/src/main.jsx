@@ -2,6 +2,7 @@ import { StrictMode, Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider, createBrowserRouter, useRouteError, Link } from 'react-router-dom';
 import Lenis from 'lenis';
+import { inject } from '@vercel/analytics';
 import './index.css';
 import Layout, { Providers } from './Layout';
 import Home from './pages/Home';
@@ -53,6 +54,9 @@ try {
 } catch {
   /* storage unavailable: app runs ephemeral */
 }
+
+// Initialize Vercel Web Analytics
+inject();
 
 // Route error boundary: a designed recovery card instead of a blank crash.
 function RouteError() {
